@@ -1,26 +1,14 @@
-<!-- # Super Comics -->
-<!-- # SuperComics -->
-<!-- # Project Super -->
-<!-- # Super-Evolution -->
-<!-- 
-Mango
-Probably taken
-Well there's a publishing company and an Android app manga reader
-http://mango.leetsoft.net
+# Ideas for a Comic Reader
 
-Mangomics
-That's a weird name
-Definitely not taken
-Well...
-Well there's some*one* who's taken the name, but no comic reader called that for sure
-(Well unless you count that person; they probably read comics 'ha,ha')
--->
-# Comic Reader
+This isn't an app, just a collection of features that I'd want in a comic reader app.
 
-An idea for a desktop comic reader app.
-For both web comics AND archive files.
+### Web Comics AND Archive Files
 
-Basically there's just two killer features that it needs:
+Dynamically download web comics so you can read them offline.
+
+Can also support comic book archive formats like `.cbr` and `.cbz`; that's much simpler to do.
+
+It would preload pages of course.
 
 
 ### Super-Resolution
@@ -32,7 +20,7 @@ And maybe web comics never look good on your fancy high DPI display.
 With waifu2x (or similar technologies), pages can be enlarged intelligently. Intuitively.
 (Using intuitive assumptions about the content. *An algorithm learns the ropes of the tropes of the ebbs and the flows of the lines.* It's pretty dope. It's pretty fine.)
 
-We can use the [waifu2x-caffe](https://github.com/lltcggie/waifu2x-caffe) CLI.
+Could use the [waifu2x-caffe](https://github.com/lltcggie/waifu2x-caffe) CLI.
 
 Zoom and enhance, baby.
 
@@ -50,73 +38,42 @@ And obvious things like arrow keys are rarely implemented.
 * Or ditto but with a gamepad
 * Or ditto but with your phone
 
-<!--
-There's also the possibility of special navigation controls that it would basically not make sense of one webcomic to implement,
-like using a mouse, especially a wireless one under a really comfy blanket, as a sort of slideshow presentation remote, using the mouse buttons to go forwards and back
-Also could support actual presentation remotes if that's really something a lot of people have access to (at home or where they're reading comics)
-Or allow using your phone as a remote!
--->
-
-<!-- ### Web Comics AND Archive Files -->
-<!-- 
-* Web comics!
-* Also formats like `.cbr` and `.cbz`
-* Preload pages
--->
-
 
 ### Other Feature Notes
 
-Preloading and offline support.
-That's maybe a third killer feature, just that it could transform webcomics into offline comics.maybe that could be implemented separately so it could be used with other clients (with standard comic book archive formats)
-
-<!--
-Also can support reading existing/traditional/offline comic book formats (.cbr file, .cbz, .pdf, etc..) 
-Like I said above somewhere I think, it could be generating a cbr or cbz as a temporary it optionally separate step which you could use with another reader program
-It could also transform existing files into higher resolution archives for the superresolution step
-Maybe it should be some kind of streaming
-Some kind of modular system of transforms, a bit? Just for the one or two things?
-Just as a sane way of handling inputs and outputs so it can be extended in the future, that is, *find* some sane way
--->
-
-* Could implement things modularly / as a pipeline so you could instead use it to just
-super-resolution enhance comic book archives, or
-super-resolution enhance web comics into comic book archives,
+* Could implement things modularly / as a pipeline so you could optionally just
+super-rez-enhance existing comic book archives, or
+convert web comics into offline super-rez'd comic book archives,
 for use in a different reader app
 
-* Would this be an RSS reader as well?
+* Would it be an RSS reader as well?
 I was thinking it would just crawl the web pages,
 maybe use clues like meta tags but mostly look for clearly labeled Next buttons etc.
 
 * Would it be a browser? Could you favorite things?
-I don't want scope creep, but it would be useful to be able to share a comic by the URL,
+I don't like scope creep, but it would be useful to be able to share a comic by the URL,
 or to open the folder a comic book archive is in.
 So maybe it could have an address bar? 😟
 (Or just a menu option like Share / Open Containing Folder depending on what type it is?)
 You'd also want to be able to jump to a page by the URL.
 
-<!--
-Also could support interactive XKCDs and maybe even superrez them
-Like, transform the images on request, ha! Like intercept HTTP to
-Hm but HTTPS, does that matter? I don't think so if it's done with like a 'browser extension' type/level of API (nw has chrome APIs, dunno what electron might have in that department ...or WebKitWebView)
--->
-
-* Definitely save your place automatically.
+* It should definitely save your place automatically.
 And you wouldn't want to lose it by simply navigating to some other place
-(for instance to show someone a page that was particularly funny or interestingly designed)
-so it could afford to be a bit smart about it in some way.
+(maybe to show someone a page that was particularly funny or interestingly designed)
+so it could afford to be a bit smart about it (in some way).
 (It could store just one bookmark and the current page you're viewing if it's earlier than that,
 but what if someone tells you about a funny later page? or what if you accidentally hit the go-to-end/latest button?
 It should probably also work then, right? I don't know how this should work.)
 
 * Splitting pages up by frames could be useful for reading on mobile devices like phones and ereaders,
-but it couldn't handle all formats, and if it did them in the wrong order that would be confusing
+but it couldn't handle all page layouts (like, creative ones! y'know?),
+and if it did them in the wrong order that would be confusing
 and you might not be able to tell what happened.
-(Although there are some interesting algorithms for this sort of thing, detecting rectangles/quadrilaterals and scuh.
+(Although there are some interesting algorithms for detecting rectangles/quadrilaterals and such.
 And you could probably check if a threshold of area of the image is covered by detected rectangles
-and display the whole image (by default, I suppose, I suppose you should be able to override it) when not enough is covered)
+and display the whole image (by default; it would be good to be able to override it) when not enough is covered.)
 
-## Previous Work ("Prior Art")
+## Previous Work ("prior art")
 
 For elementary OS:
 * [This mockup by Daniel Foré for an XKCD-specific app](https://danrabbit.deviantart.com/art/XKCD-App-332444858) (2012)
@@ -130,12 +87,25 @@ For Linux in general, or other platforms, there are lots of options.
 
 I haven't tried any of these things out yet.
 
-## This is just an idea
+## Future Work (where should it happen?)
 
-This is currently just an idea (or a set of ideas), and the solution doesn't necessarily need to be an app.
-You should never presume that an app is the solution.
-These features could be added to an existing app,
-and the super-resolution feature could be a separate tool or added to the existing GUI for waifu2x-caffe
-(comic book archive support that is; it obviously supports super-resolution given that that's what it is).
-I know the start of this readme says that it's an app and basically presumes that it should be an app,
-but... I'll update that later.
+Comic book archive support could be added to the existing GUI for waifu2x-caffe.
+All the options for configuring the algorithm are already there,
+it would just be a matter of adding source and destination options.
+
+Extracting web comics into offline archive files could be a separate tool,
+and then RSS features for keeping those files up to date (and you up to date on the comics) could make more sense.
+
+The navigation features would obviously have to be in a comic reader app,
+but it doesn't have to be a *new* one. No need to reinvent the wheel here.
+
+⁂
+
+That said, having all this integrated into a comic reader could be really nice.
+You don't want to have to think about all these different tools.
+And the different tools might *all* have to support *streaming comic book archive files* for them to work nicely together,
+that is, without agregious wait times.
+And that's not an established thing... of value... like, probably no app has ever supported that.
+So not being able to do it in a streaming fasion (super-rez-ing while preloading pages) for arbitrary reader apps
+might make the splitting up / modularity less useful.
+
