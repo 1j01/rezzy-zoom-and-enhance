@@ -87,6 +87,11 @@ For Linux in general, or other platforms, there are lots of options.
 
 I haven't tried any of these things out yet.
 
+[This article](https://www.howtogeek.com/66060/how-to-read-webcomics-offline-in-comic-book-reader-format/)
+describes how to convert webcomics to archives,
+but only for webcomics that *happen* to name all the images consistently,
+with a number being the only differing part between the file names.
+
 ## Future Work (where should it happen?)
 
 Comic book archive support could be added to the existing GUI for waifu2x-caffe.
