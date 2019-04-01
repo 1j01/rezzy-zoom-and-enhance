@@ -36,7 +36,28 @@ And obvious things like arrow keys are rarely implemented.
 * Probably some big ol' buttons
 * Sit back with a wireless mouse under a comfy blanket and use the buttons to go forwards and back (and scroll up and down)
 * Or ditto but with a gamepad
-* Or ditto but with your phone
+* Or ditto but with your phone (altho that generally implies the phone's screen would have to be on)
+
+
+### Integration with the Internet Archive
+
+You don't want these websites to go away, but they might!
+And in fact, with the way the internet currently exists, they will!
+Because the owners can't pay domain rent forever!
+
+Here's a similar project:
+	https://medium.com/needle-thread/the-podcast-archival-project-7a25114a0944
+
+	"I’d like to see Podcasting 2.0 move to a more reliable transfer protocol such as BitTorrent. Using P2P would also lower the entry cost for podcasters in terms of bandwidth. Experimenting with BitTorrent Live on my Apple TV it is also quite suitable for streaming which is likely the most common method of consuming podcasts."
+yeah, hell yeah, why rely on the internet archive even if they're good? p2p would be great.
+and i've been wondering about adhock p2p additions on top of the regular web, and i think this would be a great option or opportunity
+both with podcasts and comics, where there's a very concrete specific limited form to the content (aside from show notes, and interactive content (like certain xkcds) or other website features)
+very unit-ized; the content is always in fairly clear units
+in other words, there wouldn't be the problem of just uploading random ass bullshit to the cloud or whatever like you might get/do if you were to apply something like that to the web in general
+so it's good in that way, and i've got the superresolution'd images that i'd want to cache in a global peer to peer way
+(altho that has other problems, with verification, altho you could do a simple distance check to make sure the image resembles the original)
+
+
 
 
 ### Other Feature Notes
@@ -73,7 +94,7 @@ and you might not be able to tell what happened.
 And you could probably check if a threshold of area of the image is covered by detected rectangles
 and display the whole image (by default; it would be good to be able to override it) when not enough is covered.)
 
-## Previous Work ("prior art")
+## Previous Work / Prior Art
 
 For elementary OS:
 * [This mockup by Daniel Foré for an XKCD-specific app](https://danrabbit.deviantart.com/art/XKCD-App-332444858) (2012)
