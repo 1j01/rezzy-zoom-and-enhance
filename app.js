@@ -5,12 +5,8 @@ onload = function() {
 	var webview = document.querySelector('webview');
 	doLayout();
 
-	webview.addEventListener('dom-ready', () => {
-		console.log("To debug the webview, use:\n  openDevToolsForWebview()");
-		window.openDevToolsForWebview = ()=> {
-			webview.openDevTools();
-		};
-	});
+	window._webview = webview;
+	console.log("To debug the webview, use:\n  _webview.openDevTools();");
 
 	document.querySelector('#back').onclick = function() {
 		webview.goBack();
