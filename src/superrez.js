@@ -86,17 +86,17 @@
 				}
 				callback(null, img);
 			};
-			img.onerror = e => {
+			img.onerror = ()=> {
 				callback(new Error("Image failed to load"));
 			};
 			img.src = window.URL.createObjectURL(blob);
 		});
-	};
+	}
 
 	function write_image_to_file(image, file_path, callback) {
 		const canvas = image_to_canvas(image);
 		write_canvas_to_file(canvas, file_path, callback);
-	};
+	}
 
 	function image_to_canvas(image) {
 		const canvas = document.createElement("canvas");
@@ -105,7 +105,7 @@
 		const ctx = canvas.getContext("2d");
 		ctx.drawImage(image, 0, 0);
 		return canvas;
-	};
+	}
 
 	function write_canvas_to_file(canvas, file_path, callback) {
 		const mime_type = "image/png";
@@ -125,7 +125,7 @@
 				});
 			});
 		}, mime_type);
-	};
+	}
 
 	function read_file(file_path, callback) {
 		fs.readFile(file_path, (err, buffer) => {
@@ -142,12 +142,12 @@
 
 			callback(null, file);
 		});
-	};
+	}
 
 	function blob_to_buffer(blob, callback) {
 		const file_reader = new FileReader();
 
-		file_reader.addEventListener("loadend", event => {
+		file_reader.addEventListener("loadend", ()=> {
 			if (file_reader.error) {
 				callback(file_reader.error);
 			} else {
@@ -159,10 +159,6 @@
 		file_reader.readAsArrayBuffer(blob);
 
 		return file_reader;
-	}
-
-	function show_error_message(message, error) {
-		alert(`${message}\n\n${error}`);
 	}
 
 	module.exports = superrez_image;
