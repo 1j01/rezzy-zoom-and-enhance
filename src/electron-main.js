@@ -26,7 +26,6 @@ const createWindow = () => {
 		title: "Comic Reader",
 		webPreferences: {
 			webviewTag: true,
-			preload: require("path").join(__dirname, "/electron-injected.js"),
 		},
 	});
 

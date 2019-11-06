@@ -5,6 +5,10 @@ onload = function() {
 	var webview = document.querySelector('webview');
 	doLayout();
 
+	webview.addEventListener('dom-ready', () => {
+		webview.openDevTools();
+	});
+
 	document.querySelector('#back').onclick = function() {
 		webview.goBack();
 	};
