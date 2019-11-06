@@ -34,7 +34,7 @@ And obvious things like arrow keys are rarely implemented.
 
 * Left and right arrow keys (obviously)
 * Probably some big ol' buttons
-* Sit back with a wireless mouse under a comfy blanket and use the buttons to go forwards and back (and scroll up and down)
+* Sit back with a wireless mouse under a comfy blanket and use the right/left buttons to go forwards and back (and scroll up and down with mousewheel)
 * Or ditto but with a gamepad
 * Or ditto but with your phone
 
@@ -57,10 +57,8 @@ So maybe it could have an address bar? 😟
 (Or just a menu option like Share / Open Containing Folder depending on what type it is?)
 You'd also want to be able to jump to a page by the URL.
 
-* It should definitely save your place automatically.
-And you wouldn't want to lose it by simply navigating to some other place
-(maybe to show someone a page that was particularly funny or interestingly designed)
-so it could afford to be a bit smart about it (in some way).
+* It should save your place automatically.
+(And you shouldn't lose it by simply navigating someplace else, so 1. you should be able to go back, which implies a browser like experience, and 2. it should be clear to the user how the address is being saved automatically)
 (It could store just one bookmark and the current page you're viewing if it's earlier than that,
 but what if someone tells you about a funny later page? or what if you accidentally hit the go-to-end/latest button?
 It should probably also work then, right? I don't know how this should work.)
@@ -92,9 +90,17 @@ describes how to convert webcomics to archives,
 but only for webcomics that *happen* to name all the images consistently,
 with a number being the only differing part between the file names.
 
-## Future Work (where should it happen?)
+## Project Scope
 
-Comic book archive support could be added to the existing GUI for waifu2x-caffe.
+I don't know!
+
+Browser extension?  
+Plugin(s) to comic reading app(s)?  
+App?  
+Browser?  
+
+
+Comic book archive support *could* be added to the existing GUI for waifu2x-caffe.
 All the options for configuring the algorithm are already there,
 it would just be a matter of adding source and destination options.
 
@@ -113,4 +119,19 @@ that is, without agregious wait times.
 And that's not an established thing... of value... like, probably no app has ever supported that.
 So not being able to do it in a streaming fasion (super-rez-ing while preloading pages) for arbitrary reader apps
 might make the splitting up / modularity less useful.
+
+## Development Setup
+
+- [Clone the repo.](https://help.github.com/articles/cloning-a-repository/)
+- Install [Node.js][] if you don't have it, then open up a command prompt / terminal in the project directory.
+- Install project dependencies with `npm i`
+- Start the electron app with `npm start`
+
+[electron-debug][] and [devtron][] are included, so you can use <kbd>Ctrl+R</kbd> to reload and <kbd>F12</kbd>/<kbd>Ctrl+Shift+I</kbd> to open the devtools, and there's a Devtron tab with tools specific to Electron like an IPC message inspector.
+
+You can build for production with `npm run make`
+
+[Node.js]: https://nodejs.org/
+[electron-debug]: https://github.com/sindresorhus/electron-debug
+[devtron]: https://electronjs.org/devtron
 
