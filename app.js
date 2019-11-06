@@ -47,102 +47,98 @@ onload = function() {
 	webview.addEventListener('did-get-redirect-request', handleLoadRedirect);
 	webview.addEventListener('did-finish-load', handleLoadCommit);
 
-	// Test for the presence of the experimental <webview> zoom and find APIs.
-	if (typeof(webview.setZoom) == "function" &&
-			typeof(webview.find) == "function") {
-		var findMatchCase = false;
-
-		document.querySelector('#zoom').onclick = function() {
-			if(document.querySelector('#zoom-box').style.display == '-webkit-flex') {
-				closeZoomBox();
-			} else {
-				openZoomBox();
-			}
-		};
-
-		document.querySelector('#zoom-form').onsubmit = function(e) {
-			e.preventDefault();
-			var zoomText = document.forms['zoom-form']['zoom-text'];
-			var zoomFactor = Number(zoomText.value);
-			if (zoomFactor > 5) {
-				zoomText.value = "5";
-				zoomFactor = 5;
-			} else if (zoomFactor < 0.25) {
-				zoomText.value = "0.25";
-				zoomFactor = 0.25;
-			}
-			webview.setZoom(zoomFactor);
+	var findMatchCase = false;
+	function findInPage(text, options) {
+		if (text.length) {
+			webview.findInPage(text, options);
+		} else {
+			webview.stopFindInPage('clearSelection');
 		}
-
-		document.querySelector('#zoom-in').onclick = function(e) {
-			e.preventDefault();
-			increaseZoom();
-		}
-
-		document.querySelector('#zoom-out').onclick = function(e) {
-			e.preventDefault();
-			decreaseZoom();
-		}
-
-		document.querySelector('#find').onclick = function() {
-			if(document.querySelector('#find-box').style.display == 'block') {
-				document.querySelector('webview').stopFinding();
-				closeFindBox();
-			} else {
-				openFindBox();
-			}
-		};
-
-		document.querySelector('#find-text').oninput = function(e) {
-			webview.find(document.forms['find-form']['find-text'].value,
-				{matchCase: findMatchCase});
-		}
-
-		document.querySelector('#find-text').onkeydown = function(e) {
-			if (event.ctrlKey && event.keyCode == 13) {
-				e.preventDefault();
-				webview.stopFinding('activate');
-				closeFindBox();
-			}
-		}
-
-		document.querySelector('#match-case').onclick = function(e) {
-			e.preventDefault();
-			findMatchCase = !findMatchCase;
-			var matchCase = document.querySelector('#match-case');
-			if (findMatchCase) {
-				matchCase.style.color = "blue";
-				matchCase.style['font-weight'] = "bold";
-			} else {
-				matchCase.style.color = "black";
-				matchCase.style['font-weight'] = "";
-			}
-			webview.find(document.forms['find-form']['find-text'].value,
-				{matchCase: findMatchCase});
-		}
-
-		document.querySelector('#find-backward').onclick = function(e) {
-			e.preventDefault();
-			webview.find(document.forms['find-form']['find-text'].value,
-				{backward: true, matchCase: findMatchCase});
-		}
-
-		document.querySelector('#find-form').onsubmit = function(e) {
-			e.preventDefault();
-			webview.find(document.forms['find-form']['find-text'].value,
-				{matchCase: findMatchCase});
-		}
-
-		webview.addEventListener('findupdate', handleFindUpdate);
-		window.addEventListener('keydown', handleKeyDown);
-	} else {
-		var zoom = document.querySelector('#zoom');
-		var find = document.querySelector('#find');
-		zoom.style.visibility = "hidden";
-		zoom.style.position = "absolute";
-		find.style.visibility = "hidden";
-		find.style.position = "absolute";
 	}
+
+	document.querySelector('#zoom').onclick = function() {
+		if(document.querySelector('#zoom-box').style.display == '-webkit-flex') {
+			closeZoomBox();
+		} else {
+			openZoomBox();
+		}
+	};
+
+	document.querySelector('#zoom-form').onsubmit = function(e) {
+		e.preventDefault();
+		var zoomText = document.forms['zoom-form']['zoom-text'];
+		var zoomFactor = Number(zoomText.value);
+		if (zoomFactor > 5) {
+			zoomText.value = "5";
+			zoomFactor = 5;
+		} else if (zoomFactor < 0.25) {
+			zoomText.value = "0.25";
+			zoomFactor = 0.25;
+		}
+		webview.setZoomFactor(zoomFactor);
+	}
+
+	document.querySelector('#zoom-in').onclick = function(e) {
+		e.preventDefault();
+		increaseZoom();
+	}
+
+	document.querySelector('#zoom-out').onclick = function(e) {
+		e.preventDefault();
+		decreaseZoom();
+	}
+
+	document.querySelector('#find').onclick = function() {
+		if(document.querySelector('#find-box').style.display == 'block') {
+			document.querySelector('webview').stopFindInPage('keepSelection');
+			closeFindBox();
+		} else {
+			openFindBox();
+		}
+	};
+
+	document.querySelector('#find-text').oninput = function(e) {
+		findInPage(document.forms['find-form']['find-text'].value,
+			{matchCase: findMatchCase});
+	}
+
+	document.querySelector('#find-text').onkeydown = function(e) {
+		if (event.ctrlKey && event.keyCode == 13) {
+			e.preventDefault();
+			webview.stopFindInPage('activate');
+			closeFindBox();
+		}
+	}
+
+	document.querySelector('#match-case').onclick = function(e) {
+		e.preventDefault();
+		findMatchCase = !findMatchCase;
+		var matchCase = document.querySelector('#match-case');
+		if (findMatchCase) {
+			matchCase.style.color = "blue";
+			matchCase.style['font-weight'] = "bold";
+		} else {
+			matchCase.style.color = "black";
+			matchCase.style['font-weight'] = "";
+		}
+		findInPage(document.forms['find-form']['find-text'].value,
+			{matchCase: findMatchCase});
+	}
+
+	document.querySelector('#find-backward').onclick = function(e) {
+		e.preventDefault();
+		findInPage(document.forms['find-form']['find-text'].value,
+			{backward: true, matchCase: findMatchCase});
+	}
+
+	document.querySelector('#find-form').onsubmit = function(e) {
+		e.preventDefault();
+		findInPage(document.forms['find-form']['find-text'].value,
+			{matchCase: findMatchCase});
+	}
+
+	webview.addEventListener('findupdate', handleFindUpdate);
+	window.addEventListener('keydown', handleKeyDown);
 };
 
 function navigateTo(url) {
@@ -306,24 +302,24 @@ function getNextPresetZoom(zoomFactor) {
 
 function increaseZoom() {
 	var webview = document.querySelector('webview');
-	webview.getZoom(function(zoomFactor) {
+	webview.getZoomFactor(function(zoomFactor) {
 		var nextHigherZoom = getNextPresetZoom(zoomFactor).high;
-		webview.setZoom(nextHigherZoom);
+		webview.setZoomFactor(nextHigherZoom);
 		document.forms['zoom-form']['zoom-text'].value = nextHigherZoom.toString();
 	});
 }
 
 function decreaseZoom() {
 	var webview = document.querySelector('webview');
-	webview.getZoom(function(zoomFactor) {
+	webview.getZoomFactor(function(zoomFactor) {
 		var nextLowerZoom = getNextPresetZoom(zoomFactor).low;
-		webview.setZoom(nextLowerZoom);
+		webview.setZoomFactor(nextLowerZoom);
 		document.forms['zoom-form']['zoom-text'].value = nextLowerZoom.toString();
 	});
 }
 
 function openZoomBox() {
-	document.querySelector('webview').getZoom(function(zoomFactor) {
+	document.querySelector('webview').getZoomFactor(function(zoomFactor) {
 		var zoomText = document.forms['zoom-form']['zoom-text'];
 		zoomText.value = Number(zoomFactor.toFixed(6)).toString();
 		document.querySelector('#zoom-box').style.display = '-webkit-flex';
