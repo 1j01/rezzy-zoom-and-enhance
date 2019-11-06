@@ -4,6 +4,7 @@
 	const fs = require("fs");
 	const {execFile} = require("child_process");
 	const path = require("path");
+	const sanitizeFilename = require("sanitize-filename");
 	// const argv = require("electron").remote.process.argv;
 
 	const temp_dir = require('electron').remote.app.getPath("temp");
@@ -14,27 +15,38 @@
 	const converter_path = "C:\\Users\\Isaiah\\Downloads\\waifu2x-DeadSix27-win64_v531\\waifu2x-converter-cpp.exe"; // TODO
 
 	function superrez_image(input_image, callback) {
-		// TODO: cache images
-		const id = require("crypto").randomBytes(10).toString('hex');
+		// const id = require("crypto").randomBytes(10).toString('hex');
+		// TODO: do we need to truncate this further if adding text to the filename?
+		// TODO: hash src so that differences in only sanitized-away characters still are counted
+		const id = sanitizeFilename(input_image.src);
 		const input_image_path = require("path").join(temp_dir, `${id}-normal-rez.png`);
 		const output_image_path = require("path").join(cache_dir, `${id}-superrez.png`);
 		console.log({id, input_image_path, output_image_path});
 
-		write_image_to_file(input_image, input_image_path, (err)=> {
+		// try cache first
+		read_image_from_file(output_image_path, (err, output_image)=> {
 			if(err){
-				return callback(err);
-			}
-			superrez_file(input_image_path, output_image_path, (err)=> {
-				if(err){
-					return callback(err);
-				}
-				read_image_from_file(output_image_path, (err, output_image)=> {
+				console.log("cache miss; do the conversion");
+				write_image_to_file(input_image, input_image_path, (err)=> {
 					if(err){
 						return callback(err);
 					}
-					callback(null, output_image);
+					superrez_file(input_image_path, output_image_path, (err)=> {
+						if(err){
+							return callback(err);
+						}
+						read_image_from_file(output_image_path, (err, output_image)=> {
+							if(err){
+								return callback(err);
+							}
+							callback(null, output_image);
+						});
+					})
 				});
-			})
+				return;
+			}
+			console.log("cache hit");
+			callback(null, output_image);
 		});
 	}
 
@@ -131,20 +143,20 @@
 	};
 
 	function blob_to_buffer(blob, callback) {
-		const file_reader = new FileReader()
+		const file_reader = new FileReader();
 
 		file_reader.addEventListener("loadend", event => {
 			if (file_reader.error) {
-				callback(file_reader.error)
+				callback(file_reader.error);
 			} else {
-				callback(null, new Buffer(file_reader.result))
+				callback(null, Buffer.from(file_reader.result));
 			}
-		}, false)
+		}, false);
 
 		// Read the blob as a typed array.
-		file_reader.readAsArrayBuffer(blob)
+		file_reader.readAsArrayBuffer(blob);
 
-		return file_reader
+		return file_reader;
 	}
 
 	function show_error_message(message, error) {
