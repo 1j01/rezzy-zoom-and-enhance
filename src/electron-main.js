@@ -17,7 +17,7 @@ const createWindow = () => {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
 		useContentSize: true,
-		// autoHideMenuBar: true,
+		autoHideMenuBar: true,
 		// width: 800,
 		// height: 600,
 		// minWidth: 260,
