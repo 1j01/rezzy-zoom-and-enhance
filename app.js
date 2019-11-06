@@ -57,7 +57,6 @@ onload = function() {
 	}
 
 	document.querySelector('#zoom').onclick = function() {
-		console.log(document.querySelector('#zoom-box').style.display);
 		if(document.querySelector('#zoom-box').style.display == '-webkit-flex') {
 			closeZoomBox();
 		} else {
@@ -282,31 +281,32 @@ function handleLoadRedirect(event) {
 	document.querySelector('#location').value = event.newUrl;
 }
 
-function getNextPresetZoom(zoomFactor) {
-	console.log(zoomFactor);
-	var preset = [0.25, 0.33, 0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2,
-								2.5, 3, 4, 5];
-	var low = 0;
-	var high = preset.length - 1;
-	var mid;
-	while (high - low > 1) {
-		mid = Math.floor((high + low)/2);
-		if (preset[mid] < zoomFactor) {
-			low = mid;
-		} else if (preset[mid] > zoomFactor) {
-			high = mid;
-		} else {
-			return {low: preset[mid - 1], high: preset[mid + 1]};
+function getNextPresetZoomFactor(currentZoomFactor, zoomingIn) {
+	// console.log("getNextPresetZoomFactor", currentZoomFactor, zoomingIn);
+	const presetZoomFactors = [
+		0.25, 0.33, 0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4, 5
+	];
+	let nearestZoomFactor = Infinity;
+	let nearestDist = Infinity;
+	for (const presetZoomFactor of presetZoomFactors) {
+		const dist = Math.abs(presetZoomFactor - currentZoomFactor);
+		if (dist < nearestDist) {
+			nearestDist = dist;
+			nearestZoomFactor = presetZoomFactor;
 		}
 	}
-	console.log({low: preset[low], high: preset[high]});
-	return {low: preset[low], high: preset[high]};
+	const fromIndex = presetZoomFactors.indexOf(nearestZoomFactor);
+	const toIndex = Math.min(presetZoomFactors.length - 1, Math.max(0, fromIndex + (zoomingIn ? +1 : -1)));
+	// const oldZoomFactor = presetZoomFactors[fromIndex];
+	const newZoomFactor = presetZoomFactors[toIndex];
+	// console.log({fromIndex, toIndex, oldZoomFactor, newZoomFactor});
+	return newZoomFactor;
 }
 
 function increaseZoom() {
 	var webview = document.querySelector('webview');
 	const zoomFactor = webview.getZoomFactor();
-	var nextHigherZoom = getNextPresetZoom(zoomFactor).high;
+	var nextHigherZoom = getNextPresetZoomFactor(zoomFactor, true);
 	webview.setZoomFactor(nextHigherZoom);
 	document.forms['zoom-form']['zoom-text'].value = nextHigherZoom.toString();
 }
@@ -314,7 +314,7 @@ function increaseZoom() {
 function decreaseZoom() {
 	var webview = document.querySelector('webview');
 	const zoomFactor = webview.getZoomFactor();
-	var nextLowerZoom = getNextPresetZoom(zoomFactor).low;
+	var nextLowerZoom = getNextPresetZoomFactor(zoomFactor, false);
 	webview.setZoomFactor(nextLowerZoom);
 	document.forms['zoom-form']['zoom-text'].value = nextLowerZoom.toString();
 }
