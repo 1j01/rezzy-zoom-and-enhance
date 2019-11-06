@@ -45,7 +45,7 @@
 		superrez_image_in_place(main_img);
 	}
 	
-	document.addEventListener("load", enhance_page);
+	window.addEventListener("load", enhance_page);
 
 	// TODO: listen for url change and wait for images to load and then re-enhance
 	// in case of history.pushState or hash change?
