@@ -10,32 +10,6 @@ const fs = require("fs");
 const path = require("path");
 const argv = require("electron").remote.process.argv;
 
-// TODO: let user apply this setting somewhere in the UI
-// (and ideally revert it)
-// (Note: it would be better to use REG.EXE to apply the change, rather than a .reg file)
-// This registry modification changes the right click > Edit option for images in Windows Explorer
-const reg_contents = `Windows Registry Editor Version 5.00
-
-[HKEY_CLASSES_ROOT\\SystemFileAssociations\\image\\shell\\edit\\command]
-@="\\"${argv[0].replace(/\\/g, "\\\\")}\\" ${is_dev ? "\\\".\\\" " : ""}\\"%1\\""
-`; // oof \\\\
-const reg_file_path = path.join(is_dev ? "." : path.dirname(argv[0]), `set-jspaint${is_dev ? "-DEV-MODE" : ""}-as-default-image-editor.reg`);
-if(process.platform == "win32" && !is_dev){
-	fs.writeFile(reg_file_path, reg_contents, err => {
-		if(err){
-			return console.error(err);
-		}
-	});
-}
-
-if (process.platform == "win32" && argv.length >= 2) {
-	if (is_dev) { // in development, "path/to/electron.exe" "." "maybe/a/file.png"
-		window.document_file_path_to_open = argv[2];
-	} else { // in production, "path/to/JS Paint.exe" "maybe/a/file.png"
-		window.document_file_path_to_open = argv[1];
-	}
-}
-
 window.open_from_file_path = (file_path, callback, canceled) => {
 	fs.readFile(file_path, (err, buffer) => {
 		if(err){
@@ -89,52 +63,7 @@ window.save_to_file_path = (filePath, formatName, savedCallback) => {
 	}, mimeType);
 };
 
-// TODO: window.platform.saveCanvasAs etc. or platformIntegration or system or something
-window.systemSaveCanvasAs = (canvas, suggestedFileName, savedCallback) => {
-	const getExtension = filePathOrName => {
-		const splitByDots = filePathOrName.split(/\./g);
-		return splitByDots[splitByDots.length - 1].toLowerCase();
-	};
-	// TODO: default to existing extension, except it would be awkward to rearrange the list...
-	// const suggestedExtension = getExtension(suggestedFileName);
-	const filters = [
-		// top one is considered default by electron
-		{name: "PNG", extensions: ["png"]},
-		// TODO: enable more formats
-		// {name: "Monochrome Bitmap", extensions: ["bmp", "dib"]},
-		// {name: "16 Color Bitmap", extensions: ["bmp", "dib"]},
-		// {name: "256 Color Bitmap", extensions: ["bmp", "dib"]},
-		// {name: "24-bit Bitmap", extensions: ["bmp", "dib"]},
-		{name: "JPEG", extensions: ["jpg", "jpeg", "jpe", "jfif"]},
-		// {name: "GIF", extensions: ["gif"]},
-		// {name: "TIFF", extensions: ["tif", "tiff"]},
-		// {name: "PNG", extensions: ["png"]},
-		{name: "WebP", extensions: ["webp"]},
-	];
-	// TODO: pass BrowserWindow to make dialog modal?
-	// TODO: should suggestedFileName be sanitized in some way?
-	dialog.showSaveDialog({
-		defaultPath: suggestedFileName,
-		filters,
-	}, filePath => {
-		if(!filePath){
-			return; // user canceled
-		}
-		const extension = getExtension(filePath);
-		if(!extension){
-			// TODO: Linux/Unix?? you're not supposed to need file extensions
-			return show_error_message("Missing file extension - try adding .png to the file name");
-		}
-		const formatNameMatched = ((filters.find(({extensions}) => extensions.includes(extension))) || {}).name;
-		if(!formatNameMatched){
-			return show_error_message(`Can't save as *.${extension} - try adding .png to the file name`);
-		}
 
-		save_to_file_path(filePath, formatNameMatched, savedCallback);
-	});
-};
-
-window.systemSetAsWallpaperCentered = c => {
 	const dataPath = require('electron').remote.app.getPath("userData");
 
 	const imgPath = require("path").join(dataPath, "bg.png");
@@ -159,12 +88,10 @@ window.systemSetAsWallpaperCentered = c => {
 			if(err){
 				return show_error_message("Failed to set as desktop background: couldn't write temporary image file.", err);
 			}
-			// {scale: "center"} only supported on macOS; see above workaround
-			wallpaper.set(imgPath, {scale: "center"}, err => {
-				if(err){
-					show_error_message("Failed to set as desktop background!", err);
-				}
-			});
 		});
 	});
 };
+
+function show_error_message(message, error) {
+	alert(`${message}\n\n${error}`);
+}
