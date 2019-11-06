@@ -6,7 +6,10 @@ onload = function() {
 	doLayout();
 
 	webview.addEventListener('dom-ready', () => {
-		webview.openDevTools();
+		console.log("To debug the webview, use:\n  openDevToolsForWebview()");
+		window.openDevToolsForWebview = ()=> {
+			webview.openDevTools();
+		};
 	});
 
 	document.querySelector('#back').onclick = function() {

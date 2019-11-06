@@ -7,9 +7,6 @@
 
 	const superrez_image = require("./superrez");
 	
-	window.superrez_image = superrez_image;
-	window.superrez_image_in_place = superrez_image_in_place;
-	
 	function superrez_image_in_place(page_img) {
 		superrez_image(page_img, (err, superrezzed_img)=> {
 			if (err) {

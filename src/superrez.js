@@ -1,12 +1,10 @@
 (()=> {
 
-	// const is_dev = require("electron-is-dev");
 	const fs = require("fs");
 	const {execFile} = require("child_process");
 	const path = require("path");
 	const crypto = require("crypto");
 	const sanitizeFilename = require("sanitize-filename");
-	// const argv = require("electron").remote.process.argv;
 
 	const temp_dir = require('electron').remote.app.getPath("temp");
 	// const cacheDir = require('electron').remote.app.getPath("cache"); // TODO: is this a good dir to use?
@@ -23,12 +21,13 @@
 		const id = sanitizeFilename(`${src_digest}-${input_image.src}`);
 		const input_image_path = require("path").join(temp_dir, `${id}-normal-rez.png`);
 		const output_image_path = require("path").join(cache_dir, `${id}-superrez.png`);
-		console.log({id, input_image_path, output_image_path});
 
 		// try cache first
 		read_image_from_file(output_image_path, (err, output_image)=> {
 			if(err){
-				console.log("cache miss; do the conversion");
+				console.log("superrez cache miss; do the conversion");
+				console.log("temp file path:", input_image_path);
+
 				write_image_to_file(input_image, input_image_path, (err)=> {
 					if(err){
 						return callback(err);
@@ -37,6 +36,7 @@
 						if(err){
 							return callback(err);
 						}
+						console.log("output file path:", input_image_path);
 						read_image_from_file(output_image_path, (err, output_image)=> {
 							if(err){
 								return callback(err);
@@ -47,7 +47,7 @@
 				});
 				return;
 			}
-			console.log("cache hit");
+			console.log("superrez cache hit - reusing", output_image_path);
 			callback(null, output_image);
 		});
 	}
@@ -62,12 +62,12 @@
 				if(err){
 					return callback(err);
 				}
-				console.log("waifu2x converter stdout:\n\n", stdout);
+				console.log("waifu2x-converter-cpp stdout:\n\n", stdout);
 				if (stderr.length > 1) {
 					return callback(new Error(`Recieved error output: ${stderr}`));
 				}
 				if (stdout.match(/cv::imwrite.*failed/)) {
-					return callback(new Error(`waifu2x converter failed to write image. See console for output.`));
+					return callback(new Error(`waifu2x-converter-cpp failed to write image. See console for output.`));
 				}
 				callback();
 			}
