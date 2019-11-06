@@ -22,13 +22,7 @@ const createWindow = () => {
 		// height: 600,
 		// minWidth: 260,
 		// minHeight: 360,
-		// icon: require("path").join(__dirname, "../images/icons",
-		// 	process.platform === "win32" ?
-		// 		"windows.ico" :
-		// 		process.platform === "darwin" ?
-		// 			"mac.icns" :
-		// 			"48.png"
-		// ),
+		icon: require("path").join(__dirname, "../icon.png"),
 		title: "Comic Reader",
 		webPreferences: {
 			webviewTag: true,
