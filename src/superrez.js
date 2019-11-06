@@ -9,13 +9,16 @@
 	const temp_dir = require('electron').remote.app.getPath("temp");
 	// const cacheDir = require('electron').remote.app.getPath("cache"); // TODO: is this a good dir to use?
 	const cache_dir = require("path").join(require('electron').remote.app.getPath("appData"), "superrez-cache");
+	fs.mkdirSync(cache_dir, { recursive: true });
+
 	const converter_path = "C:\\Users\\Isaiah\\Downloads\\waifu2x-DeadSix27-win64_v531\\waifu2x-converter-cpp.exe"; // TODO
 
 	function superrez_image(input_image, callback) {
 		// TODO: cache images
-		const id = crypto.randomBytes(10).toString('hex');
+		const id = require("crypto").randomBytes(10).toString('hex');
 		const input_image_path = require("path").join(temp_dir, `${id}-normal-rez.png`);
 		const output_image_path = require("path").join(cache_dir, `${id}-superrez.png`);
+		console.log({id, input_image_path, output_image_path});
 
 		write_image_to_file(input_image, input_image_path, (err)=> {
 			if(err){
@@ -37,7 +40,24 @@
 
 	function superrez_file(input_image_path, output_image_path, callback) {
 		// TODO: do paths need quotes?
-		execFile(converter_path, ["--input", input_image_path, "--output", output_image_path]);
+		execFile(
+			converter_path,
+			["--input", input_image_path, "--output", output_image_path],
+			{cwd: require("path").dirname(converter_path)},
+			(err, stdout, stderr) => {
+				if(err){
+					return callback(err);
+				}
+				console.log("waifu2x converter stdout:\n\n", stdout);
+				if (stderr.length > 1) {
+					return callback(new Error(`Recieved error output: ${stderr}`));
+				}
+				if (stdout.match(/cv::imwrite.*failed/)) {
+					return callback(new Error(`waifu2x converter failed to write image. See console for output.`));
+				}
+				callback();
+			}
+		);
 	}
 
 	function read_image_from_file(file_path, callback) {
