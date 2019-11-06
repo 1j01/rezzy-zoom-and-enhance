@@ -4,6 +4,7 @@
 	const fs = require("fs");
 	const {execFile} = require("child_process");
 	const path = require("path");
+	const crypto = require("crypto");
 	const sanitizeFilename = require("sanitize-filename");
 	// const argv = require("electron").remote.process.argv;
 
@@ -15,10 +16,11 @@
 	const converter_path = "C:\\Users\\Isaiah\\Downloads\\waifu2x-DeadSix27-win64_v531\\waifu2x-converter-cpp.exe"; // TODO
 
 	function superrez_image(input_image, callback) {
-		// const id = require("crypto").randomBytes(10).toString('hex');
-		// TODO: do we need to truncate this further if adding text to the filename?
-		// TODO: hash src so that differences in only sanitized-away characters still are counted
-		const id = sanitizeFilename(input_image.src);
+		// Hash src so that differences in only sanitized-away characters still are counted.
+		const src_digest = crypto.createHash('md5').update(name).digest('hex');
+		// TODO: Do we need to truncate this further if adding text to the filename?
+		// Could simplify and just use the hash as ID.
+		const id = sanitizeFilename(`${src_digest}-${input_image.src}`);
 		const input_image_path = require("path").join(temp_dir, `${id}-normal-rez.png`);
 		const output_image_path = require("path").join(cache_dir, `${id}-superrez.png`);
 		console.log({id, input_image_path, output_image_path});
