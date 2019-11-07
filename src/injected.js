@@ -77,6 +77,10 @@
 
 		dynamic_queue = dynamic_queue.concat(imgs);
 
+		// TODO: partially parallelize? but deduplicate first
+		// and make queue into a list of jobs instead of images
+		// which then reference (multiple) `img.src`s or `style.backgroundImage`s to update
+
 		while (dynamic_queue.length > 0) {
 			filter_and_sort_queue();
 			// dynamic_queue = dynamic_queue.slice(0, 50);
