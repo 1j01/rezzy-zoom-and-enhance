@@ -11,7 +11,7 @@
 	const cache_dir = require("path").join(require('electron').remote.app.getPath("appData"), "superrez-cache");
 	fs.mkdirSync(cache_dir, { recursive: true });
 
-	const converter_path = "C:\\Users\\Isaiah\\Downloads\\waifu2x-DeadSix27-win64_v531\\waifu2x-converter-cpp.exe"; // TODO
+	const converter_path = "./waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe";
 
 	function superrez_image(input_image, callback) {
 		// Hash src so that differences in only sanitized-away characters still are counted.
