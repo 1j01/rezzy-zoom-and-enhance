@@ -28,7 +28,7 @@
 				console.log("superrez cache miss; do the conversion");
 				console.log("temp file path:", input_image_path);
 
-				write_image_to_file(input_image, input_image_path, (err)=> {
+				write_image_to_file(input_image.src, input_image_path, (err)=> {
 					if(err){
 						return callback(err);
 					}
@@ -93,8 +93,21 @@
 		});
 	}
 
-	function write_image_to_file(image, file_path, callback) {
-		const canvas = image_to_canvas(image);
+	function write_image_to_file(image_src, file_path, callback) {
+		const cors_image = new Image();
+		cors_image.crossOrigin = "anonymous";
+		cors_image.onload = ()=> {
+			if (!cors_image.complete || typeof cors_image.naturalWidth == "undefined" || cors_image.naturalWidth === 0) {
+				return callback(new Error(`Image failed to load; naturalWidth == ${cors_image.naturalWidth}`));
+			}
+			const canvas = image_to_canvas(cors_image);
+			write_canvas_to_file(canvas, file_path, callback);
+		};
+		cors_image.onerror = ()=> {
+			callback(new Error("Image failed to load"));
+		};
+		cors_image.src = image_src;
+		const canvas = image_to_canvas(cors_image);
 		write_canvas_to_file(canvas, file_path, callback);
 	}
 
@@ -109,22 +122,29 @@
 
 	function write_canvas_to_file(canvas, file_path, callback) {
 		const mime_type = "image/png";
-		canvas.toBlob(blob => {
-			if(blob.type !== mime_type){
-				return callback(new Error(`Failed to save image as ${mime_type} (got "${blob.type}" instead)`));
-			}
-			blob_to_buffer(blob, (err, buffer) => {
-				if(err){
-					return callback(err);
+		try {
+			canvas.toBlob(blob => {
+				if(!blob){
+					return callback(new Error(`Failed to save image as ${mime_type} (got ${blob} instead of a Blob)`));
 				}
-				fs.writeFile(file_path, buffer, err => {
+				if(blob.type !== mime_type){
+					return callback(new Error(`Failed to save image as ${mime_type} (got "${blob.type}" instead)`));
+				}
+				blob_to_buffer(blob, (err, buffer) => {
 					if(err){
 						return callback(err);
 					}
-					callback();
+					fs.writeFile(file_path, buffer, err => {
+						if(err){
+							return callback(err);
+						}
+						callback();
+					});
 				});
-			});
-		}, mime_type);
+			}, mime_type);
+		} catch(error) {
+			callback(error);
+		}
 	}
 
 	function read_file(file_path, callback) {
