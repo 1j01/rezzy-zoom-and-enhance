@@ -13,7 +13,7 @@
 		return new Promise((resolve, reject)=> {
 			superrez_image(page_img, (err, superrezzed_img)=> {
 				if (err) {
-					reject(err);
+					return reject(err);
 				}
 				page_img.style.width = getComputedStyle(page_img).width;
 				page_img.style.height = getComputedStyle(page_img).height;
