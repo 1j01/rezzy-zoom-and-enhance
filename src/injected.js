@@ -38,13 +38,13 @@
 			if (style.display === "none" || style.visibility === "hidden") return false;
 			return true;
 		}
-		const isInView = (element)=> {
+		const isPartiallyInView = (element)=> {
 			const bounds = element.getBoundingClientRect();
 			return (
-				bounds.top >= 0 &&
-				bounds.left >= 0 &&
-				bounds.bottom <= (window.innerHeight) &&
-				bounds.right <= (window.innerWidth)
+				bounds.top <= window.innerHeight &&
+				bounds.left <= window.innerWidth &&
+				bounds.bottom >= 0 &&
+				bounds.right >= 0
 			);
 		};
 		// const belongsToCurrentPage = (element)=> {
@@ -57,8 +57,8 @@
 			// const b_belongs_to_current_page = belongsToCurrentPage(b);
 			// if (a_belongs_to_current_page && !b_belongs_to_current_page) return -1;
 			// if (b_belongs_to_current_page && !a_belongs_to_current_page) return +1;
-			const a_is_in_view = isInView(a);
-			const b_is_in_view = isInView(b);
+			const a_is_in_view = isPartiallyInView(a);
+			const b_is_in_view = isPartiallyInView(b);
 			if (a_is_in_view && !b_is_in_view) return -1;
 			if (b_is_in_view && !a_is_in_view) return +1;
 			if (area(a) > area(b)) return -1;
