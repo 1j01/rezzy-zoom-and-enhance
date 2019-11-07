@@ -7,6 +7,8 @@
 
 	const superrez_image = require("./superrez");
 	
+	let dynamic_queue = []; // dynamic as in not static; it will get sorted before items are pulled
+
 	function superrez_image_in_place(page_img) {
 		superrez_image(page_img, (err, superrezzed_img)=> {
 			if (err) {
@@ -24,21 +26,52 @@
 
 	function enhance_page() {
 		console.log("enhance page");
-		// TODO: do more than just one image (but maybe do images in serial, or limited parallel)
 		// TODO: look for background-images as well
 
 		const imgs = Array.from(document.querySelectorAll("img"));
 
+		dynamic_queue = dynamic_queue.concat(imgs);
+
 		const area = (img)=> img.width * img.height; // TODO: naturalWidth/naturalHeight?
-		
-		imgs.sort((a, b)=> {
-			if (area(a) < area(b)) return +1;
+		// const inDOM = (element)=> element.parentElement != null;
+		const isVisible = (element)=> {
+			if (!element.parentElement) return false;
+			if (element.offsetWidth === 0 || element.offsetHeight === 0) return false;
+			const style = getComputedStyle(element);
+			if (style.display === "none" || style.visibility === "hidden") return false;
+			return true;
+		}
+		const isInView = (element)=> {
+			const bounds = element.getBoundingClientRect();
+			return (
+				bounds.top >= 0 &&
+				bounds.left >= 0 &&
+				bounds.bottom <= (window.innerHeight) &&
+				bounds.right <= (window.innerWidth)
+			);
+		};
+		// const belongsToCurrentPage = (element)=> {
+		// 	element.ownerDocument === document; // erm, we're in the code injected in the page currently
+		// };
+
+		dynamic_queue = dynamic_queue.filter(isVisible);
+		dynamic_queue.sort((a, b)=> {
+			// const a_belongs_to_current_page = belongsToCurrentPage(a);
+			// const b_belongs_to_current_page = belongsToCurrentPage(b);
+			// if (a_belongs_to_current_page && !b_belongs_to_current_page) return -1;
+			// if (b_belongs_to_current_page && !a_belongs_to_current_page) return +1;
+			const a_is_in_view = isInView(a);
+			const b_is_in_view = isInView(b);
+			if (a_is_in_view && !b_is_in_view) return -1;
+			if (b_is_in_view && !a_is_in_view) return +1;
 			if (area(a) > area(b)) return -1;
+			if (area(b) > area(a)) return +1;
 			return 0;
 		});
-		const main_img = imgs[0];
 
-		superrez_image_in_place(main_img);
+		const next_img = dynamic_queue[0];
+
+		superrez_image_in_place(next_img);
 	}
 	
 	window.addEventListener("load", enhance_page);
