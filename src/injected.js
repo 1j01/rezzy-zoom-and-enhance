@@ -71,6 +71,7 @@
 		console.log("enhance page");
 
 		// TODO: apply to background-images as well
+		// getComputedStyle(element).background.match(/url\((.*)\)/)
 
 		const imgs = Array.from(document.querySelectorAll("img"));
 
@@ -78,7 +79,9 @@
 
 		while (dynamic_queue.length > 0) {
 			filter_and_sort_queue();
+			// dynamic_queue = dynamic_queue.slice(0, 50);
 			const next_img = dynamic_queue.shift();
+			if (!next_img) break;
 			console.log("next_img", next_img);
 			try {
 				await superrez_image_in_place(next_img);
