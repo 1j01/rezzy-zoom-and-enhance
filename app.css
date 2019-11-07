@@ -33,13 +33,13 @@ button[disabled]:hover {
 button:hover,
 input[type="submit"]:hover {
 	border-color: #ccc;
-	background: -webkit-linear-gradient(bottom, #cccccc 0%, #f2f2f2 99%);
+	background: linear-gradient(bottom, #cccccc 0%, #f2f2f2 99%);
 }
 
 button:active,
 input[type="submit"]:active {
 	border-color: #bbb;
-	background: -webkit-linear-gradient(bottom, #e2e2e2 0%, #bbbbbb 99%);
+	background: linear-gradient(bottom, #e2e2e2 0%, #bbbbbb 99%);
 }
 
 /* These glyphs are on the small side, make them look more natural when
@@ -62,22 +62,22 @@ compared to the back/forward buttons */
 	border: solid 1px #ccc;
 	padding: 2px;
 	width: 100%;
-	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 #controls {
-	display: -webkit-flex;
-	-webit-flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 #controls #location-form {
-	-webkit-flex: 1;
-	display: -webkit-flex;
-	-webit-flex-direction: column;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
 }
 
 #controls #center-column {
-	-webkit-flex: 1;
+	flex: 1;
 }
 
 #zoom-box,
@@ -98,9 +98,9 @@ compared to the back/forward buttons */
 
 #zoom-box #zoom-form,
 #find-box #find-form {
-	-webkit-flex: 1;
-	display: -webkit-flex;
-	-webit-flex-direction: row;
+	flex: 1;
+	display: flex;
+	flex-direction: row;
 }
 
 #zoom-box input,
@@ -114,8 +114,8 @@ compared to the back/forward buttons */
 	border: solid 1px #ccc;
 	margin-right: 0px;
 	padding: 2px;
-	-webkit-box-sizing: border-box;
-	-webkit-flex: 1;
+	box-sizing: border-box;
+	flex: 1;
 }
 
 #zoom-box {
@@ -183,13 +183,13 @@ webview {
 
 /* The reload button turns into a spinning trobber */
 .loading #reload {
-	-webkit-animation: spinner-animation .5s infinite linear;
-	-webkit-transform-origin: 50% 55.5%;
+	animation: spinner-animation .5s infinite linear;
+	transform-origin: 50% 55.5%;
 }
 
-@-webkit-keyframes spinner-animation {
-	0% { -webkit-transform: rotate(0deg); }
-	100% {-webkit-transform: rotate(360deg); }
+@keyframes spinner-animation {
+	0% { transform: rotate(0deg); }
+	100% {transform: rotate(360deg); }
 }
 
 /* Due to http://crbug.com/156219 we can't use display: none */

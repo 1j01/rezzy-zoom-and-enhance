@@ -57,7 +57,7 @@ onload = function() {
 	}
 
 	document.querySelector('#zoom').onclick = function() {
-		if(document.querySelector('#zoom-box').style.display == '-webkit-flex') {
+		if(document.querySelector('#zoom-box').style.display == 'flex') {
 			closeZoomBox();
 		} else {
 			openZoomBox();
@@ -323,7 +323,7 @@ function openZoomBox() {
 	const zoomFactor = document.querySelector('webview').getZoomFactor();
 	var zoomText = document.forms['zoom-form']['zoom-text'];
 	zoomText.value = Number(zoomFactor.toFixed(6)).toString();
-	document.querySelector('#zoom-box').style.display = '-webkit-flex';
+	document.querySelector('#zoom-box').style.display = 'flex';
 	zoomText.select();
 }
 
