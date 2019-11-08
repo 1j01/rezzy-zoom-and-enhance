@@ -11,8 +11,7 @@
 
 	function filter_and_sort_jobs() {
 		
-		const area = (img)=> img.width * img.height; // TODO: naturalWidth/naturalHeight?
-		// const inDOM = (element)=> element.parentElement != null;
+		const area = (element)=> element.offsetWidth * element.offsetHeight;
 		const isVisible = (element)=> {
 			if (!element.parentElement) return false;
 			if (element.offsetWidth === 0 || element.offsetHeight === 0) return false;
