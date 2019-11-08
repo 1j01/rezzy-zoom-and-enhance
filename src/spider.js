@@ -39,7 +39,7 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 
 	// recurse forwards
 	if (forwardPages > 0) {
-		const nextLink = prevLinks[0];
+		const nextLink = nextLinks[0];
 		if (nextLink) {
 			const url = nextLink.href;
 			require("request")(url, (error, response, body)=> {
