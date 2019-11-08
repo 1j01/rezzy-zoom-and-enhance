@@ -63,15 +63,15 @@
 		// deduplicate jobs based on URL, and then partially parallelize jobs
 		jobs = jobs.concat(imgs.filter((img)=> !img.superrezQueued).map((img)=> {
 			img.superrezQueued = true;
+			img.replaceWithSuperrez = (superrezzed_blob_url)=> {
+				img.style.width = getComputedStyle(img).width;
+				img.style.height = getComputedStyle(img).height;
+				img.src = superrezzed_blob_url;
+				img.superrezzed = true;
+			};
 			return {
 				url: img.src,
 				elements: [img],
-				replaceOnPage: (superrezzed_blob_url)=> {
-					img.style.width = getComputedStyle(img).width;
-					img.style.height = getComputedStyle(img).height;
-					img.src = superrezzed_blob_url;
-					img.superrezzed = true;
-				},
 			};
 		}));
 		// TODO: robust css background-image parsing
@@ -84,15 +84,15 @@
 				const {backgroundImage} = getComputedStyle(el);
 				const url = backgroundImage.match(css_url_regex)[1];
 				console.log(url);
+				el.replaceWithSuperrez = (superrezzed_blob_url)=> {
+					// TODO: what about :hover?
+					el.style.backgroundImage = backgroundImage.replace(css_url_regex, `url("${superrezzed_blob_url}")`);
+					// TODO: rescale background image
+					el.superrezzed = true;
+				};
 				return {
 					url: url,
 					elements: [el],
-					replaceOnPage: (superrezzed_blob_url)=> {
-						// TODO: what about :hover?
-						el.style.backgroundImage = backgroundImage.replace(css_url_regex, `url("${superrezzed_blob_url}")`);
-						// TODO: rescale background image
-						el.superrezzed = true;
-					},
 				};
 			}
 		));
@@ -119,7 +119,9 @@
 						if (err) {
 							return reject(err);
 						}
-						job.replaceOnPage(superrezzed_blob_url);
+						job.elements.forEach((element)=> {
+							element.replaceWithSuperrez(superrezzed_blob_url);
+						});
 						resolve();
 					});
 				})
