@@ -74,10 +74,11 @@
 			["--input", input_image_path, "--output", output_image_path],
 			{cwd: require("path").dirname(converter_path)},
 			(err, stdout, stderr) => {
+				console.log("waifu2x-converter-cpp stdout:\n\n", stdout);
+				console.log("waifu2x-converter-cpp stderr:\n\n", stderr);
 				if(err){
 					return callback(err);
 				}
-				console.log("waifu2x-converter-cpp stdout:\n\n", stdout);
 				if (stderr.length > 1) {
 					return callback(new Error(`Received error output: ${stderr}`));
 				}

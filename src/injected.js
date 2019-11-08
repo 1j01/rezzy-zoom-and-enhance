@@ -51,12 +51,13 @@
 		});
 	}
 	function collect_jobs() {
-		console.log("collect jobs");
+		// console.log("collect jobs");
 
 		// TODO: apply to background-images as well
 		// getComputedStyle(element).background.match(/url\((.*)\)/)
 
 		const imgs = Array.from(document.querySelectorAll("img"));
+		const allElements = Array.from(document.querySelectorAll("*"));
 
 		// TODO: allow multiple `img.src`s or `style.backgroundImage`s to be included in a job
 		// deduplicate jobs based on URL, and then partially parallelize jobs
@@ -64,7 +65,6 @@
 			img.superrezQueued = true;
 			return {
 				url: img.src,
-				element: img,
 				elements: [img],
 				replaceOnPage: (superrezzed_blob_url)=> {
 					img.style.width = getComputedStyle(img).width;
@@ -74,11 +74,33 @@
 				},
 			};
 		}));
+		// TODO: robust css background-image parsing
+		const css_url_regex = /url\(["']?([^'"]*)["']?\)/;
+		jobs = jobs.concat(allElements
+			.filter((el)=> !el.superrezQueued)
+			.filter((el)=> getComputedStyle(el).backgroundImage.match(css_url_regex))
+			.map((el)=> {
+				el.superrezQueued = true;
+				const {backgroundImage} = getComputedStyle(el);
+				const url = backgroundImage.match(css_url_regex)[1];
+				console.log(url);
+				return {
+					url: url,
+					elements: [el],
+					replaceOnPage: (superrezzed_blob_url)=> {
+						// TODO: what about :hover?
+						el.style.backgroundImage = backgroundImage.replace(css_url_regex, `url("${superrezzed_blob_url}")`);
+						// TODO: rescale background image
+						el.superrezzed = true;
+					},
+				};
+			}
+		));
 		// console.log(jobs);
 	}
 
 	async function run_jobs() {
-		console.log("run jobs");
+		// console.log("run jobs");
 
 		// eslint-disable-next-line no-constant-condition
 		while (true) {
@@ -102,7 +124,7 @@
 					});
 				})
 			} catch(error) {
-				console.warn("Failed to superrez image", job.url, "because:", error, job);
+				console.error("Failed to superrez image", job.url, "because:", error, job);
 			}
 		}
 	}
