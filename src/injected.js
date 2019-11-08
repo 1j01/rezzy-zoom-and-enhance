@@ -80,14 +80,40 @@
 			.filter((el)=> getComputedStyle(el).backgroundImage.match(css_url_regex))
 			.map((el)=> {
 				el.superrezQueued = true;
-				const {backgroundImage} = getComputedStyle(el);
+				const {backgroundImage, backgroundSize} = getComputedStyle(el);
 				const url = backgroundImage.match(css_url_regex)[1];
 				console.log(url);
-				el.replaceWithSuperrez = (superrezzed_blob_url)=> {
+				el.replaceWithSuperrez = (superrezzed_blob_url, scaling_factor)=> {
 					// TODO: what about :hover?
-					el.style.backgroundImage = backgroundImage.replace(css_url_regex, `url("${superrezzed_blob_url}")`);
-					// TODO: rescale background image
-					el.superrezzed = true;
+					// TODO: what about multiple backgrounds?
+
+					// TODO: instead of parsing background-size,
+					// try generating an SVG that just contains an <image>
+					// at a higher resolution than the SVG's intrinsic size
+
+					const newBackgroundImage = backgroundImage.replace(css_url_regex, `url("${superrezzed_blob_url}")`);
+
+					if (backgroundSize === "contain" || backgroundSize === "cover") {
+						el.style.backgroundImage = newBackgroundImage;
+						el.superrezzed = true;
+					} else if (!backgroundSize || backgroundSize === "auto") {
+						const new_image = new Image();
+						new_image.onload = ()=> {
+							el.style.backgroundSize = `${new_image.width/scaling_factor}px ${new_image.height/scaling_factor}px`;
+							el.style.backgroundImage = newBackgroundImage;
+							el.superrezzed = true;
+						};
+						new_image.onerror = ()=> {
+							console.error("couldn't superrez", job, "failed to load image to get width/height");
+						};
+						new_image.src = superrezzed_blob_url;
+					} else {
+						// TODO: parse one and two value syntax
+						// el.style.backgroundSize = rescale(backgroundSize);
+						// el.style.backgroundImage = newBackgroundImage;
+						// el.superrezzed = true;
+						console.error("can't handle background-size: ", backgroundSize);
+					}
 				};
 				return {
 					url: url,
@@ -119,7 +145,7 @@
 							return reject(err);
 						}
 						job.elements.forEach((element)=> {
-							element.replaceWithSuperrez(superrezzed_blob_url);
+							element.replaceWithSuperrez(superrezzed_blob_url, 2);
 						});
 						resolve();
 					});
