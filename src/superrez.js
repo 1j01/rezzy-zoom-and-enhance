@@ -96,17 +96,6 @@
 				return callback(err);
 			}
 			return callback(null, window.URL.createObjectURL(blob));
-			// const img = new Image();
-			// img.onload = ()=> {
-			// 	if (!img.complete || typeof img.naturalWidth == "undefined" || img.naturalWidth === 0) {
-			// 		return callback(new Error(`Image failed to load; naturalWidth == ${img.naturalWidth}`));
-			// 	}
-			// 	callback(null, img);
-			// };
-			// img.onerror = ()=> {
-			// 	callback(new Error("Image failed to load"));
-			// };
-			// img.src = window.URL.createObjectURL(blob);
 		});
 	}
 
@@ -116,32 +105,8 @@
 				return callback(err);
 			}
 			const file = new File([new Uint8Array(buffer)], path.basename(file_path));
-			// can't set file.path directly, but we can do this:
-			// Object.defineProperty(file, 'path', {
-			// 	value: file_path,
-			// });
-			// we don't want that tho, for security (don't expose username etc.)
-			// or at least it probably doesn't matter in this case
-
 			callback(null, file);
 		});
-	}
-
-	function blob_to_buffer(blob, callback) {
-		const file_reader = new FileReader();
-
-		file_reader.addEventListener("loadend", ()=> {
-			if (file_reader.error) {
-				callback(file_reader.error);
-			} else {
-				callback(null, Buffer.from(file_reader.result));
-			}
-		}, false);
-
-		// Read the blob as a typed array.
-		file_reader.readAsArrayBuffer(blob);
-
-		return file_reader;
 	}
 
 	module.exports = superrez_image;

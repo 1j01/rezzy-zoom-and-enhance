@@ -1,26 +1,26 @@
 window.onresize = doLayout;
 var isLoading = false;
 
-onload = function() {
+onload = ()=> {
 	var webview = document.querySelector('webview');
 	doLayout();
 
 	window._webview = webview;
 	console.log("To debug the webview, use:\n  _webview.openDevTools();");
 
-	document.querySelector('#back').onclick = function() {
+	document.querySelector('#back').onclick = ()=> {
 		webview.goBack();
 	};
 
-	document.querySelector('#forward').onclick = function() {
+	document.querySelector('#forward').onclick = ()=> {
 		webview.goForward();
 	};
 
-	document.querySelector('#home').onclick = function() {
+	document.querySelector('#home').onclick = ()=> {
 		navigateTo('https://duckduckgo.com/?q=what+r+some+good+comics');
 	};
 
-	document.querySelector('#reload').onclick = function() {
+	document.querySelector('#reload').onclick = ()=> {
 		if (isLoading) {
 			webview.stop();
 		} else {
@@ -29,14 +29,14 @@ onload = function() {
 	};
 	document.querySelector('#reload').addEventListener(
 		'webkitAnimationIteration',
-		function() {
+		()=> {
 			if (!isLoading) {
 				document.body.classList.remove('loading');
 			}
 		});
 
-	document.querySelector('#location-form').onsubmit = function(e) {
-		e.preventDefault();
+	document.querySelector('#location-form').onsubmit = (event)=> {
+		event.preventDefault();
 		navigateTo(document.querySelector('#location').value);
 	};
 
@@ -56,7 +56,7 @@ onload = function() {
 		}
 	}
 
-	document.querySelector('#zoom').onclick = function() {
+	document.querySelector('#zoom').onclick = ()=> {
 		if(document.querySelector('#zoom-box').style.display == 'flex') {
 			closeZoomBox();
 		} else {
@@ -64,8 +64,8 @@ onload = function() {
 		}
 	};
 
-	document.querySelector('#zoom-form').onsubmit = function(e) {
-		e.preventDefault();
+	document.querySelector('#zoom-form').onsubmit = (event)=> {
+		event.preventDefault();
 		var zoomText = document.forms['zoom-form']['zoom-text'];
 		var zoomFactor = Number(zoomText.value);
 		if (zoomFactor > 5) {
@@ -78,17 +78,17 @@ onload = function() {
 		webview.setZoomFactor(zoomFactor);
 	}
 
-	document.querySelector('#zoom-in').onclick = function(e) {
-		e.preventDefault();
+	document.querySelector('#zoom-in').onclick = (event)=> {
+		event.preventDefault();
 		increaseZoom();
 	}
 
-	document.querySelector('#zoom-out').onclick = function(e) {
-		e.preventDefault();
+	document.querySelector('#zoom-out').onclick = (event)=> {
+		event.preventDefault();
 		decreaseZoom();
 	}
 
-	document.querySelector('#find').onclick = function() {
+	document.querySelector('#find').onclick = ()=> {
 		if(document.querySelector('#find-box').style.display == 'block') {
 			document.querySelector('webview').stopFindInPage('keepSelection');
 			closeFindBox();
@@ -97,21 +97,21 @@ onload = function() {
 		}
 	};
 
-	document.querySelector('#find-text').oninput = function(e) {
+	document.querySelector('#find-text').oninput = ()=> {
 		findInPage(document.forms['find-form']['find-text'].value,
 			{matchCase: findMatchCase});
 	}
 
-	document.querySelector('#find-text').onkeydown = function(e) {
+	document.querySelector('#find-text').onkeydown = (event)=> {
 		if (event.ctrlKey && event.keyCode == 13) {
-			e.preventDefault();
+			event.preventDefault();
 			webview.stopFindInPage('activate');
 			closeFindBox();
 		}
 	}
 
-	document.querySelector('#match-case').onclick = function(e) {
-		e.preventDefault();
+	document.querySelector('#match-case').onclick = (event)=> {
+		event.preventDefault();
 		findMatchCase = !findMatchCase;
 		var matchCase = document.querySelector('#match-case');
 		if (findMatchCase) {
@@ -125,14 +125,14 @@ onload = function() {
 			{matchCase: findMatchCase});
 	}
 
-	document.querySelector('#find-backward').onclick = function(e) {
-		e.preventDefault();
+	document.querySelector('#find-backward').onclick = (event)=> {
+		event.preventDefault();
 		findInPage(document.forms['find-form']['find-text'].value,
 			{backward: true, matchCase: findMatchCase});
 	}
 
-	document.querySelector('#find-form').onsubmit = function(e) {
-		e.preventDefault();
+	document.querySelector('#find-form').onsubmit = (event)=> {
+		event.preventDefault();
 		findInPage(document.forms['find-form']['find-text'].value,
 			{matchCase: findMatchCase});
 	}
@@ -263,7 +263,7 @@ function handleLoadStart(event) {
 	document.querySelector('#location').value = event.url;
 }
 
-function handleLoadStop(event) {
+function handleLoadStop() {
 	// We don't remove the loading class immediately, instead we let the animation
 	// finish, so that the spinner doesn't jerkily reset back to the 0 position.
 	isLoading = false;
