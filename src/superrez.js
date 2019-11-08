@@ -14,8 +14,9 @@
 	const converter_path = "./waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe";
 
 	function superrez_image(input_image, callback) {
+		const input_image_url = input_image.src;
 		// Hash src so that differences in only sanitized-away characters still are counted.
-		const src_digest = crypto.createHash('md5').update(name).digest('hex');
+		const src_digest = crypto.createHash('md5').update(input_image_url).digest('hex');
 		// TODO: Do we need to truncate this further if adding text to the filename?
 		// Could simplify and just use the hash as ID.
 		const id = sanitizeFilename(`${src_digest}-${input_image.src}`);
