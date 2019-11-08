@@ -11,6 +11,8 @@
 
 	function filter_and_sort_jobs() {
 		
+		// TODO: combine area and isVisible to look for most visible pixels
+		// clamp bounding client rect to viewport and get area of that
 		const area = (element)=> element.offsetWidth * element.offsetHeight;
 		const isVisible = (element)=> {
 			if (!element.parentElement) return false;
@@ -52,11 +54,15 @@
 	function collect_jobs() {
 		// console.log("collect jobs");
 
-		// TODO: apply to background-images as well
-		// getComputedStyle(element).background.match(/url\((.*)\)/)
-
 		const imgs = Array.from(document.querySelectorAll("img"));
 		const allElements = Array.from(document.querySelectorAll("*"));
+
+		// TODO: what about pseudo elements (::before and ::after) (w/ background[-image]: or content:)?
+		// Would have to parse and generate CSS to support that.
+
+		// What about :hover and :active?
+		// Hover effects that use CSS sprites work already! (e.g. next/prev buttons in Unsounded)
+		// It wouldn't work with :hover { background-image: url(hover.png); } but that's not a good pattern
 
 		// TODO: allow multiple `img.src`s or `style.backgroundImage`s to be included in a job
 		// deduplicate jobs based on URL, and then partially parallelize jobs
@@ -87,7 +93,6 @@
 					elements: [el],
 				};
 				el.replaceWithSuperrez = (superrezzed_blob_url, scaling_factor)=> {
-					// TODO: what about :hover?
 					// TODO: what about multiple backgrounds?
 
 					// TODO: instead of parsing background-size,
