@@ -34,7 +34,7 @@
 		// 	element.ownerDocument === document; // erm, we're in the code injected in the page currently
 		// };
 
-		jobs = jobs.filter((job)=> job.elements.some(isVisible));
+		jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.elements.length === 0);
 		jobs.sort((a, b)=> {
 			// const a_belongs_to_current_page = belongsToCurrentPage(a);
 			// const b_belongs_to_current_page = belongsToCurrentPage(b);
@@ -173,8 +173,9 @@
 		require("./spider").spiderFromHTML(document.documentElement.innerHTML, {
 			backwardPages: 1,
 			forwardPages: 20,
-		}, (url)=> {
-			jobs.push({url, elements: []});
+			addJob: (url)=> {
+				jobs.push({url, elements: []});
+			},
 		});
 	});
 })();
