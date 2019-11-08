@@ -54,7 +54,7 @@
 	function collect_jobs() {
 		// console.log("collect jobs");
 
-		const imgs = Array.from(document.querySelectorAll("img"));
+		const imgs = Array.from(document.getElementsByTagName("img"));
 		const allElements = Array.from(document.querySelectorAll("*"));
 
 		// TODO: what about pseudo elements (::before and ::after) (w/ background[-image]: or content:)?
@@ -165,6 +165,11 @@
 		console.error(`Superrez job loop crashed\n\n${error}`);
 		alert(`Superrez job loop crashed\n\n${error}`);
 	});
+
 	window.addEventListener("load", collect_jobs);
-	setInterval(collect_jobs, 500)
+	setInterval(collect_jobs, 500);
+
+	document.addEventListener("DOMContentLoaded", ()=> {
+		require("./spider").spiderFromHTML(document.documentElement.innerHTML);
+	});
 })();
