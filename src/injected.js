@@ -82,7 +82,10 @@
 				el.superrezQueued = true;
 				const {backgroundImage, backgroundSize} = getComputedStyle(el);
 				const url = backgroundImage.match(css_url_regex)[1];
-				console.log(url);
+				const job = {
+					url: url,
+					elements: [el],
+				};
 				el.replaceWithSuperrez = (superrezzed_blob_url, scaling_factor)=> {
 					// TODO: what about :hover?
 					// TODO: what about multiple backgrounds?
@@ -115,10 +118,7 @@
 						console.error("can't handle background-size: ", backgroundSize);
 					}
 				};
-				return {
-					url: url,
-					elements: [el],
-				};
+				return job;
 			}
 		));
 		// console.log(jobs);
