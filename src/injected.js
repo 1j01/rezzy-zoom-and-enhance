@@ -9,11 +9,6 @@
 	
 	let jobs = []; // (sorted before items are pulled)
 
-	function show_error_message(message, error) {
-		console.error(`${message}\n\n${error}`);
-		// alert(`${message}\n\n${error}`);
-	}
-
 	function filter_and_sort_jobs() {
 		
 		const area = (img)=> img.width * img.height; // TODO: naturalWidth/naturalHeight?
@@ -55,9 +50,8 @@
 			return 0;
 		});
 	}
-
-	async function enhance_page() {
-		console.log("enhance page");
+	function collect_jobs() {
+		console.log("collect jobs");
 
 		// TODO: apply to background-images as well
 		// getComputedStyle(element).background.match(/url\((.*)\)/)
@@ -80,14 +74,22 @@
 				},
 			};
 		}));
-		console.log(jobs);
+		// console.log(jobs);
+	}
 
-		while (jobs.length > 0) {
+	async function run_jobs() {
+		console.log("run jobs");
+
+		// eslint-disable-next-line no-constant-condition
+		while (true) {
 			filter_and_sort_jobs();
 			// jobs = jobs.slice(0, 50);
-			console.log(jobs);
+			// console.log(jobs);
 			const job = jobs.shift();
-			if (!job) break;
+			if (!job) {
+				await new Promise((resolve)=> { setTimeout(resolve, 100); });
+				continue;
+			}
 			console.log("next job:", job);
 			try {
 				await new Promise((resolve, reject)=> {
@@ -100,12 +102,15 @@
 					});
 				})
 			} catch(error) {
-				console.log("Failed to superrez image", job.url, "because:", error, job);
-				show_error_message("Failed to superrez image", error);
+				console.warn("Failed to superrez image", job.url, "because:", error, job);
 			}
 		}
 	}
 
-	window.addEventListener("load", enhance_page);
-	setInterval(enhance_page, 500)
+	run_jobs().catch((error)=> {
+		console.error(`Superrez job loop crashed\n\n${error}`);
+		alert(`Superrez job loop crashed\n\n${error}`);
+	});
+	window.addEventListener("load", collect_jobs);
+	setInterval(collect_jobs, 500)
 })();
