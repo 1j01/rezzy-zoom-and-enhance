@@ -14,13 +14,12 @@
 
 	const converter_path = require("path").join(__dirname, "../waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe");
 
-	function superrez_image(input_image, callback) {
-		const input_image_url = input_image.src;
+	function superrez_image_url(input_image_url, callback) {
 		// Hash src so that differences in only sanitized-away characters still are counted.
 		const src_digest = crypto.createHash('md5').update(input_image_url).digest('hex');
 		// TODO: Do we need to truncate this further if adding text to the filename?
 		// Could simplify and just use the hash as ID.
-		const id = sanitizeFilename(`${src_digest}-${input_image.src}`);
+		const id = sanitizeFilename(`${src_digest}-${input_image_url}`);
 		const input_image_path = require("path").join(temp_dir, `${id}-normal-rez.png`);
 		const output_image_path = require("path").join(cache_dir, `${id}-superrez.png`);
 
@@ -109,6 +108,6 @@
 		});
 	}
 
-	module.exports = superrez_image;
+	module.exports = superrez_image_url;
 
 })();

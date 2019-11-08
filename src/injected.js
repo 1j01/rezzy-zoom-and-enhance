@@ -5,30 +5,16 @@
 (()=> {
 	console.log("injected");
 
-	const superrez_image = require("./superrez");
+	const superrez_image_url = require("./superrez");
 	
-	let dynamic_queue = []; // dynamic as in not static; it will get sorted before items are pulled
+	let jobs = []; // (sorted before items are pulled)
 
-	function superrez_image_in_place(page_img) {
-		return new Promise((resolve, reject)=> {
-			superrez_image(page_img, (err, superrezzed_blob_url)=> {
-				if (err) {
-					return reject(err);
-				}
-				page_img.style.width = getComputedStyle(page_img).width;
-				page_img.style.height = getComputedStyle(page_img).height;
-				page_img.src = superrezzed_blob_url;
-				resolve();
-			});
-		})
-	}
-	
 	function show_error_message(message, error) {
 		console.error(`${message}\n\n${error}`);
 		// alert(`${message}\n\n${error}`);
 	}
 
-	function filter_and_sort_queue() {
+	function filter_and_sort_jobs() {
 		
 		const area = (img)=> img.width * img.height; // TODO: naturalWidth/naturalHeight?
 		// const inDOM = (element)=> element.parentElement != null;
@@ -52,8 +38,8 @@
 		// 	element.ownerDocument === document; // erm, we're in the code injected in the page currently
 		// };
 
-		dynamic_queue = dynamic_queue.filter(isVisible);
-		dynamic_queue.sort((a, b)=> {
+		jobs = jobs.filter(isVisible);
+		jobs.sort((a, b)=> {
 			// const a_belongs_to_current_page = belongsToCurrentPage(a);
 			// const b_belongs_to_current_page = belongsToCurrentPage(b);
 			// if (a_belongs_to_current_page && !b_belongs_to_current_page) return -1;
@@ -76,22 +62,41 @@
 
 		const imgs = Array.from(document.querySelectorAll("img"));
 
-		dynamic_queue = dynamic_queue.concat(imgs);
+		// TODO: allow multiple `img.src`s or `style.backgroundImage`s to be included in a job
+		// deduplicate jobs based on URL, and then partially parallelize jobs
+		jobs = jobs.concat(imgs.map((img)=> {
+			return {
+				url: img.src,
+				element: img,
+				elements: [img],
+				replaceOnPage: (superrezzed_blob_url)=> {
+					img.style.width = getComputedStyle(img).width;
+					img.style.height = getComputedStyle(img).height;
+					img.src = superrezzed_blob_url;
+				},
+			};
+		}));
+		console.log(jobs);
 
-		// TODO: partially parallelize? but deduplicate first
-		// and make queue into a list of jobs instead of images
-		// which then reference (multiple) `img.src`s or `style.backgroundImage`s to update
-
-		while (dynamic_queue.length > 0) {
-			filter_and_sort_queue();
-			// dynamic_queue = dynamic_queue.slice(0, 50);
-			const next_img = dynamic_queue.shift();
-			if (!next_img) break;
-			console.log("next_img", next_img);
+		while (jobs.length > 0) {
+			filter_and_sort_jobs();
+			// jobs = jobs.slice(0, 50);
+			console.log(jobs);
+			const job = jobs.shift();
+			if (!job) break;
+			console.log("next job:", job);
 			try {
-				await superrez_image_in_place(next_img);
+				await new Promise((resolve, reject)=> {
+					superrez_image_url(job.url, (err, superrezzed_blob_url)=> {
+						if (err) {
+							return reject(err);
+						}
+						job.replaceOnPage(superrezzed_blob_url);
+						resolve();
+					});
+				})
 			} catch(error) {
-				console.log("Failed to superrez image", next_img, "because:", error);
+				console.log("Failed to superrez image", job.url, "because:", error, job);
 				show_error_message("Failed to superrez image", error);
 			}
 		}
