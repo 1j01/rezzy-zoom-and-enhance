@@ -24,7 +24,7 @@
 			const style = getComputedStyle(element);
 			if (style.display === "none" || style.visibility === "hidden") return false;
 			return true;
-		}
+		};
 		const isPartiallyInView = (element)=> {
 			const bounds = element.getBoundingClientRect();
 			return (
@@ -38,18 +38,20 @@
 		// 	element.ownerDocument === document; // erm, we're in the code injected in the page currently
 		// };
 
-		jobs = jobs.filter(isVisible);
+		jobs = jobs.filter((job)=> job.elements.some(isVisible));
 		jobs.sort((a, b)=> {
 			// const a_belongs_to_current_page = belongsToCurrentPage(a);
 			// const b_belongs_to_current_page = belongsToCurrentPage(b);
 			// if (a_belongs_to_current_page && !b_belongs_to_current_page) return -1;
 			// if (b_belongs_to_current_page && !a_belongs_to_current_page) return +1;
-			const a_is_in_view = isPartiallyInView(a);
-			const b_is_in_view = isPartiallyInView(b);
+			const a_is_in_view = a.elements.some(isPartiallyInView);
+			const b_is_in_view = b.elements.some(isPartiallyInView);
 			if (a_is_in_view && !b_is_in_view) return -1;
 			if (b_is_in_view && !a_is_in_view) return +1;
-			if (area(a) > area(b)) return -1;
-			if (area(b) > area(a)) return +1;
+			const a_max_area = Math.max(...a.elements.map(area));
+			const b_max_area = Math.max(...b.elements.map(area));
+			if (a_max_area > b_max_area) return -1;
+			if (b_max_area > a_max_area) return +1;
 			return 0;
 		});
 	}
@@ -64,7 +66,8 @@
 
 		// TODO: allow multiple `img.src`s or `style.backgroundImage`s to be included in a job
 		// deduplicate jobs based on URL, and then partially parallelize jobs
-		jobs = jobs.concat(imgs.map((img)=> {
+		jobs = jobs.concat(imgs.filter((img)=> !img.superrezQueued).map((img)=> {
+			img.superrezQueued = true;
 			return {
 				url: img.src,
 				element: img,
@@ -73,6 +76,7 @@
 					img.style.width = getComputedStyle(img).width;
 					img.style.height = getComputedStyle(img).height;
 					img.src = superrezzed_blob_url;
+					img.superrezzed = true;
 				},
 			};
 		}));
@@ -101,11 +105,7 @@
 			}
 		}
 	}
-	
-	window.addEventListener("load", enhance_page);
 
-	// TODO: listen for url change and wait for images to load and then re-enhance
-	// in case of history.pushState or hash change?
-	// Could just poll location.href
-	// Could just periodically poll for images that are large and loaded
+	window.addEventListener("load", enhance_page);
+	setInterval(enhance_page, 500)
 })();
