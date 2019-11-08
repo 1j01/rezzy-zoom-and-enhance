@@ -11,20 +11,21 @@
 
 	function superrez_image_in_place(page_img) {
 		return new Promise((resolve, reject)=> {
-			superrez_image(page_img, (err, superrezzed_img)=> {
+			superrez_image(page_img, (err, superrezzed_blob_url)=> {
 				if (err) {
 					return reject(err);
 				}
 				page_img.style.width = getComputedStyle(page_img).width;
 				page_img.style.height = getComputedStyle(page_img).height;
-				page_img.src = superrezzed_img.src;
+				page_img.src = superrezzed_blob_url;
 				resolve();
 			});
 		})
 	}
 	
 	function show_error_message(message, error) {
-		alert(`${message}\n\n${error}`);
+		console.error(`${message}\n\n${error}`);
+		// alert(`${message}\n\n${error}`);
 	}
 
 	function filter_and_sort_queue() {
@@ -90,6 +91,7 @@
 			try {
 				await superrez_image_in_place(next_img);
 			} catch(error) {
+				console.log("Failed to superrez image", next_img, "because:", error);
 				show_error_message("Failed to superrez image", error);
 			}
 		}

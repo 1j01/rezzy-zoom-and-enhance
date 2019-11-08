@@ -9,9 +9,10 @@
 	const temp_dir = require('electron').remote.app.getPath("temp");
 	// const cacheDir = require('electron').remote.app.getPath("cache"); // TODO: is this a good dir to use?
 	const cache_dir = require("path").join(require('electron').remote.app.getPath("appData"), "superrez-cache");
+	fs.mkdirSync(temp_dir, { recursive: true });
 	fs.mkdirSync(cache_dir, { recursive: true });
 
-	const converter_path = "./waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe";
+	const converter_path = require("path").join(__dirname, "../waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe");
 
 	function superrez_image(input_image, callback) {
 		const input_image_url = input_image.src;
@@ -24,32 +25,46 @@
 		const output_image_path = require("path").join(cache_dir, `${id}-superrez.png`);
 
 		// try cache first
-		read_image_from_file(output_image_path, (err, output_image)=> {
-			if(err){
+		read_file_as_blob_url(output_image_path, (err, output_blob_url)=> {
+			if(err && err.code === "ENOENT"){
 				console.log("superrez cache miss; do the conversion");
 				console.log("temp file path:", input_image_path);
 
-				write_image_to_file(input_image.src, input_image_path, (err)=> {
-					if(err){
-						return callback(err);
+				var write_stream = fs.createWriteStream(input_image_path);
+				var errored = false;
+				require("request")
+					.get(input_image_url)
+					.on('error', (err)=> {
+						errored = true
+						callback(err);
+					})
+					.pipe(write_stream);
+
+				write_stream.on("finish", ()=> {
+					if(errored){
+						console.warn("finish after error?"); // TODO: is it possible?
+						return;
 					}
 					superrez_file(input_image_path, output_image_path, (err)=> {
 						if(err){
 							return callback(err);
 						}
 						console.log("output file path:", input_image_path);
-						read_image_from_file(output_image_path, (err, output_image)=> {
+						read_file_as_blob_url(output_image_path, (err, output_blob_url)=> {
 							if(err){
 								return callback(err);
 							}
-							callback(null, output_image);
+							callback(null, output_blob_url);
 						});
 					})
 				});
 				return;
 			}
+			if (err) {
+				return callback(err);
+			}
 			console.log("superrez cache hit - reusing", output_image_path);
-			callback(null, output_image);
+			callback(null, output_blob_url);
 		});
 	}
 
@@ -65,7 +80,7 @@
 				}
 				console.log("waifu2x-converter-cpp stdout:\n\n", stdout);
 				if (stderr.length > 1) {
-					return callback(new Error(`Recieved error output: ${stderr}`));
+					return callback(new Error(`Received error output: ${stderr}`));
 				}
 				if (stdout.match(/cv::imwrite.*failed/)) {
 					return callback(new Error(`waifu2x-converter-cpp failed to write image. See console for output.`));
@@ -75,77 +90,24 @@
 		);
 	}
 
-	function read_image_from_file(file_path, callback) {
+	function read_file_as_blob_url(file_path, callback) {
 		read_file(file_path, (err, blob)=> {
 			if(err){
 				return callback(err);
 			}
-			const img = new Image();
-			img.onload = ()=> {
-				if (!img.complete || typeof img.naturalWidth == "undefined" || img.naturalWidth === 0) {
-					return callback(new Error(`Image failed to load; naturalWidth == ${img.naturalWidth}`));
-				}
-				callback(null, img);
-			};
-			img.onerror = ()=> {
-				callback(new Error("Image failed to load"));
-			};
-			img.src = window.URL.createObjectURL(blob);
+			return callback(null, window.URL.createObjectURL(blob));
+			// const img = new Image();
+			// img.onload = ()=> {
+			// 	if (!img.complete || typeof img.naturalWidth == "undefined" || img.naturalWidth === 0) {
+			// 		return callback(new Error(`Image failed to load; naturalWidth == ${img.naturalWidth}`));
+			// 	}
+			// 	callback(null, img);
+			// };
+			// img.onerror = ()=> {
+			// 	callback(new Error("Image failed to load"));
+			// };
+			// img.src = window.URL.createObjectURL(blob);
 		});
-	}
-
-	function write_image_to_file(image_src, file_path, callback) {
-		const cors_image = new Image();
-		cors_image.crossOrigin = "anonymous";
-		cors_image.onload = ()=> {
-			if (!cors_image.complete || typeof cors_image.naturalWidth == "undefined" || cors_image.naturalWidth === 0) {
-				return callback(new Error(`Image failed to load; naturalWidth == ${cors_image.naturalWidth}`));
-			}
-			const canvas = image_to_canvas(cors_image);
-			write_canvas_to_file(canvas, file_path, callback);
-		};
-		cors_image.onerror = ()=> {
-			callback(new Error("Image failed to load"));
-		};
-		cors_image.src = image_src;
-		const canvas = image_to_canvas(cors_image);
-		write_canvas_to_file(canvas, file_path, callback);
-	}
-
-	function image_to_canvas(image) {
-		const canvas = document.createElement("canvas");
-		canvas.width = image.width; // TODO: naturalWidth?
-		canvas.height = image.height; // TODO: naturalHeight?
-		const ctx = canvas.getContext("2d");
-		ctx.drawImage(image, 0, 0);
-		return canvas;
-	}
-
-	function write_canvas_to_file(canvas, file_path, callback) {
-		const mime_type = "image/png";
-		try {
-			canvas.toBlob(blob => {
-				if(!blob){
-					return callback(new Error(`Failed to save image as ${mime_type} (got ${blob} instead of a Blob)`));
-				}
-				if(blob.type !== mime_type){
-					return callback(new Error(`Failed to save image as ${mime_type} (got "${blob.type}" instead)`));
-				}
-				blob_to_buffer(blob, (err, buffer) => {
-					if(err){
-						return callback(err);
-					}
-					fs.writeFile(file_path, buffer, err => {
-						if(err){
-							return callback(err);
-						}
-						callback();
-					});
-				});
-			}, mime_type);
-		} catch(error) {
-			callback(error);
-		}
 	}
 
 	function read_file(file_path, callback) {
