@@ -44,8 +44,8 @@
 			const b_is_in_view = b.elements.some(isPartiallyInView);
 			if (a_is_in_view && !b_is_in_view) return -1;
 			if (b_is_in_view && !a_is_in_view) return +1;
-			const a_max_area = Math.max(...a.elements.map(area));
-			const b_max_area = Math.max(...b.elements.map(area));
+			const a_max_area = Math.max(0, ...a.elements.map(area));
+			const b_max_area = Math.max(0, ...b.elements.map(area));
 			if (a_max_area > b_max_area) return -1;
 			if (b_max_area > a_max_area) return +1;
 			return 0;
@@ -170,6 +170,11 @@
 	setInterval(collect_jobs, 500);
 
 	document.addEventListener("DOMContentLoaded", ()=> {
-		require("./spider").spiderFromHTML(document.documentElement.innerHTML);
+		require("./spider").spiderFromHTML(document.documentElement.innerHTML, {
+			backwardPages: 1,
+			forwardPages: 20,
+		}, (url)=> {
+			jobs.push({url, elements: []});
+		});
 	});
 })();
