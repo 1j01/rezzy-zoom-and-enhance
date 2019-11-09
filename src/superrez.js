@@ -16,12 +16,11 @@
 
 	function superrez_image_url(input_image_url, callback) {
 		// Hash src so that differences in only sanitized-away characters still are counted.
+		// (Could simplify and just use the hash as ID...)
 		const src_digest = crypto.createHash('md5').update(input_image_url).digest('hex');
-		// TODO: Do we need to truncate this further if adding text to the filename?
-		// Could simplify and just use the hash as ID.
 		const id = sanitizeFilename(`${src_digest}-${input_image_url}`);
-		const input_image_path = require("path").join(temp_dir, `${id}-normal-rez.png`);
-		const output_image_path = require("path").join(cache_dir, `${id}-superrez.png`);
+		const input_image_path = require("path").join(temp_dir, sanitizeFilename(`${id}-original-rez`));
+		const output_image_path = require("path").join(cache_dir, sanitizeFilename(`${id}-superrez`));
 
 		// try cache first
 		read_file_as_blob_url(output_image_path, (err, output_blob_url)=> {
