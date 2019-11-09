@@ -44,14 +44,22 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 	nextLinks.sort(prioritizePageLinksFirst);
 	prevLinks.sort(prioritizePageLinksFirst);
 
-	console.log("[spider] links:", {nextLinks, prevLinks});
+	console.log("[spider] found links:", {nextLinks, prevLinks});
 	
 	// find jobs
 	images.forEach((img)=> {
-		addJob(img.src);
+		require("request").head(img.src).on("response", (response)=> {
+			const content_length = response.headers["content-length"];
+			if (content_length > 20000) {
+				console.log(`[spider] preloading image ${img.src} (content-length: ${content_length}`);
+				addJob(img.src);
+			} else {
+				console.log(`[spider] ignoring image ${img.src} (content-length: ${content_length}`);
+			}
+		});
 	});
 
-	// recurse backwards
+	// recurse going backwards
 	// TODO: prioritize this maybe at like after loading 5 next pages? or something?
 	if (backwardPages > 0) {
 		const prevLink = prevLinks[0];
@@ -69,11 +77,11 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 				module.exports.spiderFromHTML(body, {backwardPages: backwardPages - 1, forwardPages: 0, addJob});
 			});
 		} else {
-			console.warn("No previous page link found");
+			console.warn("[spider] No previous page link found");
 		}
 	}
 
-	// recurse forwards
+	// recurse going forwards
 	if (forwardPages > 0) {
 		const nextLink = nextLinks[0];
 		if (nextLink) {
