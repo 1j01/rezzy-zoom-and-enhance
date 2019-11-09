@@ -18,13 +18,20 @@
 		// Hash src so that differences in only sanitized-away characters still are counted.
 		// (Could simplify and just use the hash as ID...)
 		const src_digest = crypto.createHash('md5').update(input_image_url).digest('hex');
-		const extension = (
-			input_image_url.match(/\.(jpe?g|jp2|png)/) ||
-			input_image_url.match(/(jpe?g|jp2|png)/) ||
-			[]
-		)[0];
+		// TODO: get file extension from mime type returned from server (make HEAD request or move logic later into GET request)
+		let extension =
+			(input_image_url.match(/\.(jpe?g|jp2|png)$/i) || [])[0] ||
+			(input_image_url.match(/\.(jpe?g|jp2|png)/i) || [])[0] ||
+			(input_image_url.match(/(jpe?g|jp2|png)/i) || [])[0];
 		if (!extension) {
 			return callback(new Error(`Unsupported file extension. URL must contain jpeg, jpg, jp2, or png`));
+		}
+		extension = extension.toLowerCase();
+		if (!extension[0] === ".") {
+			extension = `.${extension}`;
+		}
+		if (extension === ".jp2") {
+			extension = ".jpg";
 		}
 		const id = sanitizeFilename(`${src_digest}-${input_image_url.replace(/:\/\//, "_").slice(0, 50)}`, {replacement: "_"});
 		const input_image_path = require("path").join(temp_dir, sanitizeFilename(`${id}-original-rez${extension}`));
