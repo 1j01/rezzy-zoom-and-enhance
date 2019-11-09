@@ -90,7 +90,7 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 				module.exports.spiderFromHTML(body, {backwardPages: 0, forwardPages: forwardPages - 1, addJob});
 			});
 		} else {
-			console.warn("[spider] No previous page link found");
+			console.warn("[spider] No next page link found");
 		}
 	}
 
