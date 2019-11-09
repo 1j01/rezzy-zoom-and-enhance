@@ -14,9 +14,11 @@
 
 	const converter_path = require("path").join(__dirname, "../waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe");
 
+	const scaling_factor = 2;
+
 	function superrez_image_url(input_image_url, callback) {
 		const origin = new URL(input_image_url).origin;
-		const origin_folder = require("path").join(cache_dir, sanitizeFilename(origin, {replacement: "_"}));
+		const origin_folder = require("path").join(cache_dir, sanitizeFilename(origin.replace(/:\/\//, "_"), {replacement: "_"}));
 		fs.mkdirSync(origin_folder, { recursive: true });
 		const id = crypto.createHash('md5').update(input_image_url).digest('hex');
 		// TODO: get file extension from mime type returned from server (make HEAD request or move logic later into GET request)
@@ -35,7 +37,7 @@
 			extension = ".jpeg";
 		}
 		const input_image_path = require("path").join(temp_dir, `${id}-original-rez${extension}`);
-		const output_image_path = require("path").join(origin_folder, `${id}-superrez${extension}`);
+		const output_image_path = require("path").join(origin_folder, `${id}-superrez-${scaling_factor}x${extension}`);
 
 		// try cache first
 		read_file_as_blob_url(output_image_path, (err, output_blob_url)=> {
