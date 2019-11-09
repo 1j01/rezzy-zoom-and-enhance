@@ -39,6 +39,7 @@ Adding *gamepad support* to any given webcomic would be objectively a waste of t
 
 See also: [Input Control](https://github.com/multiism/input-control)
 
+
 ### Other Feature Notes
 
 * Could implement things modularly / as a pipeline so you could optionally just
@@ -50,18 +51,8 @@ for use in a different reader app
 I was thinking it would just crawl the web pages,
 maybe use clues like meta tags but mostly look for clearly labeled Next buttons etc.
 
-* Would it be a browser? Could you favorite things?
-I don't like scope creep, but it would be useful to be able to share a comic by the URL,
-or to open the folder a comic book archive is in.
-So maybe it could have an address bar? 😟
-(Or just a menu option like Share / Open Containing Folder depending on what type it is?)
-You'd also want to be able to jump to a page by the URL.
-
 * It should save your place automatically.
-(And you shouldn't lose it by simply navigating someplace else, so 1. you should be able to go back, which implies a browser like experience, and 2. it should be clear to the user how the address is being saved automatically)
-(It could store just one bookmark and the current page you're viewing if it's earlier than that,
-but what if someone tells you about a funny later page? or what if you accidentally hit the go-to-end/latest button?
-It should probably also work then, right? I don't know how this should work.)
+(And you shouldn't lose it by simply navigating someplace else, so 1. you should be able to go back, which implies a browser like experience (with either a browser extention or specialized browser), and 2. it should be clear to the user how the address is being saved automatically)
 
 * Splitting pages up by frames could be useful for reading on mobile devices like phones and ereaders,
 but it couldn't handle all page layouts (like, creative ones! y'know?),
