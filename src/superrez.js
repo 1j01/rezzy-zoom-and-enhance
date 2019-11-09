@@ -18,9 +18,10 @@
 		// Hash src so that differences in only sanitized-away characters still are counted.
 		// (Could simplify and just use the hash as ID...)
 		const src_digest = crypto.createHash('md5').update(input_image_url).digest('hex');
-		const id = sanitizeFilename(`${src_digest}-${input_image_url}`);
-		const input_image_path = require("path").join(temp_dir, sanitizeFilename(`${id}-original-rez`));
-		const output_image_path = require("path").join(cache_dir, sanitizeFilename(`${id}-superrez`));
+		const extension = (input_image_url.match(/\.(jpe?g|png)/) || [])[0] || ".png";
+		const id = sanitizeFilename(`${src_digest}-${input_image_url.replace(/:\/\//, "_")}`, {replacement: "_"});
+		const input_image_path = require("path").join(temp_dir, sanitizeFilename(`${id}-original-rez${extension}`));
+		const output_image_path = require("path").join(cache_dir, sanitizeFilename(`${id}-superrez${extension}`));
 
 		// try cache first
 		read_file_as_blob_url(output_image_path, (err, output_blob_url)=> {
@@ -85,6 +86,9 @@
 				}
 				if (stdout.match(/cv::imwrite.*failed/)) {
 					return callback(new Error(`waifu2x-converter-cpp failed to write image. See console for output.`));
+				}
+				if (stdout.match(/Unsupported output extension./)) {
+					return callback(new Error(`waifu2x-converter-cpp failed to read image. Unsupported output extension. See console for output.`));
 				}
 				console.log("[waifu2x-converter-cpp] output", output_image_path);
 				callback();
