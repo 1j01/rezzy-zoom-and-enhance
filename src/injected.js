@@ -169,6 +169,8 @@
 				await new Promise((resolve, reject)=> {
 					require("request").head(job.url).on("response", (response)=> {
 						const content_length = response.headers["content-length"];
+						// TODO: content_length can be undefined; handle that?
+						// e.g. for http://www.aibq.com/
 						if (content_length > 20 * 20) { // very small
 							console.log(`loading image ${job.url} (content-length: ${content_length})`);
 							superrez_image_url(job.url, (err, superrezzed_blob_url)=> {
