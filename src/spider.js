@@ -7,11 +7,12 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 	// console.log("[spider] links", links);
 	// TODO: look for main image link
 	const nextLinks = links.filter((a)=>
-		a.outerHTML.match(/next|forward/)
+		a.outerHTML.match(/next(?![da])|forward/)
 	);
 	const prevLinks = links.filter((a)=>
-		a.outerHTML.match(/prev|backward/)
+		a.outerHTML.match(/prev(?!iew|[eau])|backward|back(\b|[_-])/)
 	);
+	// TODO: prioritize links that match "page" as well to avoid possible "next chapter" or totally unrelated next/prev buttons
 	console.log("[spider]", {nextLinks, prevLinks});
 	
 	// find jobs
