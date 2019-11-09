@@ -256,11 +256,14 @@ function handleLoadStart(event) {
 	isLoading = true;
 
 	resetExitedState();
-	if (!event.isTopLevel) {
-		return;
-	}
+	console.log(event.type);
+	// console.log('  isTopLevel: ' + event.isTopLevel);
+	// console.log('  isMainFrame: ' + event.isMainFrame);//?
+	// if (!event.isTopLevel) {
+	// 	return;
+	// }
 
-	document.querySelector('#location').value = event.url;
+	// document.querySelector('#location').value = event.url;
 }
 
 function handleLoadStop() {
@@ -270,14 +273,18 @@ function handleLoadStop() {
 }
 
 function handleLoadAbort(event) {
-	console.log('LoadAbort');
-	console.log('  url: ' + event.url);
-	console.log('  isTopLevel: ' + event.isTopLevel);
+	console.log(event.type);
+	console.log('  validatedURL: ' + event.validatedURL);
+	console.log('  isMainFrame: ' + event.isMainFrame);
 	console.log('  type: ' + event.type);
 }
 
 function handleLoadRedirect(event) {
 	resetExitedState();
+	console.log('newUrl:', event.newUrl);
+	console.log('url:', event.url);
+	console.log('validatedURL:', event.validatedURL);
+	if (event.newUrl == null) return;
 	document.querySelector('#location').value = event.newUrl;
 }
 
