@@ -26,7 +26,7 @@
 		if (!extension) {
 			return callback(new Error(`Unsupported file extension. URL must contain jpeg, jpg, jp2, or png`));
 		}
-		const id = sanitizeFilename(`${src_digest}-${input_image_url.replace(/:\/\//, "_")}`, {replacement: "_"});
+		const id = sanitizeFilename(`${src_digest}-${input_image_url.replace(/:\/\//, "_").slice(0, 50)}`, {replacement: "_"});
 		const input_image_path = require("path").join(temp_dir, sanitizeFilename(`${id}-original-rez${extension}`));
 		const output_image_path = require("path").join(cache_dir, sanitizeFilename(`${id}-superrez${extension}`));
 
