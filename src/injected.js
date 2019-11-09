@@ -150,14 +150,22 @@
 			console.log("next job:", job);
 			try {
 				await new Promise((resolve, reject)=> {
-					superrez_image_url(job.url, (err, superrezzed_blob_url)=> {
-						if (err) {
-							return reject(err);
+					require("request").head(job.url).on("response", (response)=> {
+						const content_length = response.headers["content-length"];
+						if (content_length > 20 * 20) { // very small
+							console.log(`loading image ${job.url} (content-length: ${content_length})`);
+							superrez_image_url(job.url, (err, superrezzed_blob_url)=> {
+								if (err) {
+									return reject(err);
+								}
+								job.elements.forEach((element)=> {
+									element.replaceWithSuperrez(superrezzed_blob_url, 2);
+								});
+								resolve();
+							});
+						} else {
+							console.log(`ignoring image ${job.url} (content-length: ${content_length})`);
 						}
-						job.elements.forEach((element)=> {
-							element.replaceWithSuperrez(superrezzed_blob_url, 2);
-						});
-						resolve();
 					});
 				})
 			} catch(error) {
