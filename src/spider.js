@@ -27,12 +27,12 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 		!!a.outerHTML.match(/next(?![da])|forward|fr?wr?d/i)
 	);
 	const prevLinks = links.filter((a)=>
-		!!a.outerHTML.match(/prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bckwd/i)
+		!!a.outerHTML.match(/prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bc?k?wd(\b|[_-])/i)
 	);
 	const prioritizePageLinksFirst = (a, b)=> {
-		const ch_regexp = /chapter|chap(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
-		const pg_regexp = /page/i;
-		const comic_regexp = /comic/i;
+		const ch_regexp = /chapter|chapt?(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
+		const pg_regexp = /page|(\b|[_-])p[gp](\b|[_-])/i;
+		const comic_regexp = /comic|(\b|[_-])cc(\b|[_-])/i;
 		const a_is_ch = !!a.outerHTML.match(ch_regexp);
 		const b_is_ch = !!b.outerHTML.match(ch_regexp);
 		const a_is_pg = !!a.outerHTML.match(pg_regexp);
