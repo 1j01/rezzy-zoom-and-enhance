@@ -14,19 +14,30 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 	);
 	const prioritizePageLinksFirst = (a, b)=> {
 		const ch_regexp = /chapter|chap(\b|[_-])|(\b|[_-])ch(\b|[_-])/;
-		const pg_regexp = /page|comic/;
+		const pg_regexp = /page/;
+		const comic_regexp = /comic/;
 		const a_is_ch = a.outerHTML.match(ch_regexp);
 		const b_is_ch = b.outerHTML.match(ch_regexp);
 		const a_is_pg = a.outerHTML.match(pg_regexp);
 		const b_is_pg = b.outerHTML.match(pg_regexp);
+		const a_is_comic = a.outerHTML.match(comic_regexp);
+		const b_is_comic = b.outerHTML.match(comic_regexp);
 
 		// deprioritize, but don't exclude chapter buttons;
 		// a webcomic could have entire chapters on a page
 		if (a_is_ch && !b_is_ch) return +1;
 		if (b_is_ch && !a_is_ch) return -1;
 
+		// prioritize "page" links
 		if (a_is_pg && !b_is_pg) return -1;
 		if (b_is_pg && !a_is_pg) return +1;
+
+		// prioritize "comic" links, which is hopefully synonymous with page,
+		// and not refering to a web ring https://en.wikipedia.org/wiki/Webring
+		// TODO: deprioritize/exclude external links
+		// and simplify to /page|comic/
+		if (a_is_comic && !b_is_comic) return -1;
+		if (b_is_comic && !a_is_comic) return +1;
 
 		return 0;
 	};
