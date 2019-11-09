@@ -6,8 +6,10 @@
 	console.log("injected");
 
 	const superrez_image_url = require("./superrez");
+	const {spiderFromURL} = require("./spider");
 	
 	let jobs = []; // (sorted before items are pulled)
+	let spider_started = false;
 
 	function filter_and_sort_jobs() {
 		
@@ -135,6 +137,21 @@
 				return job;
 			}
 		));
+
+		// only start spidering when other jobs have an opportunity to be added
+		// so they can be prioritized initially
+		if (!spider_started) {
+			spider_started = true;
+			console.log("starting spider");
+
+			spiderFromURL(location.href, {
+				backwardPages: 1,
+				forwardPages: 20,
+				addJob: (url)=> {
+					jobs.push({url, elements: []});
+				},
+			});
+		}
 	}
 
 	async function run_jobs() {
@@ -182,12 +199,4 @@
 
 	window.addEventListener("load", collect_jobs);
 	setInterval(collect_jobs, 500);
-
-	require("./spider").spiderFromURL(location.href, {
-		backwardPages: 1,
-		forwardPages: 20,
-		addJob: (url)=> {
-			jobs.push({url, elements: []});
-		},
-	});
 })();
