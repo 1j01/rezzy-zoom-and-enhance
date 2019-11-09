@@ -165,6 +165,7 @@
 							});
 						} else {
 							console.log(`ignoring image ${job.url} (content-length: ${content_length})`);
+							resolve();
 						}
 					});
 				})

@@ -44,7 +44,7 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 	nextLinks.sort(prioritizePageLinksFirst);
 	prevLinks.sort(prioritizePageLinksFirst);
 
-	console.log("[spider] found links:", {nextLinks, prevLinks});
+	console.log("[spider] found elements:", {nextLinks, prevLinks, images});
 	
 	// find jobs
 	images.forEach((img)=> {
@@ -101,7 +101,4 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 			console.warn("[spider] No next page link found");
 		}
 	}
-
-	// debug
-	// console.log("[spider]", {nextLinks, prevLinks, images});
 };
