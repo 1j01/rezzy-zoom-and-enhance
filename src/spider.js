@@ -7,15 +7,15 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 
 	// TODO: look for main image link
 	const nextLinks = links.filter((a)=>
-		a.outerHTML.match(/next(?![da])|forward|fr?wr?d/)
+		a.outerHTML.match(/next(?![da])|forward|fr?wr?d/i)
 	);
 	const prevLinks = links.filter((a)=>
-		a.outerHTML.match(/prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bckwd/)
+		a.outerHTML.match(/prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bckwd/i)
 	);
 	const prioritizePageLinksFirst = (a, b)=> {
-		const ch_regexp = /chapter|chap(\b|[_-])|(\b|[_-])ch(\b|[_-])/;
-		const pg_regexp = /page/;
-		const comic_regexp = /comic/;
+		const ch_regexp = /chapter|chap(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
+		const pg_regexp = /page/i;
+		const comic_regexp = /comic/i;
 		const a_is_ch = a.outerHTML.match(ch_regexp);
 		const b_is_ch = b.outerHTML.match(ch_regexp);
 		const a_is_pg = a.outerHTML.match(pg_regexp);
@@ -35,7 +35,7 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 		// prioritize "comic" links, which is hopefully synonymous with page,
 		// and not refering to a web ring https://en.wikipedia.org/wiki/Webring
 		// TODO: deprioritize/exclude external links
-		// and simplify to /page|comic/
+		// and simplify to /page|comic/i
 		if (a_is_comic && !b_is_comic) return -1;
 		if (b_is_comic && !a_is_comic) return +1;
 
