@@ -4,16 +4,36 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 
 	const images = Array.from(dummy_element.getElementsByTagName("img"));
 	const links = Array.from(dummy_element.getElementsByTagName("a"));
-	// console.log("[spider] links", links);
+
 	// TODO: look for main image link
 	const nextLinks = links.filter((a)=>
-		a.outerHTML.match(/next(?![da])|forward/)
+		a.outerHTML.match(/next(?![da])|forward|fr?wr?d/)
 	);
 	const prevLinks = links.filter((a)=>
-		a.outerHTML.match(/prev(?!iew|[eau])|backward|back(\b|[_-])/)
+		a.outerHTML.match(/prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bckwd/)
 	);
-	// TODO: prioritize links that match "page" as well to avoid possible "next chapter" or totally unrelated next/prev buttons
-	console.log("[spider]", {nextLinks, prevLinks});
+	const prioritizePageLinksFirst = (a, b)=> {
+		const ch_regexp = /chapter|chap(\b|[_-])|(\b|[_-])ch(\b|[_-])/;
+		const pg_regexp = /page|comic/;
+		const a_is_ch = a.outerHTML.match(ch_regexp);
+		const b_is_ch = b.outerHTML.match(ch_regexp);
+		const a_is_pg = a.outerHTML.match(pg_regexp);
+		const b_is_pg = b.outerHTML.match(pg_regexp);
+
+		// deprioritize, but don't exclude chapter buttons;
+		// a webcomic could have entire chapters on a page
+		if (a_is_ch && !b_is_ch) return +1;
+		if (b_is_ch && !a_is_ch) return -1;
+
+		if (a_is_pg && !b_is_pg) return -1;
+		if (b_is_pg && !a_is_pg) return +1;
+
+		return 0;
+	};
+	nextLinks.sort(prioritizePageLinksFirst);
+	prevLinks.sort(prioritizePageLinksFirst);
+
+	console.log("[spider] links:", {nextLinks, prevLinks});
 	
 	// find jobs
 	images.forEach((img)=> {
@@ -64,5 +84,5 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 	}
 
 	// debug
-	console.log("[spider]", {nextLinks, prevLinks, images});
+	// console.log("[spider]", {nextLinks, prevLinks, images});
 };
