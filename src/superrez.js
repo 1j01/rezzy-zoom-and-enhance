@@ -15,9 +15,10 @@
 	const converter_path = require("path").join(__dirname, "../waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe");
 
 	function superrez_image_url(input_image_url, callback) {
-		// Hash src so that differences in only sanitized-away characters still are counted.
-		// (Could simplify and just use the hash as ID...)
-		const src_digest = crypto.createHash('md5').update(input_image_url).digest('hex');
+		const origin = new URL(input_image_url).origin;
+		const origin_folder = require("path").join(cache_dir, sanitizeFilename(origin, {replacement: "_"}));
+		fs.mkdirSync(origin_folder, { recursive: true });
+		const id = crypto.createHash('md5').update(input_image_url).digest('hex');
 		// TODO: get file extension from mime type returned from server (make HEAD request or move logic later into GET request)
 		let extension =
 			(input_image_url.match(/\.(jpe?g|jp2|png)$/i) || [])[0] ||
@@ -30,12 +31,11 @@
 		if (!extension[0] === ".") {
 			extension = `.${extension}`;
 		}
-		if (extension === ".jp2") {
-			extension = ".jpg";
+		if (extension === ".jp2" || extension === ".jpg") {
+			extension = ".jpeg";
 		}
-		const id = sanitizeFilename(`${src_digest}-${input_image_url.replace(/:\/\//, "_").slice(0, 50)}`, {replacement: "_"});
-		const input_image_path = require("path").join(temp_dir, sanitizeFilename(`${id}-original-rez${extension}`));
-		const output_image_path = require("path").join(cache_dir, sanitizeFilename(`${id}-superrez${extension}`));
+		const input_image_path = require("path").join(temp_dir, `${id}-original-rez${extension}`);
+		const output_image_path = require("path").join(origin_folder, `${id}-superrez${extension}`);
 
 		// try cache first
 		read_file_as_blob_url(output_image_path, (err, output_blob_url)=> {
