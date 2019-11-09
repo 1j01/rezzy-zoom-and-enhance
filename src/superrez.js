@@ -18,7 +18,10 @@
 		// Hash src so that differences in only sanitized-away characters still are counted.
 		// (Could simplify and just use the hash as ID...)
 		const src_digest = crypto.createHash('md5').update(input_image_url).digest('hex');
-		const extension = (input_image_url.match(/\.(jpe?g|png)/) || [])[0] || ".png";
+		const extension = (input_image_url.match(/\.(jpe?g|png)/) || [])[0];
+		if (!extension) {
+			return callback(new Error(`Unsupported file extension. URL must say .jpeg .jpg or .png`));
+		}
 		const id = sanitizeFilename(`${src_digest}-${input_image_url.replace(/:\/\//, "_")}`, {replacement: "_"});
 		const input_image_path = require("path").join(temp_dir, sanitizeFilename(`${id}-original-rez${extension}`));
 		const output_image_path = require("path").join(cache_dir, sanitizeFilename(`${id}-superrez${extension}`));
