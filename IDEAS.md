@@ -1,8 +1,10 @@
 # Ideas for a Comic Reader
 
-These are not planned features or to-dos, but things I'd like to see in a comic reader.
+These are not planned features or to-dos.
+This is not a roadmap.
 
-This is not a roadmap, it's just some notes.
+This is a collection of notes on what I'd like to see in a comic reader.
+
 
 ### Web Comics AND Archive Files
 
@@ -10,21 +12,14 @@ Dynamically download web comics so you can read them offline.
 
 Can also support comic book archive formats like `.cbr` and `.cbz`; that's much simpler to do.
 
-It would preload pages of course.
+It would preload pages of course, like any good photo viewer.
 
 
 ### Super-Resolution
 
-Normally you don't want to zoom in because it introduces blurriness and aliasing artifacts.
-It can be hard to read text when it's too small, but zoomed in it's hard because of the blurriness!
-And maybe web comics never look good on your fancy high DPI display.
+Sometimes the text in a comic is too small, and it'd be nice to zoom in, but then everything becomes blurry. But that's because simple upscaling algorithms are used. It doesn't have to be that way.
 
-With waifu2x (or similar technologies), pages can be enlarged intelligently. Intuitively.
-(Using intuitive assumptions about the content. *An algorithm learns the ropes of the tropes of the ebbs and the flows of the lines.* It's pretty dope. It's pretty fine.)
-
-Could use the [waifu2x-caffe](https://github.com/lltcggie/waifu2x-caffe) CLI.
-
-Zoom and enhance, baby.
+Super-Resolution is a technique that uses neural networks to intelligently upscale content. There are networks already trained on thousands of comics, and they work great.
 
 
 ### Consistent Navigation
@@ -40,6 +35,9 @@ And obvious things like arrow keys are rarely implemented.
 * Or ditto but with a gamepad
 * Or ditto but with your phone
 
+Adding *gamepad support* to any given webcomic would be objectively a waste of time (unless it includes game elements, as some sort of hybrid media), but adding it as a mode of navigation for *all comics* is a much more reasonable proposition.
+
+See also: [Input Control](https://github.com/multiism/input-control)
 
 ### Other Feature Notes
 
