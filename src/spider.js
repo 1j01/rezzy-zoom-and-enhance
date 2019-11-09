@@ -22,21 +22,25 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 
 	// recurse backwards
 	// TODO: prioritize this maybe at like after loading 5 next pages? or something?
-	// if (backwardPages > 0) {
-	// 	const prevLink = prevLinks[0];
-	// 	if (prevLink) {
-	// 		const url = prevLink.href;
-	// 		require("request")(url, (error, response, body)=> {
-	// 			if (error) {
-	// 				console.error(`[spider] Failed to get ${url} - stopping scraping (backwards)`);
-	// 				return;
-	// 			}
-	// 			module.exports.spiderFromHTML(body, {backwardPages: backwardPages - 1, forwardPages: 0, addJob});
-	// 		});
-	// 	} else {
-	// 		console.warn("No previous page link found");
-	// 	}
-	// }
+	if (backwardPages > 0) {
+		const prevLink = prevLinks[0];
+		if (prevLink) {
+			const url = prevLink.href;
+			require("request")(url, (error, response, body)=> {
+				if (error) {
+					console.error(`[spider] Failed to get ${url} - stopping scraping (backwards)`);
+					return;
+				}
+				if (response.statusCode !== 200) {
+					console.error(`[spider] Failed to get ${url} - recieved HTTP ${response.statusCode} - stopping scraping (forwards)`);
+					return;
+				}
+				module.exports.spiderFromHTML(body, {backwardPages: backwardPages - 1, forwardPages: 0, addJob});
+			});
+		} else {
+			console.warn("No previous page link found");
+		}
+	}
 
 	// recurse forwards
 	if (forwardPages > 0) {
@@ -46,6 +50,10 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 			require("request")(url, (error, response, body)=> {
 				if (error) {
 					console.error(`[spider] Failed to get ${url} - stopping scraping (forwards)`);
+					return;
+				}
+				if (response.statusCode !== 200) {
+					console.error(`[spider] Failed to get ${url} - recieved HTTP ${response.statusCode} - stopping scraping (forwards)`);
 					return;
 				}
 				module.exports.spiderFromHTML(body, {backwardPages: 0, forwardPages: forwardPages - 1, addJob});

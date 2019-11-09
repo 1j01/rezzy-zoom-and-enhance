@@ -31,6 +31,7 @@
 
 				var write_stream = fs.createWriteStream(input_image_path);
 				var errored = false;
+				// TODO: detect non-200 status code?
 				require("request")
 					.get(input_image_url)
 					.on('error', (err)=> {
