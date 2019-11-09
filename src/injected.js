@@ -183,13 +183,11 @@
 	window.addEventListener("load", collect_jobs);
 	setInterval(collect_jobs, 500);
 
-	document.addEventListener("DOMContentLoaded", ()=> {
-		require("./spider").spiderFromURL(location.href, {
-			backwardPages: 1,
-			forwardPages: 20,
-			addJob: (url)=> {
-				jobs.push({url, elements: []});
-			},
-		});
+	require("./spider").spiderFromURL(location.href, {
+		backwardPages: 1,
+		forwardPages: 20,
+		addJob: (url)=> {
+			jobs.push({url, elements: []});
+		},
 	});
 })();
