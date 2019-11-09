@@ -1,7 +1,7 @@
 const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 	const direction = backwardPages > 0 ?
 		(forwardPages > 0 ? "from start" : "backwards") :
-		(forwardPages > 0 ? "forwards" : "on last page to scrape in this direction")
+		(forwardPages > 0 ? "forwards" : "on last page to scrape in this direction");
 	require("request")(url, (error, response, body)=> {
 		if (error) {
 			console.error(`[spider] Failed to get ${url} - stopping scraping (${direction})`);
@@ -62,6 +62,8 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	prevLinks.sort(prioritizePageLinksFirst);
 
 	console.log("[spider] found elements:", {nextLinks, prevLinks, images});
+	// console.log("[spider] next links, in order of priority:\n\n", nextLinks.map((a)=> a.outerHTML).join("\n\n"));
+	// console.log("[spider] prev links, in order of priority:\n\n", prevLinks.map((a)=> a.outerHTML).join("\n\n"));
 	
 	// find jobs
 	images.forEach((img)=> {
