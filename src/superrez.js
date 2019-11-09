@@ -97,7 +97,8 @@
 				if(err){
 					return callback(err);
 				}
-				if (stderr.length > 1) {
+				stderr = stderr.replace("libpng warning: iCCP: known incorrect sRGB profile", "");
+				if (stderr.trim().length > 1) {
 					return callback(new Error(`Received error output: ${stderr}`));
 				}
 				if (stdout.match(/cv::imwrite.*failed/)) {
