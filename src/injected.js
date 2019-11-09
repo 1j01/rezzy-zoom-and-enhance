@@ -126,17 +126,13 @@
 				return job;
 			}
 		));
-		// console.log(jobs);
 	}
 
 	async function run_jobs() {
-		// console.log("run jobs");
-
 		// eslint-disable-next-line no-constant-condition
 		while (true) {
 			filter_and_sort_jobs();
-			// jobs = jobs.slice(0, 50);
-			// console.log(jobs);
+			
 			const job = jobs.shift();
 			if (!job) {
 				await new Promise((resolve)=> { setTimeout(resolve, 100); });

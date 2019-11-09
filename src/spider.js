@@ -51,10 +51,10 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 		require("request").head(img.src).on("response", (response)=> {
 			const content_length = response.headers["content-length"];
 			if (content_length > 20000) {
-				console.log(`[spider] preloading image ${img.src} (content-length: ${content_length}`);
+				// console.log(`[spider] preloading image ${img.src} (content-length: ${content_length})`);
 				addJob(img.src);
 			} else {
-				console.log(`[spider] ignoring image ${img.src} (content-length: ${content_length}`);
+				// console.log(`[spider] ignoring image ${img.src} (content-length: ${content_length})`);
 			}
 		});
 	});

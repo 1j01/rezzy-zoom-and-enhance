@@ -49,7 +49,6 @@
 						if(err){
 							return callback(err);
 						}
-						console.log("output file path:", input_image_path);
 						read_file_as_blob_url(output_image_path, (err, output_blob_url)=> {
 							if(err){
 								return callback(err);
@@ -70,13 +69,15 @@
 
 	function superrez_file(input_image_path, output_image_path, callback) {
 		// TODO: do paths need quotes?
+		console.log("[waifu2x-converter-cpp] processing", input_image_path);
 		execFile(
 			converter_path,
 			["--input", input_image_path, "--output", output_image_path],
 			{cwd: require("path").dirname(converter_path)},
 			(err, stdout, stderr) => {
-				console.log("waifu2x-converter-cpp stdout:\n\n", stdout);
-				console.log("waifu2x-converter-cpp stderr:\n\n", stderr);
+				console.log("[waifu2x-converter-cpp] results for", input_image_path);
+				console.log("[waifu2x-converter-cpp] stdout:\n", stdout);
+				console.log("[waifu2x-converter-cpp] stderr:\n", stderr);
 				if(err){
 					return callback(err);
 				}
@@ -86,6 +87,7 @@
 				if (stdout.match(/cv::imwrite.*failed/)) {
 					return callback(new Error(`waifu2x-converter-cpp failed to write image. See console for output.`));
 				}
+				console.log("[waifu2x-converter-cpp] output", output_image_path);
 				callback();
 			}
 		);
