@@ -48,6 +48,9 @@ module.exports.spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> 
 	
 	// find jobs
 	images.forEach((img)=> {
+		if (!img.src.match(/^(https?):/)) {
+			return;
+		}
 		require("request").head(img.src).on("response", (response)=> {
 			const content_length = response.headers["content-length"];
 			if (content_length > 20000) {
