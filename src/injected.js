@@ -8,7 +8,7 @@
 	const superrez_image_url = require("./superrez");
 	const {spiderFromURL} = require("./spider");
 	
-	let jobs = []; // (sorted before items are pulled)
+	let jobs_by_url = new Map();
 	let spider_started = false;
 
 	function filter_and_sort_jobs() {
@@ -36,6 +36,7 @@
 		// 	element.ownerDocument === document; // erm, we're in the code injected in the page currently
 		// };
 
+		let jobs = [...jobs_by_url.values()];
 		jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.elements.length === 0);
 		jobs.sort((a, b)=> {
 			// very WET...
@@ -61,6 +62,7 @@
 			if (b_max_area > a_max_area) return +1;
 			return 0;
 		});
+		return jobs;
 	}
 	function collect_jobs() {
 		// console.log("collect jobs");
@@ -75,27 +77,44 @@
 		// Hover effects that use CSS sprites work already! (e.g. next/prev buttons in Unsounded)
 		// It wouldn't work with :hover { background-image: url(hover.png); } but that's not a good pattern
 
-		// TODO: allow multiple `img.src`s or `style.backgroundImage`s to be included in a job
-		// deduplicate jobs based on URL, and then partially parallelize jobs
-		jobs = jobs.concat(imgs.filter((img)=> !img.superrezQueued).map((img)=> {
-			img.superrezQueued = true;
-			img.replaceWithSuperrez = (superrezzed_blob_url)=> {
-				img.style.width = getComputedStyle(img).width;
-				img.style.height = getComputedStyle(img).height;
-				img.src = superrezzed_blob_url;
-				img.superrezzed = true;
+		const addJob = ({url, elements})=> {
+			const job = jobs_by_url.get(url) || {
+				url,
+				scaling_factor: 2,
+				elements: [],
+				started: false,
+				result: null,
 			};
-			return {
-				url: img.src,
-				elements: [img],
-			};
-		}));
+			if (job.result) {
+				elements.forEach((element)=> {
+					element.replaceWithSuperrez(job.result, job.scaling_factor);
+				});
+			}
+			jobs_by_url.set(url, job);
+			job.elements = job.elements.concat(elements);
+		};
+
+		imgs
+			.filter((img)=> !img.superrezQueued)
+			.forEach((img)=> {
+				img.superrezQueued = true;
+				img.replaceWithSuperrez = (superrezzed_blob_url)=> {
+					img.style.width = getComputedStyle(img).width;
+					img.style.height = getComputedStyle(img).height;
+					img.src = superrezzed_blob_url;
+					img.superrezzed = true;
+				};
+				addJob({
+					url: img.src,
+					elements: [img],
+				});
+			});
 		// TODO: robust css background-image parsing
 		const css_url_regex = /url\(["']?([^'"]*)["']?\)/;
-		jobs = jobs.concat(allElements
+		allElements
 			.filter((el)=> !el.superrezQueued)
 			.filter((el)=> getComputedStyle(el).backgroundImage.match(css_url_regex))
-			.map((el)=> {
+			.forEach((el)=> {
 				el.superrezQueued = true;
 				const {backgroundImage, backgroundSize} = getComputedStyle(el);
 				const url = backgroundImage.match(css_url_regex)[1];
@@ -134,12 +153,12 @@
 						console.error("can't handle background-size: ", backgroundSize);
 					}
 				};
-				return job;
-			}
-		));
+				addJob(job);
+			});
 
 		// only start spidering when other jobs have an opportunity to be added
 		// so they can be prioritized initially
+		// ...actually, if it's starting on the *current* URL, it should be fine, right?
 		if (!spider_started) {
 			spider_started = true;
 			console.log("starting spider");
@@ -148,22 +167,29 @@
 				backwardPages: 1,
 				forwardPages: 20,
 				addJob: (url)=> {
-					jobs.push({url, elements: []});
+					addJob({url, elements: []});
 				},
 			});
 		}
 	}
 
+	function get_next_job() {
+		return filter_and_sort_jobs().filter((job)=> !job.started)[0];
+	}
+
 	async function run_jobs() {
+		// TODO: try parallelizing jobs in a limited way?
+		// It seems to already use a lot of processing power tho, so maybe it's not a good idea.
+		// I mean maybe it's even parallelizing itself, with the tiles of the image, idk!
+
 		// eslint-disable-next-line no-constant-condition
 		while (true) {
-			filter_and_sort_jobs();
-			
-			const job = jobs.shift();
+			const job = get_next_job();
 			if (!job) {
 				await new Promise((resolve)=> { setTimeout(resolve, 100); });
 				continue;
 			}
+			job.started = true;
 			console.log("next job:", job);
 			try {
 				await new Promise((resolve, reject)=> {
@@ -177,8 +203,9 @@
 								if (err) {
 									return reject(err);
 								}
+								job.result = superrezzed_blob_url;
 								job.elements.forEach((element)=> {
-									element.replaceWithSuperrez(superrezzed_blob_url, 2);
+									element.replaceWithSuperrez(job.result, job.scaling_factor);
 								});
 								resolve();
 							});
