@@ -77,19 +77,22 @@
 		// Hover effects that use CSS sprites work already! (e.g. next/prev buttons in Unsounded)
 		// It wouldn't work with :hover { background-image: url(hover.png); } but that's not a good pattern
 
-		const addJob = ({url, elements, spoder=false})=> {
+		const addJob = ({url, elements, applyResultToPage, spoder=false})=> {
 			const job = jobs_by_url.get(url) || {
 				url,
 				scaling_factor: 2,
 				elements: [],
+				callbacks: [],
 				spoder,
 				started: false,
 				result: null,
 			};
-			if (job.result) {
-				elements.forEach((element)=> {
-					element.replaceWithSuperrez(job.result, job.scaling_factor);
-				});
+			if (applyResultToPage) {
+				if (job.result) {
+					applyResultToPage(job.result, job.scaling_factor);
+				} else {
+					job.callbacks.push(applyResultToPage);
+				}
 			}
 			jobs_by_url.set(url, job);
 			job.elements = job.elements.concat(elements);
@@ -99,15 +102,15 @@
 			.filter((img)=> !img.superrezQueued)
 			.forEach((img)=> {
 				img.superrezQueued = true;
-				img.replaceWithSuperrez = (superrezzed_blob_url)=> {
-					img.style.width = getComputedStyle(img).width;
-					img.style.height = getComputedStyle(img).height;
-					img.src = superrezzed_blob_url;
-					img.superrezzed = true;
-				};
 				addJob({
 					url: img.src,
 					elements: [img],
+					applyResultToPage: (superrezzed_blob_url)=> {
+						img.style.width = getComputedStyle(img).width;
+						img.style.height = getComputedStyle(img).height;
+						img.src = superrezzed_blob_url;
+						img.superrezzed = true;
+					}
 				});
 			});
 		// TODO: robust css background-image parsing
@@ -123,7 +126,7 @@
 					url: url,
 					elements: [el],
 				};
-				el.replaceWithSuperrez = (superrezzed_blob_url, scaling_factor)=> {
+				job.applyResultToPage = (superrezzed_blob_url, scaling_factor)=> {
 					// TODO: what about multiple backgrounds?
 
 					// TODO: instead of parsing background-size,
@@ -205,8 +208,8 @@
 									return reject(err);
 								}
 								job.result = superrezzed_blob_url;
-								job.elements.forEach((element)=> {
-									element.replaceWithSuperrez(job.result, job.scaling_factor);
+								job.callbacks.forEach((applyResultToPage)=> {
+									applyResultToPage(job.result, job.scaling_factor);
 								});
 								resolve();
 							});
