@@ -74,12 +74,11 @@
 			.forEach((el)=> {
 				el.superrezQueued = true;
 				const {backgroundImage, backgroundSize} = getComputedStyle(el);
-				const url = backgroundImage.match(css_url_regex)[1];
-				const job = {
-					url: url,
+				const original_url = backgroundImage.match(css_url_regex)[1];
+				addJob({
+					url: original_url,
 					elements: [el],
-				};
-				job.applyResultToPage = (superrez_url, scaling_factor)=> {
+					applyResultToPage: (superrez_url, scaling_factor)=> {
 					// TODO: what about multiple backgrounds?
 
 					// TODO: instead of parsing background-size,
@@ -97,7 +96,7 @@
 							el.style.backgroundImage = newBackgroundImage;
 						};
 						new_image.onerror = ()=> {
-							console.error("couldn't superrez", job, "failed to load image to get width/height");
+							console.error("couldn't superrez background-image for", el, "failed to load image to get width/height");
 						};
 						new_image.src = superrez_url;
 					} else {
@@ -106,8 +105,7 @@
 						// el.style.backgroundImage = newBackgroundImage;
 						console.error("can't handle background-size: ", backgroundSize);
 					}
-				};
-				addJob(job);
+				});
 			});
 
 		// only start spidering when other jobs have an opportunity to be added
