@@ -23,11 +23,11 @@ const addJob = ({url, callback, from_spider=false})=> {
 		callbacks: [],
 		from_spider,
 		started: false,
-		result: null,
+		output_file_path: null,
 	};
 	if (callback) {
-		if (job.result) {
-			callback(job.result, job.scaling_factor);
+		if (job.output_file_path) {
+			callback(job.output_file_path, job.scaling_factor);
 		} else {
 			job.callbacks.push(callback);
 		}
@@ -107,21 +107,26 @@ async function run_jobs() {
 			// TODO: content-length is not necessarily given; handle that?
 			// e.g. on http://www.aibq.com/
 			if (content_length > 20 * 20) { // very small
-				// console.log(`loading image ${job.url} (content-length: ${content_length})`);
-				// superrez_image_url(job.url, (err, superrez_url)=> {
-				// 	if (err) {
-				// 		return reject(err);
-				// 	}
-				// 	job.result = superrez_url;
-				// 	job.callbacks.forEach((applyResultToPage)=> {
-				// 		applyResultToPage(job.result, job.scaling_factor);
-				// 	});
-				// });
-				job.result = superrez_image_url(job.url);
-				job.callbacks.forEach((applyResultToPage)=> {
-					applyResultToPage(job.result, job.scaling_factor);
+				console.log(`original image ${job.url} (content-length: ${content_length})`);
+				await new Promise((resolve, reject)=> {
+					superrez(job.url, (err, output_file_path)=> {
+						if (err) {
+							console.error("failed to superrez, got:", err);
+							reject(err);
+							return;
+						}
+						job.output_file_path = output_file_path;
+						job.callbacks.forEach((callback)=> {
+							callback(job.output_file_path, job.scaling_factor);
+						});
+						resolve();
+					});
 				});
-				console.log(`enhancing image ${job.url} (content-length: ${content_length}) by replacing with ${job.result}`);
+				// job.result = superrez_image_url(job.url);
+				// job.callbacks.forEach((applyResultToPage)=> {
+				// 	applyResultToPage(job.result, job.scaling_factor);
+				// });
+				// console.log(`enhancing image ${job.url} (content-length: ${content_length}) by replacing with ${job.result}`);
 			} else {
 				console.log(`ignoring image ${job.url} (content-length: ${content_length})`);
 			}
@@ -132,8 +137,7 @@ async function run_jobs() {
 }
 
 run_jobs().catch((error)=> {
-	console.error(`Superrez job loop crashed\n\n${error}`);
-	alert(`Superrez job loop crashed\n\n${error}`);
+	console.error(`\n\nSuperrez job loop crashed\n\n${error.stack}\n\n`);
 });
 
 // ROUTES FOR OUR API
@@ -148,14 +152,12 @@ router.get('/', function(req, res) {
 router.get('/superrez', function(req, res) {
 	const url = req.query.url;
 	console.log("/superrez an image:", url);
-	superrez(url, (err, output_file_path)=> {
-		if (err) {
-			console.error("failed to superrez, got:", err);
-			res.json({ message: `Failed to superrez ${url}, got: ${err}` });
-			return;
-		}
-		res.sendFile(output_file_path);
-	});
+	addJob({
+		url,
+		callback: ()=> {
+			res.sendFile(output_file_path);
+		},
+	})
 });
 
 // REGISTER OUR ROUTES -------------------------------
