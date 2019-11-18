@@ -24,6 +24,7 @@
     "eslint": "6.4.0"
   },
   "scripts": {
+    "start": "node src/server.js",
     "lint": "eslint src/"
   },
   "repository": {
