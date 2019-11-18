@@ -18,7 +18,7 @@
 
 	const scaling_factor = 2;
 
-	function superrez_image_url(input_image_url, callback) {
+	function superrez(input_image_url, callback) {
 		const origin = new URL(input_image_url).origin;
 		const origin_folder = path.join(cache_dir, sanitizeFilename(origin.replace(/:\/\//, "_"), {replacement: "_"}));
 		fs.mkdirSync(origin_folder, { recursive: true });
@@ -115,6 +115,6 @@
 		);
 	}
 
-	module.exports = superrez_image_url;
+	module.exports = superrez;
 
 })();

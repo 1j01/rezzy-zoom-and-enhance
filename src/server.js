@@ -19,9 +19,20 @@ router.get('/', function(req, res) {
 	res.json({ message: 'hooray! welcome to our api!' });
 });
 
+router.get('/superrez', function(req, res) {
+	const url = req.query.url;
+	console.log("/superrez an image:", url);
+	res.json({ message: `TODO: superrez ${url}` });
+});
+
 // REGISTER OUR ROUTES -------------------------------
 // all of our routes will be prefixed with /api
 app.use('/api', router);
+
+// nice to have something at the root (accessed at GET http://localhost:4284/)
+app.get('/', function(req, res) {
+	res.json({ message: 'API is at /api' });
+});
 
 // START THE SERVER
 // =============================================================================
