@@ -1,0 +1,19 @@
+{
+	"manifest_version": 2,
+	"name": "Rezzy",
+	"description": "Webcomic Zoom & Enhance",
+	"version": "0.1",
+	"homepage_url": "https://github.com/1j01/comic-reader",
+	"icons": {
+		"510": "icon-510x510.png"
+	},
+	"content_scripts": [
+		{
+			"matches": ["*://*.casualvillain.com/*"],
+			"js": ["src/injected.js"]
+		}
+	],
+	"permissions": [
+		"http://127.0.0.1:4284/*"
+	]
+}
