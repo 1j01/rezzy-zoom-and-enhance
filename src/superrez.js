@@ -41,7 +41,7 @@
 		const output_image_path = require("path").join(origin_folder, `${id}-superrez-${scaling_factor}x${extension}`);
 
 		// try cache first
-		read_file_as_blob_url(output_image_path, (err, output_blob_url)=> {
+		fs.readFile(output_image_path, (err, buffer) => {
 			if(err && err.code === "ENOENT"){
 				console.log("superrez cache miss; do the conversion");
 				console.log("temp file path:", input_image_path);
@@ -66,11 +66,11 @@
 						if(err){
 							return callback(err);
 						}
-						read_file_as_blob_url(output_image_path, (err, output_blob_url)=> {
+						fs.readFile(output_image_path, (err, buffer)=> {
 							if(err){
 								return callback(err);
 							}
-							callback(null, output_blob_url);
+							callback(null, buffer);
 						});
 					})
 				});
@@ -80,7 +80,7 @@
 				return callback(err);
 			}
 			console.log("superrez cache hit - reusing", output_image_path);
-			callback(null, output_blob_url);
+			callback(null, buffer);
 		});
 	}
 
@@ -112,25 +112,6 @@
 				callback();
 			}
 		);
-	}
-
-	function read_file_as_blob_url(file_path, callback) {
-		read_file(file_path, (err, blob)=> {
-			if(err){
-				return callback(err);
-			}
-			return callback(null, window.URL.createObjectURL(blob));
-		});
-	}
-
-	function read_file(file_path, callback) {
-		fs.readFile(file_path, (err, buffer) => {
-			if(err){
-				return callback(err);
-			}
-			const file = new File([new Uint8Array(buffer)], path.basename(file_path));
-			callback(null, file);
-		});
 	}
 
 	module.exports = superrez_image_url;
