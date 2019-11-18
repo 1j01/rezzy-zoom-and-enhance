@@ -4,12 +4,13 @@
 	const {execFile} = require("child_process");
 	const path = require("path");
 	const crypto = require("crypto");
+	const envPaths = require("env-paths");
 	const sanitizeFilename = require("sanitize-filename");
 
-	const app_data_dir = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
-	const data_dir_for_this_program = path.join(app_data_dir, "rezzy");
-	const temp_dir = path.join(data_dir_for_this_program, "original-rez-temp");
-	const cache_dir = path.join(data_dir_for_this_program, "superrez-cache");
+	const paths = envPaths("Rezzy");
+
+	const temp_dir = path.join(paths.temp, "original-rez-images");
+	const cache_dir = path.join(paths.cache, "superrez-images");
 	fs.mkdirSync(temp_dir, { recursive: true });
 	fs.mkdirSync(cache_dir, { recursive: true });
 
