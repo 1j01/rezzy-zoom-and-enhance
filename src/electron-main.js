@@ -22,7 +22,7 @@ const createWindow = () => {
 		// height: 600,
 		// minWidth: 260,
 		// minHeight: 360,
-		icon: require("path").join(__dirname, "../icon.png"),
+		icon: require("path").join(__dirname, "../icon-510x510.png"),
 		title: "Comic Reader",
 		webPreferences: {
 			webviewTag: true,
