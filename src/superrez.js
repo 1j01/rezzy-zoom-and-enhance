@@ -6,9 +6,10 @@
 	const crypto = require("crypto");
 	const sanitizeFilename = require("sanitize-filename");
 
-	const temp_dir = require('electron').remote.app.getPath("temp");
-	// const cacheDir = require('electron').remote.app.getPath("cache"); // TODO: is this a good dir to use?
-	const cache_dir = require("path").join(require('electron').remote.app.getPath("appData"), "superrez-cache");
+	const app_data_dir = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
+	const data_dir_for_this_program = require("path").join(app_data_dir, "rezzy");
+	const temp_dir = require("path").join(data_dir_for_this_program, "original-rez-temp");
+	const cache_dir = require("path").join(data_dir_for_this_program, "superrez-cache");
 	fs.mkdirSync(temp_dir, { recursive: true });
 	fs.mkdirSync(cache_dir, { recursive: true });
 

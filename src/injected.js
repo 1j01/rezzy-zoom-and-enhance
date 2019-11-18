@@ -1,6 +1,7 @@
-// Code injected into the webview
+// Code injected into the page
 
-// TODO: security: don't expose filesystem access (or anything else dangerous) to webpages
+// TODO: security: don't allow webpages to circumvent CORS restrictions for any images on the web
+
 
 (()=> {
 	console.log("injected");
