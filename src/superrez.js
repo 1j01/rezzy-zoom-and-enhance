@@ -4,6 +4,7 @@
 	const {execFile} = require("child_process");
 	const path = require("path");
 	const crypto = require("crypto");
+	const request = require("request");
 	const envPaths = require("env-paths");
 	const sanitizeFilename = require("sanitize-filename");
 
@@ -42,15 +43,18 @@
 		const output_image_path = path.join(origin_folder, `${id}-superrez-${scaling_factor}x${extension}`);
 
 		// try cache first
-		fs.readFile(output_image_path, (err, buffer) => {
-			if(err && err.code === "ENOENT"){
+		fs.exists(output_image_path, (exists_in_cache)=> {
+			if (exists_in_cache) {
+				console.log("superrez cache hit - reusing", output_image_path);
+				callback(null, output_image_path);
+			} else {
 				console.log("superrez cache miss; do the conversion");
 				console.log("temp file path:", input_image_path);
 
 				var write_stream = fs.createWriteStream(input_image_path);
 				var errored = false;
 				// TODO: detect non-200 status code?
-				require("request")
+				request
 					.get(input_image_url)
 					.on('error', (err)=> {
 						errored = true
@@ -67,21 +71,11 @@
 						if(err){
 							return callback(err);
 						}
-						fs.readFile(output_image_path, (err, buffer)=> {
-							if(err){
-								return callback(err);
-							}
-							callback(null, buffer);
-						});
+						callback(null, output_image_path);
 					})
 				});
 				return;
 			}
-			if (err) {
-				return callback(err);
-			}
-			console.log("superrez cache hit - reusing", output_image_path);
-			callback(null, buffer);
 		});
 	}
 

@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const superrez = require('./superrez');
 
 const port = 4284;
 
@@ -22,7 +23,14 @@ router.get('/', function(req, res) {
 router.get('/superrez', function(req, res) {
 	const url = req.query.url;
 	console.log("/superrez an image:", url);
-	res.json({ message: `TODO: superrez ${url}` });
+	superrez(url, (err, output_file_path)=> {
+		if (err) {
+			console.error("failed to superrez, got:", err);
+			res.json({ message: `Failed to superrez ${url}, got: ${err}` });
+			return;
+		}
+		res.sendFile(output_file_path);
+	});
 });
 
 // REGISTER OUR ROUTES -------------------------------
