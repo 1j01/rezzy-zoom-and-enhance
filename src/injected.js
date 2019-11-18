@@ -1,7 +1,8 @@
 // Code injected into the page
 
-// TODO: security: don't allow webpages to circumvent CORS restrictions for any images on the web
+// TODO: make the job loop/queue actually meaningful again and move it into the server
 
+// TODO: security: don't allow webpages to circumvent CORS restrictions for any images on the web
 
 (()=> {
 	console.log("injected");
@@ -14,14 +15,15 @@
 	let jobs_by_url = new Map();
 	// let spider_started = false;
 
-	function superrez_image_url(image_url, callback) {
+	function superrez_image_url(image_url) {
 		const endpoint_url = `${api_base_url}/superrez?url=${encodeURIComponent(image_url)}`;
 		// fetch(endpoint_url).then(()=> {
 		// 	callback(null, superrezzed_blob_url);
 		// }, (err)=> {
 		// 	callback(err);
 		// })
-		callback(null, endpoint_url);
+		// callback(null, endpoint_url);
+		return endpoint_url;
 	}
 
 	function filter_and_sort_jobs() {
@@ -204,30 +206,29 @@
 			job.started = true;
 			console.log("next job:", job);
 			try {
-				await new Promise((resolve, reject)=> {
-					// TODO
-					// require("request").head(job.url).on("response", (response)=> {
-					// 	const content_length = response.headers["content-length"];
-					// 	// TODO: content_length can be undefined; handle that?
-					// 	// e.g. for http://www.aibq.com/
-					// 	if (content_length > 20 * 20) { // very small
-					// 		console.log(`loading image ${job.url} (content-length: ${content_length})`);
-							superrez_image_url(job.url, (err, superrezzed_blob_url)=> {
-								if (err) {
-									return reject(err);
-								}
-								job.result = superrezzed_blob_url;
-								job.callbacks.forEach((applyResultToPage)=> {
-									applyResultToPage(job.result, job.scaling_factor);
-								});
-								resolve();
-							});
-					// 	} else {
-					// 		console.log(`ignoring image ${job.url} (content-length: ${content_length})`);
-					// 		resolve();
+				const head_response = await fetch(job.url, {method: "HEAD"});
+				const content_length = head_response.headers.get("content-length");
+				// TODO: content-length is not necessarily given; handle that?
+				// e.g. on http://www.aibq.com/
+				if (content_length > 20 * 20) { // very small
+					// console.log(`loading image ${job.url} (content-length: ${content_length})`);
+					// superrez_image_url(job.url, (err, superrezzed_blob_url)=> {
+					// 	if (err) {
+					// 		return reject(err);
 					// 	}
+					// 	job.result = superrezzed_blob_url;
+					// 	job.callbacks.forEach((applyResultToPage)=> {
+					// 		applyResultToPage(job.result, job.scaling_factor);
+					// 	});
 					// });
-				})
+					job.result = superrez_image_url(job.url);
+					job.callbacks.forEach((applyResultToPage)=> {
+						applyResultToPage(job.result, job.scaling_factor);
+					});
+					console.log(`enhancing image ${job.url} (content-length: ${content_length}) by replacing with ${job.result}`);
+				} else {
+					console.log(`ignoring image ${job.url} (content-length: ${content_length})`);
+				}
 			} catch(error) {
 				console.error("Failed to superrez image", job.url, "because:", error, job);
 			}
