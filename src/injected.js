@@ -7,7 +7,6 @@
 (()=> {
 	console.log("injected");
 
-	// const superrez_image_url = require("./superrez");
 	// const {spiderFromURL} = require("./spider");
 
 	const api_base_url = "http://localhost:4284/api";
@@ -23,8 +22,11 @@
 		})
 	}
 
-	function addJob() {
-		post("job", {});
+	function addJob({url, elements, applyResultToPage, from_spider}) {
+		// post("job", {url, from_spider});
+		const superrez_url = superrez_image_url(url);
+		const scaling_factor = 2;
+		applyResultToPage(superrez_url, scaling_factor);
 	}
 	// let spider_started = false;
 
@@ -79,32 +81,33 @@
 					url: original_url,
 					elements: [el],
 					applyResultToPage: (superrez_url, scaling_factor)=> {
-					// TODO: what about multiple backgrounds?
+						// TODO: what about multiple backgrounds?
 
-					// TODO: instead of parsing background-size,
-					// try generating an SVG that just contains an <image>
-					// at a higher resolution than the SVG's intrinsic size
+						// TODO: instead of parsing background-size,
+						// try generating an SVG that just contains an <image>
+						// at a higher resolution than the SVG's intrinsic size
 
-					const newBackgroundImage = backgroundImage.replace(css_url_regex, `url("${superrez_url}")`);
+						const newBackgroundImage = backgroundImage.replace(css_url_regex, `url("${superrez_url}")`);
 
-					if (backgroundSize === "contain" || backgroundSize === "cover") {
-						el.style.backgroundImage = newBackgroundImage;
-					} else if (!backgroundSize || backgroundSize === "auto") {
-						const new_image = new Image();
-						new_image.onload = ()=> {
-							el.style.backgroundSize = `${new_image.width/scaling_factor}px ${new_image.height/scaling_factor}px`;
+						if (backgroundSize === "contain" || backgroundSize === "cover") {
 							el.style.backgroundImage = newBackgroundImage;
-						};
-						new_image.onerror = ()=> {
-							console.error("couldn't superrez background-image for", el, "failed to load image to get width/height");
-						};
-						new_image.src = superrez_url;
-					} else {
-						// TODO: parse one and two value syntax
-						// el.style.backgroundSize = rescale(backgroundSize);
-						// el.style.backgroundImage = newBackgroundImage;
-						console.error("can't handle background-size: ", backgroundSize);
-					}
+						} else if (!backgroundSize || backgroundSize === "auto") {
+							const new_image = new Image();
+							new_image.onload = ()=> {
+								el.style.backgroundSize = `${new_image.width/scaling_factor}px ${new_image.height/scaling_factor}px`;
+								el.style.backgroundImage = newBackgroundImage;
+							};
+							new_image.onerror = ()=> {
+								console.error("couldn't superrez background-image for", el, "failed to load image to get width/height");
+							};
+							new_image.src = superrez_url;
+						} else {
+							// TODO: parse one and two value syntax
+							// el.style.backgroundSize = rescale(backgroundSize);
+							// el.style.backgroundImage = newBackgroundImage;
+							console.error("can't handle background-size: ", backgroundSize);
+						}
+					},
 				});
 			});
 

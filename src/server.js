@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 // JOB LOOP or whatever
 // ==============
-
+/*
 let jobs_by_url = new Map();
 
 const addJob = ({url, elements, applyResultToPage, from_spider=false})=> {
@@ -136,7 +136,7 @@ run_jobs().catch((error)=> {
 	console.error(`Superrez job loop crashed\n\n${error}`);
 	alert(`Superrez job loop crashed\n\n${error}`);
 });
-
+*/
 
 // ROUTES FOR OUR API
 // =============================================================================
