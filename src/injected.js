@@ -31,7 +31,7 @@
 	function superrez_image_url(image_url) {
 		const endpoint_url = `${api_base_url}/superrez?url=${encodeURIComponent(image_url)}`;
 		// fetch(endpoint_url).then(()=> {
-		// 	callback(null, superrezzed_blob_url);
+		// 	callback(null, superrez_url);
 		// }, (err)=> {
 		// 	callback(err);
 		// })
@@ -59,11 +59,10 @@
 				addJob({
 					url: img.src,
 					elements: [img],
-					applyResultToPage: (superrezzed_blob_url)=> {
+					applyResultToPage: (superrez_url)=> {
 						img.style.width = getComputedStyle(img).width;
 						img.style.height = getComputedStyle(img).height;
-						img.src = superrezzed_blob_url;
-						img.superrezzed = true;
+						img.src = superrez_url;
 					}
 				});
 			});
@@ -80,34 +79,31 @@
 					url: url,
 					elements: [el],
 				};
-				job.applyResultToPage = (superrezzed_blob_url, scaling_factor)=> {
+				job.applyResultToPage = (superrez_url, scaling_factor)=> {
 					// TODO: what about multiple backgrounds?
 
 					// TODO: instead of parsing background-size,
 					// try generating an SVG that just contains an <image>
 					// at a higher resolution than the SVG's intrinsic size
 
-					const newBackgroundImage = backgroundImage.replace(css_url_regex, `url("${superrezzed_blob_url}")`);
+					const newBackgroundImage = backgroundImage.replace(css_url_regex, `url("${superrez_url}")`);
 
 					if (backgroundSize === "contain" || backgroundSize === "cover") {
 						el.style.backgroundImage = newBackgroundImage;
-						el.superrezzed = true;
 					} else if (!backgroundSize || backgroundSize === "auto") {
 						const new_image = new Image();
 						new_image.onload = ()=> {
 							el.style.backgroundSize = `${new_image.width/scaling_factor}px ${new_image.height/scaling_factor}px`;
 							el.style.backgroundImage = newBackgroundImage;
-							el.superrezzed = true;
 						};
 						new_image.onerror = ()=> {
 							console.error("couldn't superrez", job, "failed to load image to get width/height");
 						};
-						new_image.src = superrezzed_blob_url;
+						new_image.src = superrez_url;
 					} else {
 						// TODO: parse one and two value syntax
 						// el.style.backgroundSize = rescale(backgroundSize);
 						// el.style.backgroundImage = newBackgroundImage;
-						// el.superrezzed = true;
 						console.error("can't handle background-size: ", backgroundSize);
 					}
 				};

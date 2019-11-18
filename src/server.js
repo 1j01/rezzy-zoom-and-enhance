@@ -109,11 +109,11 @@ async function run_jobs() {
 			// e.g. on http://www.aibq.com/
 			if (content_length > 20 * 20) { // very small
 				// console.log(`loading image ${job.url} (content-length: ${content_length})`);
-				// superrez_image_url(job.url, (err, superrezzed_blob_url)=> {
+				// superrez_image_url(job.url, (err, superrez_url)=> {
 				// 	if (err) {
 				// 		return reject(err);
 				// 	}
-				// 	job.result = superrezzed_blob_url;
+				// 	job.result = superrez_url;
 				// 	job.callbacks.forEach((applyResultToPage)=> {
 				// 		applyResultToPage(job.result, job.scaling_factor);
 				// 	});
