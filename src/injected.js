@@ -21,25 +21,22 @@
 			body: JSON.stringify(data) // body data type must match "Content-Type" header
 		})
 	}
+	
+	let jobs_by_url = new Map();
 
 	function addJob({url, elements, applyResultToPage, from_spider}) {
-		// post("job", {url, from_spider});
-		const superrez_url = superrez_image_url(url);
-		const scaling_factor = 2;
-		applyResultToPage(superrez_url, scaling_factor);
+		const job = jobs_by_url.get(url) || {
+			url,
+			superrez_url: `${api_base_url}/superrez?url=${encodeURIComponent(url)}`,
+			scaling_factor: 2,
+			elements: [],
+			from_spider,
+		};
+		jobs_by_url.set(url, job);
+		job.elements = job.elements.concat(elements);
+		applyResultToPage(job.superrez_url, job.scaling_factor);
 	}
 	// let spider_started = false;
-
-	function superrez_image_url(image_url) {
-		const endpoint_url = `${api_base_url}/superrez?url=${encodeURIComponent(image_url)}`;
-		// fetch(endpoint_url).then(()=> {
-		// 	callback(null, superrez_url);
-		// }, (err)=> {
-		// 	callback(err);
-		// })
-		// callback(null, endpoint_url);
-		return endpoint_url;
-	}
 
 	function collect_jobs() {
 		// console.log("collect jobs");
