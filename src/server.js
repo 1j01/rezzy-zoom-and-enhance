@@ -13,28 +13,27 @@ app.use(bodyParser.json());
 
 // JOB LOOP or whatever
 // ==============
-/*
 let jobs_by_url = new Map();
 
-const addJob = ({url, elements, applyResultToPage, from_spider=false})=> {
+const addJob = ({url, callback, from_spider=false})=> {
 	const job = jobs_by_url.get(url) || {
 		url,
 		scaling_factor: 2,
-		elements: [],
+		// elements: [],
 		callbacks: [],
 		from_spider,
 		started: false,
 		result: null,
 	};
-	if (applyResultToPage) {
+	if (callback) {
 		if (job.result) {
-			applyResultToPage(job.result, job.scaling_factor);
+			callback(job.result, job.scaling_factor);
 		} else {
-			job.callbacks.push(applyResultToPage);
+			job.callbacks.push(callback);
 		}
 	}
 	jobs_by_url.set(url, job);
-	job.elements = job.elements.concat(elements);
+	// job.elements = job.elements.concat(elements);
 };
 
 function filter_and_sort_jobs() {
@@ -136,7 +135,6 @@ run_jobs().catch((error)=> {
 	console.error(`Superrez job loop crashed\n\n${error}`);
 	alert(`Superrez job loop crashed\n\n${error}`);
 });
-*/
 
 // ROUTES FOR OUR API
 // =============================================================================
