@@ -37,7 +37,7 @@
 		// };
 
 		let jobs = [...jobs_by_url.values()];
-		jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.spoder);
+		jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.from_spider);
 		jobs.sort((a, b)=> {
 			// very WET...
 			// const a_belongs_to_current_page = belongsToCurrentPage(a);
@@ -77,13 +77,13 @@
 		// Hover effects that use CSS sprites work already! (e.g. next/prev buttons in Unsounded)
 		// It wouldn't work with :hover { background-image: url(hover.png); } but that's not a good pattern
 
-		const addJob = ({url, elements, applyResultToPage, spoder=false})=> {
+		const addJob = ({url, elements, applyResultToPage, from_spider=false})=> {
 			const job = jobs_by_url.get(url) || {
 				url,
 				scaling_factor: 2,
 				elements: [],
 				callbacks: [],
-				spoder,
+				from_spider,
 				started: false,
 				result: null,
 			};
@@ -171,7 +171,7 @@
 				backwardPages: 1,
 				forwardPages: 20,
 				addJob: (url)=> {
-					addJob({url, elements: [], spoder: true});
+					addJob({url, elements: [], from_spider: true});
 				},
 			});
 		}
