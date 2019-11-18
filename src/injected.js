@@ -6,11 +6,23 @@
 (()=> {
 	console.log("injected");
 
-	const superrez_image_url = require("./superrez");
-	const {spiderFromURL} = require("./spider");
+	// const superrez_image_url = require("./superrez");
+	// const {spiderFromURL} = require("./spider");
+
+	const api_base_url = "http://localhost:4284/api";
 	
 	let jobs_by_url = new Map();
-	let spider_started = false;
+	// let spider_started = false;
+
+	function superrez_image_url(image_url, callback) {
+		const endpoint_url = `${api_base_url}/superrez?url=${encodeURIComponent(image_url)}`;
+		// fetch(endpoint_url).then(()=> {
+		// 	callback(null, superrezzed_blob_url);
+		// }, (err)=> {
+		// 	callback(err);
+		// })
+		callback(null, endpoint_url);
+	}
 
 	function filter_and_sort_jobs() {
 		
@@ -157,6 +169,7 @@
 		// only start spidering when other jobs have an opportunity to be added
 		// so they can be prioritized initially
 		// ...actually, if it's starting on the *current* URL, it should be fine, right?
+		/*
 		if (!spider_started) {
 			spider_started = true;
 			console.log("starting spider");
@@ -169,6 +182,7 @@
 				},
 			});
 		}
+		*/
 	}
 
 	function get_next_job() {
@@ -191,12 +205,13 @@
 			console.log("next job:", job);
 			try {
 				await new Promise((resolve, reject)=> {
-					require("request").head(job.url).on("response", (response)=> {
-						const content_length = response.headers["content-length"];
-						// TODO: content_length can be undefined; handle that?
-						// e.g. for http://www.aibq.com/
-						if (content_length > 20 * 20) { // very small
-							console.log(`loading image ${job.url} (content-length: ${content_length})`);
+					// TODO
+					// require("request").head(job.url).on("response", (response)=> {
+					// 	const content_length = response.headers["content-length"];
+					// 	// TODO: content_length can be undefined; handle that?
+					// 	// e.g. for http://www.aibq.com/
+					// 	if (content_length > 20 * 20) { // very small
+					// 		console.log(`loading image ${job.url} (content-length: ${content_length})`);
 							superrez_image_url(job.url, (err, superrezzed_blob_url)=> {
 								if (err) {
 									return reject(err);
@@ -207,11 +222,11 @@
 								});
 								resolve();
 							});
-						} else {
-							console.log(`ignoring image ${job.url} (content-length: ${content_length})`);
-							resolve();
-						}
-					});
+					// 	} else {
+					// 		console.log(`ignoring image ${job.url} (content-length: ${content_length})`);
+					// 		resolve();
+					// 	}
+					// });
 				})
 			} catch(error) {
 				console.error("Failed to superrez image", job.url, "because:", error, job);
