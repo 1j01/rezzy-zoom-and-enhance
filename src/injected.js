@@ -32,18 +32,11 @@
 				bounds.right >= 0
 			);
 		};
-		// const belongsToCurrentPage = (element)=> {
-		// 	element.ownerDocument === document; // erm, we're in the code injected in the page currently
-		// };
 
 		let jobs = [...jobs_by_url.values()];
 		jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.from_spider);
 		jobs.sort((a, b)=> {
 			// very WET...
-			// const a_belongs_to_current_page = belongsToCurrentPage(a);
-			// const b_belongs_to_current_page = belongsToCurrentPage(b);
-			// if (a_belongs_to_current_page && !b_belongs_to_current_page) return -1;
-			// if (b_belongs_to_current_page && !a_belongs_to_current_page) return +1;
 			const a_is_in_view = a.elements.some(isPartiallyInView);
 			const b_is_in_view = b.elements.some(isPartiallyInView);
 			if (a_is_in_view && !b_is_in_view) return -1;
