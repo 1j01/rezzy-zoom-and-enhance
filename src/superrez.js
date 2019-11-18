@@ -7,19 +7,19 @@
 	const sanitizeFilename = require("sanitize-filename");
 
 	const app_data_dir = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
-	const data_dir_for_this_program = require("path").join(app_data_dir, "rezzy");
-	const temp_dir = require("path").join(data_dir_for_this_program, "original-rez-temp");
-	const cache_dir = require("path").join(data_dir_for_this_program, "superrez-cache");
+	const data_dir_for_this_program = path.join(app_data_dir, "rezzy");
+	const temp_dir = path.join(data_dir_for_this_program, "original-rez-temp");
+	const cache_dir = path.join(data_dir_for_this_program, "superrez-cache");
 	fs.mkdirSync(temp_dir, { recursive: true });
 	fs.mkdirSync(cache_dir, { recursive: true });
 
-	const converter_path = require("path").join(__dirname, "../waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe");
+	const converter_path = path.join(__dirname, "../waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe");
 
 	const scaling_factor = 2;
 
 	function superrez_image_url(input_image_url, callback) {
 		const origin = new URL(input_image_url).origin;
-		const origin_folder = require("path").join(cache_dir, sanitizeFilename(origin.replace(/:\/\//, "_"), {replacement: "_"}));
+		const origin_folder = path.join(cache_dir, sanitizeFilename(origin.replace(/:\/\//, "_"), {replacement: "_"}));
 		fs.mkdirSync(origin_folder, { recursive: true });
 		const id = crypto.createHash('md5').update(input_image_url).digest('hex');
 		// TODO: get file extension from mime type returned from server (make HEAD request or move logic later into GET request)
@@ -37,8 +37,8 @@
 		if (extension === ".jp2" || extension === ".jpg") {
 			extension = ".jpeg";
 		}
-		const input_image_path = require("path").join(temp_dir, `${id}-original-rez${extension}`);
-		const output_image_path = require("path").join(origin_folder, `${id}-superrez-${scaling_factor}x${extension}`);
+		const input_image_path = path.join(temp_dir, `${id}-original-rez${extension}`);
+		const output_image_path = path.join(origin_folder, `${id}-superrez-${scaling_factor}x${extension}`);
 
 		// try cache first
 		fs.readFile(output_image_path, (err, buffer) => {
@@ -90,7 +90,7 @@
 		execFile(
 			converter_path,
 			["--input", input_image_path, "--output", output_image_path],
-			{cwd: require("path").dirname(converter_path)},
+			{cwd: path.dirname(converter_path)},
 			(err, stdout, stderr) => {
 				console.log("[waifu2x-converter-cpp] results for", input_image_path);
 				console.log("[waifu2x-converter-cpp] stdout:\n", stdout);
