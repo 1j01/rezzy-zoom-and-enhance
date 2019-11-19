@@ -5,9 +5,9 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 	app.quit();
 }
 
-if (require('electron-is-dev')){
+// if (require('electron-is-dev')){
 	require('electron-debug')({ showDevTools: false });
-}
+// }
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
