@@ -44,6 +44,7 @@
   "dependencies": {
     "electron-is-dev": "^1.1.0",
     "electron-squirrel-startup": "^1.0.0",
+    "request": "2.88.0",
     "sanitize-filename": "1.6.3"
   },
   "devDependencies": {
