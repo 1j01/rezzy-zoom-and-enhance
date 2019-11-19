@@ -13,7 +13,7 @@
 
 	function filter_and_sort_jobs() {
 		
-		// TODO: combine area and isVisible to look for most visible pixels
+		// TODO: combine area and isVisible into a visible area metric
 		// clamp bounding client rect to viewport and get area of that
 		const area = (element)=> element.offsetWidth * element.offsetHeight;
 		const isVisible = (element)=> {
