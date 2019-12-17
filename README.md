@@ -13,6 +13,8 @@ It's currently an incredibly lackluster web browser (based on an [electron brows
 
 ## Development Setup
 
+Note: this MVP Electron app is only set up to work on Windows. For other platforms, you'll need to download a different release of waifu2x-converter-cpp, and change the path to the executable binary.
+
 - [Install Git Large File Storage][git lfs install] if you don't have it.
 - [Clone the repo.][git clone]
 - Install [Node.js][] if you don't have it, then open up a command prompt / terminal in the project directory.
