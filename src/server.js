@@ -51,7 +51,11 @@ io.on("connection", (socket)=> {
 		}
 	});
 	let stop_spider;
+	let started_from_url;
 	socket.on("spider-from-url", (starting_url)=> {
+		if (started_from_url === starting_url) {
+			return;
+		}
 		stop_spider && stop_spider();
 		console.log("starting spider from ", starting_url);
 		stop_spider = spiderFromURL(starting_url, {
@@ -61,6 +65,7 @@ io.on("connection", (socket)=> {
 				add_job({url, elements: [], from_spider: true});
 			},
 		});
+		started_from_url = starting_url;
 	});
 	socket.on("disconnect", ()=> {
 		let formerly_wanted = 0;

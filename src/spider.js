@@ -1,3 +1,5 @@
+const cheerio = require('cheerio');
+
 const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 	const direction = backwardPages > 0 ?
 		(forwardPages > 0 ? "from start" : "backwards") :
@@ -28,29 +30,29 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	let cancel_functions = [];
 	let stopped = false;
 
-	const dummy_element = document.createElement("html");
-	dummy_element.innerHTML = html;
+	const $ = cheerio.load(html);
 
-	const images = Array.from(dummy_element.getElementsByTagName("img"));
-	const links = Array.from(dummy_element.getElementsByTagName("a"));
+	const images = $("img").toArray();
+	const links = $("a").toArray();
 
-	// TODO: look for main image link
+	// TODO: look for linked webcomic image, which could help with webcomics in different languages,
+	// which might not say "back"/"forward" in English in any way
 	const nextLinks = links.filter((a)=>
-		!!a.outerHTML.match(/next(?![da])|forward|fr?wr?d/i)
+		!!$.html(a).match(/next(?![da])|forward|fr?wr?d/i)
 	);
 	const prevLinks = links.filter((a)=>
-		!!a.outerHTML.match(/prev(?!iew|[eau])|backward|back([\b_-])|backwd|bc?k?wd(\b|[_-])/i)
+		!!$.html(a).match(/prev(?!iew|[eau])|backward|back([\b_-])|backwd|bc?k?wd(\b|[_-])/i)
 	);
 	const prioritizePageLinksFirst = (a, b)=> {
 		const ch_regexp = /chapter|chapt?([\b_-])|([\b_-])ch([\b_-])/i;
 		const pg_regexp = /page|([\b_-])(p[gp]|cc)([\b_-])/i;
 		const comic_regexp = /comic/i;
-		const a_is_ch = !!a.outerHTML.match(ch_regexp);
-		const b_is_ch = !!b.outerHTML.match(ch_regexp);
-		const a_is_pg = !!a.outerHTML.match(pg_regexp);
-		const b_is_pg = !!b.outerHTML.match(pg_regexp);
-		const a_is_comic = !!a.outerHTML.match(comic_regexp);
-		const b_is_comic = !!b.outerHTML.match(comic_regexp);
+		const a_is_ch = !!$.html(a).match(ch_regexp);
+		const b_is_ch = !!$.html(b).match(ch_regexp);
+		const a_is_pg = !!$.html(a).match(pg_regexp);
+		const b_is_pg = !!$.html(b).match(pg_regexp);
+		const a_is_comic = !!$.html(a).match(comic_regexp);
+		const b_is_comic = !!$.html(b).match(comic_regexp);
 
 		// deprioritize, but don't exclude chapter buttons;
 		// a webcomic could have entire chapters on a page
@@ -74,21 +76,22 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	prevLinks.sort(prioritizePageLinksFirst);
 
 	console.log("[spider] found elements:", {nextLinks, prevLinks, images});
-	// console.log("[spider] next links, in order of priority:\n\n", nextLinks.map((a)=> a.outerHTML).join("\n\n"));
-	// console.log("[spider] prev links, in order of priority:\n\n", prevLinks.map((a)=> a.outerHTML).join("\n\n"));
+	// console.log("[spider] next links, in order of priority:\n\n", nextLinks.map((a)=> $.html(a)).join("\n\n"));
+	// console.log("[spider] prev links, in order of priority:\n\n", prevLinks.map((a)=> $.html(a)).join("\n\n"));
 	
 	// find jobs
 	images.forEach((img)=> {
-		if (!img.src.match(/^(https?):/)) {
+		const src = $(img).attr("src");
+		if (!src.match(/^(https?):/)) {
 			return;
 		}
-		require("request").head(img.src).on("response", (response)=> {
+		require("request").head(src).on("response", (response)=> {
 			const content_length = response.headers["content-length"];
 			if (content_length > 20000) {
-				// console.log(`[spider] preloading image ${img.src} (content-length: ${content_length})`);
-				addJob(img.src);
+				// console.log(`[spider] preloading image ${src} (content-length: ${content_length})`);
+				addJob(src);
 			} else {
-				// console.log(`[spider] ignoring image ${img.src} (content-length: ${content_length})`);
+				// console.log(`[spider] ignoring image ${src} (content-length: ${content_length})`);
 			}
 		});
 	});
@@ -102,8 +105,9 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	if (backwardPages > 0) {
 		const prevLink = prevLinks[0];
 		if (prevLink) {
+			const prev_url = $(prevLink).attr("href");
 			cancel_functions.push(
-				spiderFromURL(prevLink.href, {backwardPages: backwardPages - 1, forwardPages: 0, addJob})
+				spiderFromURL(prev_url, {backwardPages: backwardPages - 1, forwardPages: 0, addJob})
 			);
 		} else {
 			console.warn("[spider] No previous page link found");
@@ -114,8 +118,9 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	if (forwardPages > 0) {
 		const nextLink = nextLinks[0];
 		if (nextLink) {
+			const next_url = $(nextLink).attr("href");
 			cancel_functions.push(
-				spiderFromURL(nextLink.href, {backwardPages: 0, forwardPages: forwardPages - 1, addJob})
+				spiderFromURL(next_url, {backwardPages: 0, forwardPages: forwardPages - 1, addJob})
 			);
 		} else {
 			console.warn("[spider] No next page link found");
