@@ -59,7 +59,7 @@ function filter_and_sort_jobs() {
 	};
 
 	let jobs = [...jobs_by_url.values()];
-	jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.from_spider);
+	/*jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.from_spider);
 	jobs.sort((a, b)=> {
 		// very WET...
 		const a_is_in_view = a.elements.some(isPartiallyInView);
@@ -79,7 +79,7 @@ function filter_and_sort_jobs() {
 		if (a_max_area > b_max_area) return -1;
 		if (b_max_area > a_max_area) return +1;
 		return 0;
-	});
+	});*/
 	return jobs;
 }
 
@@ -154,7 +154,8 @@ router.get('/superrez', function(req, res) {
 	console.log("/superrez an image:", url);
 	addJob({
 		url,
-		callback: ()=> {
+		callback: (output_file_path)=> {
+			res.setHeader("Access-Control-Allow-Origin", "*");
 			res.sendFile(output_file_path);
 		},
 	})

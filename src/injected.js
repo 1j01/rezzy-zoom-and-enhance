@@ -2,7 +2,9 @@
 
 // TODO: make the job loop/queue actually meaningful again and move it into the server
 
-// TODO: security: don't allow webpages to circumvent CORS restrictions for any images on the web
+// security: be mindful about what data access the extension gives pages
+// - regarding CORS, sites can already request any URL using a proxy like CORS Anywhere 
+// - if the extension were to request resources with cookies it could expose private information
 
 (()=> {
 	console.log("injected");
@@ -34,6 +36,7 @@
 		};
 		jobs_by_url.set(url, job);
 		job.elements = job.elements.concat(elements);
+		post(`job?url=${encodeURIComponent(url)}`, job);
 		applyResultToPage(job.superrez_url, job.scaling_factor);
 	}
 	// let spider_started = false;
