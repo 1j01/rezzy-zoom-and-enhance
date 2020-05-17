@@ -12,19 +12,6 @@
 	const socket = window.io();
 
 	// const {spiderFromURL} = require("./spider");
-
-	const api_base_url = "http://localhost:4284/api";
-	
-	function post(endpoint, data) {
-		const endpoint_url = `${api_base_url}/${endpoint}`;
-		fetch(endpoint_url, {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(data) // body data type must match "Content-Type" header
-		})
-	}
 	
 	let jobs_by_url = {};
 
@@ -54,17 +41,19 @@
 	function addJob({url, elements, applyResultToPage, from_spider}) {
 		const job = jobs_by_url[url] || {
 			url,
-			superrez_url: `${api_base_url}/superrez?url=${encodeURIComponent(url)}`,
 			scaling_factor: 2,
 			elements: [],
 			from_spider,
 		};
 		jobs_by_url[url] = job;
 		job.elements = job.elements.concat(elements);
-		post(`job?url=${encodeURIComponent(url)}`, job);
-		applyResultToPage(job.superrez_url, job.scaling_factor);
+		socket.emit("job", job);
 	}
 	// let spider_started = false;
+
+	socket.on("superrez-result", (result)=> {
+		applyResultToPage(job.superrez_url, job.scaling_factor);
+	});
 
 	function collect_jobs() {
 		// console.log("collect jobs");

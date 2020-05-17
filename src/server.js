@@ -1,15 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const Server = require('./socket-io');
 const superrez = require('./superrez');
 
 const port = 4284;
+const io = new Server(port);
 
-const app = express();
-
-// configure app to use bodyParser()
-// this will let us get the data from a POST
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+io.on("job", ()=> {
+	
+})
 
 // JOB LOOP or whatever
 // ==============
@@ -37,49 +34,9 @@ const addJob = ({url, callback, from_spider=false})=> {
 };
 
 function filter_and_sort_jobs() {
-		
-	// TODO: combine area and isVisible to look for most visible pixels
-	// clamp bounding client rect to viewport and get area of that
-	const area = (element)=> element.offsetWidth * element.offsetHeight;
-	const isVisible = (element)=> {
-		if (!element.parentElement) return false;
-		if (element.offsetWidth === 0 || element.offsetHeight === 0) return false;
-		const style = getComputedStyle(element);
-		if (style.display === "none" || style.visibility === "hidden") return false;
-		return true;
-	};
-	const isPartiallyInView = (element)=> {
-		const bounds = element.getBoundingClientRect();
-		return (
-			bounds.top <= window.innerHeight &&
-			bounds.left <= window.innerWidth &&
-			bounds.bottom >= 0 &&
-			bounds.right >= 0
-		);
-	};
-
 	let jobs = [...jobs_by_url.values()];
-	/*jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.from_spider);
-	jobs.sort((a, b)=> {
-		// very WET...
-		const a_is_in_view = a.elements.some(isPartiallyInView);
-		const b_is_in_view = b.elements.some(isPartiallyInView);
-		if (a_is_in_view && !b_is_in_view) return -1;
-		if (b_is_in_view && !a_is_in_view) return +1;
-		const a_max_area = Math.max(0, ...a.elements.map(area));
-		const b_max_area = Math.max(0, ...b.elements.map(area));
-		const a_is_large = a_max_area > 150000;
-		const b_is_large = b_max_area > 150000;
-		const a_is_img = a_is_large && a.elements[0] && a.elements[0].nodeName === "IMG";
-		const b_is_img = b_is_large && b.elements[0] && b.elements[0].nodeName === "IMG";
-		const a_is_main_content = a_is_large && a_is_img;
-		const b_is_main_content = b_is_large && b_is_img;
-		if (a_is_main_content && !b_is_main_content) return -1;
-		if (b_is_main_content && !a_is_main_content) return +1;
-		if (a_max_area > b_max_area) return -1;
-		if (b_max_area > a_max_area) return +1;
-		return 0;
-	});*/
+	// jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.from_spider);
+	jobs.sort((a, b)=> b.priority - a.priority);
 	return jobs;
 }
 
