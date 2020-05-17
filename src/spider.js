@@ -1,18 +1,19 @@
 const cheerio = require('cheerio');
 
 const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
-	const direction = backwardPages > 0 ?
-		(forwardPages > 0 ? "from start" : "backwards") :
-		(forwardPages > 0 ? "forwards" : "on last page to scrape in this direction");
+	const description = backwardPages > 0 ?
+		(forwardPages > 0 ? "starting point URL" : "crawling backwards") :
+		(forwardPages > 0 ? "crawling forwards" : "reached limit of number of pages to scrape in this direction");
 	let cancel_function;
 	let stopped = false;
+	console.error(`[spider] crawling ${url} (${description})`);
 	require("request")(url, (error, response, body)=> {
 		if (error) {
-			console.error(`[spider] Failed to get ${url} - stopping scraping (${direction})`);
+			console.error(`[spider] Failed to get ${url} - stopping scraping (${description})`);
 			return;
 		}
 		if (response.statusCode !== 200) {
-			console.error(`[spider] Failed to get ${url} - recieved HTTP ${response.statusCode} - stopping scraping (${direction})`);
+			console.error(`[spider] Failed to get ${url} - recieved HTTP ${response.statusCode} - stopping scraping (${description})`);
 			return;
 		}
 		if (stopped) {
@@ -21,6 +22,7 @@ const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 		cancel_function = spiderFromHTML(body, url, {backwardPages, forwardPages, addJob});
 	});
 	return ()=> {
+		// console.log("[spider] stopped");
 		stopped = true;
 		cancel_function && cancel_function();
 	};
@@ -75,9 +77,10 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 	nextLinks.sort(prioritizePageLinksFirst);
 	prevLinks.sort(prioritizePageLinksFirst);
 
+	console.log(`[spider] found ${images.length} images, ${nextLinks.length} next link(s), ${prevLinks.length} prev link(s)`);
 	// console.log("[spider] found elements:", {nextLinks, prevLinks, images});
-	console.log("[spider] next links, in order of priority:\n\n", nextLinks.map((a)=> $.html(a)).join("\n\n"));
-	console.log("[spider] prev links, in order of priority:\n\n", prevLinks.map((a)=> $.html(a)).join("\n\n"));
+	// console.log("[spider] next links, in order of priority:\n\n", nextLinks.map((a)=> $.html(a)).join("\n\n"));
+	// console.log("[spider] prev links, in order of priority:\n\n", prevLinks.map((a)=> $.html(a)).join("\n\n"));
 	
 	// find jobs
 	images.forEach((img)=> {
@@ -135,6 +138,7 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 	}
 
 	return ()=> {
+		// console.log("[spider] stopped");
 		stopped = true;
 		cancel_functions.forEach(cancel_function=> cancel_function());
 	};

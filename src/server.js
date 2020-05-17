@@ -14,10 +14,11 @@ io.on("connection", (socket)=> {
 	socket.on("jobs", (client_wanted_jobs)=> {
 		// console.log("client_wanted_jobs", client_wanted_jobs);
 		for (const client_wanted_job of client_wanted_jobs) {
-			if (!jobs_by_url.has(client_wanted_job.url) || !jobs_by_url.get(client_wanted_job.url).wanted_by_sockets.has(socket)) {
+			if (!jobs_by_url.has(client_wanted_job.url) || !jobs_by_url.get(client_wanted_job.url).wanted_directly_by_sockets.has(socket)) {
 				add_job({
 					url: client_wanted_job.url,
 					scaling_factor: client_wanted_job.scaling_factor,
+					wanted_directly_by_socket: socket,
 					callback: (output_file_path)=> {
 						fs.readFile(output_file_path, (error, data)=> {
 							if (error) {
@@ -43,9 +44,9 @@ io.on("connection", (socket)=> {
 				}
 			}
 			if (wanted_by_this_client) {
-				job.wanted_by_sockets.add(socket);
+				job.wanted_directly_by_sockets.add(socket);
 			} else {
-				job.wanted_by_sockets.delete(socket);
+				job.wanted_directly_by_sockets.delete(socket);
 				cancel_unwanted_jobs();
 			}
 		}
@@ -62,44 +63,61 @@ io.on("connection", (socket)=> {
 			backwardPages: 1,
 			forwardPages: 20,
 			addJob: (url)=> {
-				add_job({url, from_spider: true, scaling_factor: 2});
+				add_job({
+					url,
+					scaling_factor: 2,
+					wanted_spidered_by_socket: socket,
+				});
 			},
 		});
 		started_from_url = starting_url;
 	});
 	socket.on("disconnect", ()=> {
-		let formerly_wanted = 0;
+		let formerly_wanted_directly = 0;
+		let formerly_wanted_spidered = 0;
 		for (const job of jobs_by_url.values()) {
-			if (job.wanted_by_sockets.has(socket)) {
-				formerly_wanted += 1;
+			if (job.wanted_directly_by_sockets.has(socket)) {
+				formerly_wanted_directly += 1;
 			}
-			job.wanted_by_sockets.delete(socket);
+			if (job.wanted_spidered_by_sockets.has(socket)) {
+				formerly_wanted_spidered += 1;
+			}
+			job.wanted_directly_by_sockets.delete(socket);
+			job.wanted_spidered_by_sockets.delete(socket);
 		}
-		console.log("Client disconnected with", formerly_wanted, "jobs requested");
+		console.log("Client disconnected with", formerly_wanted_directly, "jobs requested, and", formerly_wanted_spidered, "jobs from spidering");
 		cancel_unwanted_jobs();
 		stop_spider && stop_spider();
+		stop_spider = null;
 	});
 });
 
 function cancel_unwanted_jobs() {
 	for (const [url, job] of jobs_by_url.entries()) {
-		if (job.wanted_by_sockets.size === 0 && !job.from_spider) {
+		if (job.wanted_directly_by_sockets.size === 0 && job.wanted_spidered_by_sockets.size === 0) {
 			console.log("Job no longer wanted by any active clients: ", url);
 			jobs_by_url.delete(url);
 		}
 	}
 }
 
-const add_job = ({url, callback, from_spider=false})=> {
+const add_job = ({url, callback, wanted_directly_by_socket, wanted_spidered_by_socket})=> {
 	const job = jobs_by_url.get(url) || {
 		url,
-		wanted_by_sockets: new Set(),
-		scaling_factor: 2,
+		scaling_factor: 2, // can't be changed for now
+		// Note: a job could be start out from a spider and then the page is navigated to and it gets a directly-interested socket
+		wanted_directly_by_sockets: new Set(), // sockets to send results to when finished, to display on a page that is open
+		wanted_spidered_by_sockets: new Set(), // sockets that led to spidering of a page that has an image; don't need to send to these sockets
 		callbacks: [],
-		from_spider,
 		started: false,
 		output_file_path: null,
 	};
+	if (wanted_directly_by_socket) {
+		job.wanted_directly_by_sockets.add(wanted_directly_by_socket);
+	}
+	if (wanted_spidered_by_socket) {
+		job.wanted_spidered_by_sockets.add(wanted_spidered_by_socket);
+	}
 	if (callback) {
 		if (job.output_file_path) {
 			callback(job.output_file_path, job.scaling_factor);
@@ -137,6 +155,7 @@ async function run_jobs() {
 		}
 		job.started = true;
 		console.log(`next job: ${job.url} @ ${job.scaling_factor}x`);
+		console.log("wanted spidered by", job.wanted_spidered_by_sockets.size, "sockets and directly by", job.wanted_directly_by_sockets.size, "pages");
 		try {
 			const head_response = await fetch(job.url, {method: "HEAD"});
 			const content_length = head_response.headers.get("content-length");
