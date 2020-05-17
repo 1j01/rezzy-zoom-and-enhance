@@ -18,7 +18,7 @@ const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 		if (stopped) {
 			return;
 		}
-		cancel_function = module.exports.spiderFromHTML(body, {backwardPages, forwardPages, addJob});
+		cancel_function = spiderFromHTML(body, url, {backwardPages, forwardPages, addJob});
 	});
 	return ()=> {
 		stopped = true;
@@ -26,7 +26,7 @@ const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 	};
 };
 
-const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
+const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 	let cancel_functions = [];
 	let stopped = false;
 
@@ -75,23 +75,30 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	nextLinks.sort(prioritizePageLinksFirst);
 	prevLinks.sort(prioritizePageLinksFirst);
 
-	console.log("[spider] found elements:", {nextLinks, prevLinks, images});
-	// console.log("[spider] next links, in order of priority:\n\n", nextLinks.map((a)=> $.html(a)).join("\n\n"));
-	// console.log("[spider] prev links, in order of priority:\n\n", prevLinks.map((a)=> $.html(a)).join("\n\n"));
+	// console.log("[spider] found elements:", {nextLinks, prevLinks, images});
+	console.log("[spider] next links, in order of priority:\n\n", nextLinks.map((a)=> $.html(a)).join("\n\n"));
+	console.log("[spider] prev links, in order of priority:\n\n", prevLinks.map((a)=> $.html(a)).join("\n\n"));
 	
 	// find jobs
 	images.forEach((img)=> {
-		const src = $(img).attr("src");
-		if (!src.match(/^(https?):/)) {
+		const image_url = new URL($(img).attr("src"), url).href;
+		console.log("[spider] found image:", image_url);
+		if (!image_url.match(/^(https?):/)) {
 			return;
 		}
-		require("request").head(src).on("response", (response)=> {
+		require("request")
+		.head(image_url)
+		// this error handling doesn't seem to cover invalid URLs
+		.on("error", (error)=> {
+			console.error("[spider] error doing HEAD request for", image_url, error);
+		})
+		.on("response", (response)=> {
 			const content_length = response.headers["content-length"];
 			if (content_length > 20000) {
-				// console.log(`[spider] preloading image ${src} (content-length: ${content_length})`);
-				addJob(src);
+				// console.log(`[spider] preloading image ${image_url} (content-length: ${content_length})`);
+				addJob(image_url);
 			} else {
-				// console.log(`[spider] ignoring image ${src} (content-length: ${content_length})`);
+				// console.log(`[spider] ignoring image ${image_url} (content-length: ${content_length})`);
 			}
 		});
 	});
@@ -105,7 +112,7 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	if (backwardPages > 0) {
 		const prevLink = prevLinks[0];
 		if (prevLink) {
-			const prev_url = $(prevLink).attr("href");
+			const prev_url = new URL($(prevLink).attr("href"), url).href;
 			cancel_functions.push(
 				spiderFromURL(prev_url, {backwardPages: backwardPages - 1, forwardPages: 0, addJob})
 			);
@@ -118,7 +125,7 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	if (forwardPages > 0) {
 		const nextLink = nextLinks[0];
 		if (nextLink) {
-			const next_url = $(nextLink).attr("href");
+			const next_url = new URL($(nextLink).attr("href"), url).href;
 			cancel_functions.push(
 				spiderFromURL(next_url, {backwardPages: 0, forwardPages: forwardPages - 1, addJob})
 			);
@@ -133,4 +140,4 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	};
 };
 
-module.exports = {spiderFromURL, spiderFromHTML};
+module.exports = {spiderFromURL};

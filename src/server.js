@@ -61,8 +61,8 @@ io.on("connection", (socket)=> {
 		stop_spider = spiderFromURL(starting_url, {
 			backwardPages: 1,
 			forwardPages: 20,
-			add_job: (url)=> {
-				add_job({url, elements: [], from_spider: true});
+			addJob: (url)=> {
+				add_job({url, from_spider: true, scaling_factor: 2});
 			},
 		});
 		started_from_url = starting_url;
@@ -83,7 +83,7 @@ io.on("connection", (socket)=> {
 
 function cancel_unwanted_jobs() {
 	for (const [url, job] of jobs_by_url.entries()) {
-		if (job.wanted_by_sockets.size === 0) {
+		if (job.wanted_by_sockets.size === 0 && !job.from_spider) {
 			console.log("Job no longer wanted by any active clients: ", url);
 			jobs_by_url.delete(url);
 		}
