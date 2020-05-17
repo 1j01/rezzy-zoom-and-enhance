@@ -9,6 +9,8 @@
 (()=> {
 	console.log("injected");
 
+	const socket = window.io();
+
 	// const {spiderFromURL} = require("./spider");
 
 	const api_base_url = "http://localhost:4284/api";
@@ -24,17 +26,40 @@
 		})
 	}
 	
-	let jobs_by_url = new Map();
+	let jobs_by_url = {};
+
+	function updatePrioritities() {
+		for (const [url, job] of Object.entries(jobs_by_url)) {
+			job.elements.forEach(element=> {
+				element.style.outline = `${visiblePixels(element)/50000}px solid red`;
+			});
+			// const pixels = job.elements.map(visiblePixels).reduce((a, b) => a + b, 0);
+			// socket.emit("priority", {url, priority: pixels});
+		}
+	}
+
+	function visiblePixels(element) {
+		if (!element.parentElement) return 0;
+		if (element.offsetWidth === 0 || element.offsetHeight === 0) return 0;
+		const style = getComputedStyle(element);
+		if (style.display === "none" || style.visibility === "hidden") return 0;
+		const bounds = element.getBoundingClientRect();
+		const visibleWidth = Math.max(0, Math.min(window.innerWidth, bounds.right) - Math.max(0, bounds.left));
+		const visibleHeight = Math.max(0, Math.min(window.innerHeight, bounds.bottom) - Math.max(0, bounds.top));
+		return visibleWidth * visibleHeight;
+	}
+
+	setInterval(updatePrioritities, 500);
 
 	function addJob({url, elements, applyResultToPage, from_spider}) {
-		const job = jobs_by_url.get(url) || {
+		const job = jobs_by_url[url] || {
 			url,
 			superrez_url: `${api_base_url}/superrez?url=${encodeURIComponent(url)}`,
 			scaling_factor: 2,
 			elements: [],
 			from_spider,
 		};
-		jobs_by_url.set(url, job);
+		jobs_by_url[url] = job;
 		job.elements = job.elements.concat(elements);
 		post(`job?url=${encodeURIComponent(url)}`, job);
 		applyResultToPage(job.superrez_url, job.scaling_factor);

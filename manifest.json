@@ -10,7 +10,10 @@
 	"content_scripts": [
 		{
 			"matches": ["*://*.casualvillain.com/*"],
-			"js": ["src/injected.js"]
+			"js": [
+				"lib/socket.io.js",
+				"src/injected.js"
+			]
 		}
 	],
 	"permissions": [
