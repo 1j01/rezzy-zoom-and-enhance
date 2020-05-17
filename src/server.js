@@ -4,19 +4,53 @@ const superrez = require('./superrez');
 const port = 4284;
 const io = new Server(port);
 
-io.on("job", ()=> {
-	
-})
-
-// JOB LOOP or whatever
-// ==============
+// using a Map instead of a plain object just because I don't want the page to be able to overwrite "prototype" and stuff like that
 let jobs_by_url = new Map();
 
-const addJob = ({url, callback, from_spider=false})=> {
+io.on("connection", (socket)=> {
+	socket.on("jobs", (client_wanted_jobs)=> {
+		for (const client_wanted_job of client_wanted_jobs) {
+			if (!jobs_by_url.has(client_wanted_job.url)) {
+				add_job(client_wanted_job);
+			}
+		}
+		for (const [url, job] of jobs_by_url.entries()) {
+			let wanted_by_this_client = false;
+			for (const client_wanted_job of client_wanted_jobs) {
+				if (client_wanted_job.url === url) {
+					wanted_by_this_client = true;
+				}
+			}
+			if (wanted_by_this_client) {
+				job.wanted_by_sockets.add(socket);
+			} else {
+				job.wanted_by_sockets.delete(socket);
+				cancel_unwanted_jobs();
+			}
+		}
+	});
+	socket.on("disconnect", ()=> {
+		for (const job of jobs_by_url.values()) {
+			job.wanted_by_sockets.delete(socket);
+		}
+		cancel_unwanted_jobs();
+	});
+});
+
+function cancel_unwanted_jobs() {
+	for (const [url, job] of jobs_by_url.entries()) {
+		if (job.wanted_by_sockets.size === 0) {
+			console.log("Job no longer wanted by any active clients: ", url);
+			jobs_by_url.delete(url);
+		}
+	}
+}
+
+const add_job = ({url, callback, from_spider=false})=> {
 	const job = jobs_by_url.get(url) || {
 		url,
+		wanted_by_sockets: new Set(),
 		scaling_factor: 2,
-		// elements: [],
 		callbacks: [],
 		from_spider,
 		started: false,
@@ -30,18 +64,19 @@ const addJob = ({url, callback, from_spider=false})=> {
 		}
 	}
 	jobs_by_url.set(url, job);
-	// job.elements = job.elements.concat(elements);
 };
 
-function filter_and_sort_jobs() {
+// JOB LOOP
+// ========
+
+function get_sorted_jobs() {
 	let jobs = [...jobs_by_url.values()];
-	// jobs = jobs.filter((job)=> job.elements.some(isVisible) || job.from_spider);
 	jobs.sort((a, b)=> b.priority - a.priority);
 	return jobs;
 }
 
 function get_next_job() {
-	return filter_and_sort_jobs().filter((job)=> !job.started)[0];
+	return get_sorted_jobs().filter((job)=> !job.started)[0];
 }
 
 async function run_jobs() {
@@ -97,38 +132,5 @@ run_jobs().catch((error)=> {
 	console.error(`\n\nSuperrez job loop crashed\n\n${error.stack}\n\n`);
 });
 
-// ROUTES FOR OUR API
-// =============================================================================
-const router = express.Router();
-
-// test route to make sure everything is working (accessed at GET http://localhost:4284/api)
-router.get('/', function(req, res) {
-	res.json({ message: 'hooray! welcome to our api!' });
-});
-
-router.get('/superrez', function(req, res) {
-	const url = req.query.url;
-	console.log("/superrez an image:", url);
-	addJob({
-		url,
-		callback: (output_file_path)=> {
-			res.setHeader("Access-Control-Allow-Origin", "*");
-			res.sendFile(output_file_path);
-		},
-	})
-});
-
-// REGISTER OUR ROUTES -------------------------------
-// all of our routes will be prefixed with /api
-app.use('/api', router);
-
-// nice to have something at the root (accessed at GET http://localhost:4284/)
-app.get('/', function(req, res) {
-	res.json({ message: 'API is at /api' });
-});
-
-// START THE SERVER
-// =============================================================================
-app.listen(port);
 console.log('Magic happens on port ' + port);
 
