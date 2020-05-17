@@ -1,4 +1,5 @@
 const fs = require('fs');
+const fetch = require('node-fetch');
 const Server = require('socket.io');
 const superrez = require('./superrez');
 
@@ -49,9 +50,14 @@ io.on("connection", (socket)=> {
 		}
 	});
 	socket.on("disconnect", ()=> {
+		let formerly_wanted = 0;
 		for (const job of jobs_by_url.values()) {
+			if (job.wanted_by_sockets.has(socket)) {
+				formerly_wanted += 1;
+			}
 			job.wanted_by_sockets.delete(socket);
 		}
+		console.log("Client disconnected with", formerly_wanted, "jobs requested");
 		cancel_unwanted_jobs();
 	});
 });
@@ -111,7 +117,7 @@ async function run_jobs() {
 			continue;
 		}
 		job.started = true;
-		console.log("next job:", job);
+		console.log(`next job: ${job.url} @ ${job.scaling_factor}x`);
 		try {
 			const head_response = await fetch(job.url, {method: "HEAD"});
 			const content_length = head_response.headers.get("content-length");

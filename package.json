@@ -15,6 +15,7 @@
   "author": "Isaiah Odhner <isaiahodhner@gmail.com>",
   "dependencies": {
     "env-paths": "2.2.0",
+    "node-fetch": "2.6.0",
     "request": "2.88.0",
     "sanitize-filename": "1.6.3",
     "socket.io": "2.3.0"

@@ -5,7 +5,7 @@
 // - if the extension were to request resources with cookies it could expose private information
 
 (()=> {
-	console.log("injected");
+	console.log("Rezzy injected");
 
 	const socket = window.io("http://localhost:4284");
 
@@ -15,9 +15,9 @@
 
 	function update_jobs_list() {
 		for (const job of Object.values(jobs_by_url)) {
-			job.elements.forEach(element=> {
-				element.style.outline = `${visible_pixels(element)/50000}px solid red`;
-			});
+			// job.elements.forEach(element=> {
+			// 	element.style.outline = `${visible_pixels(element)/50000}px solid red`;
+			// });
 			const pixels = job.elements.map(visible_pixels).reduce((a, b) => a + b, 0);
 			job.priority = pixels;
 		}
