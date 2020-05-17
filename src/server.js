@@ -2,6 +2,7 @@ const fs = require('fs');
 const fetch = require('node-fetch');
 const Server = require('socket.io');
 const superrez = require('./superrez');
+const {spiderFromURL} = require("./spider");
 
 const port = 4284;
 const io = new Server(port);
@@ -49,6 +50,18 @@ io.on("connection", (socket)=> {
 			}
 		}
 	});
+	let stop_spider;
+	socket.on("spider-from-url", (starting_url)=> {
+		stop_spider && stop_spider();
+		console.log("starting spider from ", starting_url);
+		stop_spider = spiderFromURL(starting_url, {
+			backwardPages: 1,
+			forwardPages: 20,
+			add_job: (url)=> {
+				add_job({url, elements: [], from_spider: true});
+			},
+		});
+	});
 	socket.on("disconnect", ()=> {
 		let formerly_wanted = 0;
 		for (const job of jobs_by_url.values()) {
@@ -59,6 +72,7 @@ io.on("connection", (socket)=> {
 		}
 		console.log("Client disconnected with", formerly_wanted, "jobs requested");
 		cancel_unwanted_jobs();
+		stop_spider && stop_spider();
 	});
 });
 

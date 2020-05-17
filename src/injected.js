@@ -9,8 +9,6 @@
 
 	const socket = window.io("http://localhost:4284");
 
-	// const {spiderFromURL} = require("./spider");
-	
 	let jobs_by_url = {};
 
 	function update_jobs_list() {
@@ -25,6 +23,7 @@
 			[...Object.values(jobs_by_url)]
 			.map(({url, scaling_factor, priority})=> ({url, scaling_factor, priority}));
 		socket.emit("jobs", jobs);
+		socket.emit("spider-from-url", location.href);
 	}
 
 	function visible_pixels(element) {
@@ -40,13 +39,12 @@
 
 	setInterval(update_jobs_list, 500);
 
-	function add_job({url, elements, apply_result_to_page, from_spider}) {
+	function add_job({url, elements, apply_result_to_page}) {
 		// TODO: handle multiple elements with the same image resource
 		const job = jobs_by_url[url] || {
 			url,
 			scaling_factor: 2,
 			elements: [], // concated below
-			from_spider,
 			apply_result_to_page,
 			priority: 0, // calculated later
 		};
@@ -54,7 +52,6 @@
 		job.elements = job.elements.concat(elements);
 		socket.emit("job", job);
 	}
-	// let spider_started = false;
 
 	socket.on("superrez-result", ({url, scaling_factor, result_array_buffer})=> {
 		const job = jobs_by_url[url];
@@ -140,15 +137,6 @@
 		/*
 		if (!spider_started) {
 			spider_started = true;
-			console.log("starting spider");
-
-			spiderFromURL(location.href, {
-				backwardPages: 1,
-				forwardPages: 20,
-				add_job: (url)=> {
-					add_job({url, elements: [], from_spider: true});
-				},
-			});
 		}
 		*/
 	}

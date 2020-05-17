@@ -2,6 +2,8 @@ const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 	const direction = backwardPages > 0 ?
 		(forwardPages > 0 ? "from start" : "backwards") :
 		(forwardPages > 0 ? "forwards" : "on last page to scrape in this direction");
+	let cancel_function;
+	let stopped = false;
 	require("request")(url, (error, response, body)=> {
 		if (error) {
 			console.error(`[spider] Failed to get ${url} - stopping scraping (${direction})`);
@@ -11,12 +13,22 @@ const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 			console.error(`[spider] Failed to get ${url} - recieved HTTP ${response.statusCode} - stopping scraping (${direction})`);
 			return;
 		}
-		module.exports.spiderFromHTML(body, {backwardPages, forwardPages, addJob});
+		if (stopped) {
+			return;
+		}
+		cancel_function = module.exports.spiderFromHTML(body, {backwardPages, forwardPages, addJob});
 	});
+	return ()=> {
+		stopped = true;
+		cancel_function && cancel_function();
+	};
 };
 
 const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
-	var dummy_element = document.createElement("html");
+	let cancel_functions = [];
+	let stopped = false;
+
+	const dummy_element = document.createElement("html");
 	dummy_element.innerHTML = html;
 
 	const images = Array.from(dummy_element.getElementsByTagName("img"));
@@ -81,12 +93,18 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 		});
 	});
 
+	if (stopped) {
+		return;
+	}
+
 	// recurse going backwards
 	// TODO: prioritize this maybe at like after loading 5 next pages? or something?
 	if (backwardPages > 0) {
 		const prevLink = prevLinks[0];
 		if (prevLink) {
-			spiderFromURL(prevLink.href, {backwardPages: backwardPages - 1, forwardPages: 0, addJob});
+			cancel_functions.push(
+				spiderFromURL(prevLink.href, {backwardPages: backwardPages - 1, forwardPages: 0, addJob})
+			);
 		} else {
 			console.warn("[spider] No previous page link found");
 		}
@@ -96,11 +114,18 @@ const spiderFromHTML = (html, {backwardPages, forwardPages, addJob})=> {
 	if (forwardPages > 0) {
 		const nextLink = nextLinks[0];
 		if (nextLink) {
-			spiderFromURL(nextLink.href, {backwardPages: 0, forwardPages: forwardPages - 1, addJob});
+			cancel_functions.push(
+				spiderFromURL(nextLink.href, {backwardPages: 0, forwardPages: forwardPages - 1, addJob})
+			);
 		} else {
 			console.warn("[spider] No next page link found");
 		}
 	}
+
+	return ()=> {
+		stopped = true;
+		cancel_functions.forEach(cancel_function=> cancel_function());
+	};
 };
 
 module.exports = {spiderFromURL, spiderFromHTML};
