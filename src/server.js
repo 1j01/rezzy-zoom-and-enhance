@@ -10,12 +10,12 @@ let jobs_by_url = new Map();
 
 io.on("connection", (socket)=> {
 	socket.on("jobs", (client_wanted_jobs)=> {
+		// console.log("client_wanted_jobs", client_wanted_jobs);
 		for (const client_wanted_job of client_wanted_jobs) {
-			const job = jobs_by_url.get(client_wanted_job.url);
-			if (!job || !job.wanted_by_sockets.has(socket)) {
+			if (!jobs_by_url.has(client_wanted_job.url) || !jobs_by_url.get(client_wanted_job.url).wanted_by_sockets.has(socket)) {
 				add_job({
-					url: job.url,
-					scaling_factor: job.scaling_factor,
+					url: client_wanted_job.url,
+					scaling_factor: client_wanted_job.scaling_factor,
 					callback: (output_file_path)=> {
 						fs.readFile(output_file_path, (error, data)=> {
 							if (error) {
@@ -24,8 +24,8 @@ io.on("connection", (socket)=> {
 							}
 							const result_array_buffer = data.buffer;
 							socket.emit("superrez-result", {
-								url: job.url,
-								scaling_factor: job.scaling_factor,
+								url: client_wanted_job.url,
+								scaling_factor: client_wanted_job.scaling_factor,
 								result_array_buffer,
 							});
 						});

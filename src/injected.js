@@ -7,7 +7,7 @@
 (()=> {
 	console.log("injected");
 
-	const socket = window.io();
+	const socket = window.io("http://localhost:4284");
 
 	// const {spiderFromURL} = require("./spider");
 	
@@ -23,7 +23,7 @@
 		}
 		const jobs =
 			[...Object.values(jobs_by_url)]
-			.map(({url, scaling_factor, priority})=> {url, scaling_factor, priority});
+			.map(({url, scaling_factor, priority})=> ({url, scaling_factor, priority}));
 		socket.emit("jobs", jobs);
 	}
 
