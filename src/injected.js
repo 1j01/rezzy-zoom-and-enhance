@@ -1,7 +1,5 @@
 // Code injected into the page
 
-// TODO: make the job loop/queue actually meaningful again and move it into the server
-
 // security: be mindful about what data access the extension gives pages
 // - regarding CORS, sites can already request any URL using a proxy like CORS Anywhere 
 // - if the extension were to request resources with cookies it could expose private information
@@ -15,17 +13,21 @@
 	
 	let jobs_by_url = {};
 
-	function updatePrioritities() {
-		for (const [url, job] of Object.entries(jobs_by_url)) {
+	function update_jobs_list() {
+		for (const job of Object.values(jobs_by_url)) {
 			job.elements.forEach(element=> {
-				element.style.outline = `${visiblePixels(element)/50000}px solid red`;
+				element.style.outline = `${visible_pixels(element)/50000}px solid red`;
 			});
-			// const pixels = job.elements.map(visiblePixels).reduce((a, b) => a + b, 0);
-			// socket.emit("priority", {url, priority: pixels});
+			const pixels = job.elements.map(visible_pixels).reduce((a, b) => a + b, 0);
+			job.priority = pixels;
 		}
+		const jobs =
+			[...Object.values(jobs_by_url)]
+			.map(({url, scaling_factor, priority})=> {url, scaling_factor, priority});
+		socket.emit("jobs", jobs);
 	}
 
-	function visiblePixels(element) {
+	function visible_pixels(element) {
 		if (!element.parentElement) return 0;
 		if (element.offsetWidth === 0 || element.offsetHeight === 0) return 0;
 		const style = getComputedStyle(element);
@@ -36,14 +38,17 @@
 		return visibleWidth * visibleHeight;
 	}
 
-	setInterval(updatePrioritities, 500);
+	setInterval(update_jobs_list, 500);
 
-	function addJob({url, elements, applyResultToPage, from_spider}) {
+	function add_job({url, elements, apply_result_to_page, from_spider}) {
+		// TODO: handle multiple elements with the same image resource
 		const job = jobs_by_url[url] || {
 			url,
 			scaling_factor: 2,
-			elements: [],
+			elements: [], // concated below
 			from_spider,
+			apply_result_to_page,
+			priority: 0, // calculated later
 		};
 		jobs_by_url[url] = job;
 		job.elements = job.elements.concat(elements);
@@ -51,8 +56,12 @@
 	}
 	// let spider_started = false;
 
-	socket.on("superrez-result", (result)=> {
-		applyResultToPage(job.superrez_url, job.scaling_factor);
+	socket.on("superrez-result", ({url, scaling_factor, result_array_buffer})=> {
+		const job = jobs_by_url[url];
+		if (!job) return;
+		const blob = new Blob([result_array_buffer]); // , {type: "image/png"}
+		const blob_url = URL.createObjectURL(blob);
+		job.apply_result_to_page(blob_url, scaling_factor);
 	});
 
 	function collect_jobs() {
@@ -72,10 +81,10 @@
 			.filter((img)=> !img.superrezQueued)
 			.forEach((img)=> {
 				img.superrezQueued = true;
-				addJob({
+				add_job({
 					url: img.src,
 					elements: [img],
-					applyResultToPage: (superrez_url)=> {
+					apply_result_to_page: (superrez_url)=> {
 						img.style.width = getComputedStyle(img).width;
 						img.style.height = getComputedStyle(img).height;
 						img.src = superrez_url;
@@ -91,10 +100,10 @@
 				el.superrezQueued = true;
 				const {backgroundImage, backgroundSize} = getComputedStyle(el);
 				const original_url = backgroundImage.match(css_url_regex)[1];
-				addJob({
+				add_job({
 					url: original_url,
 					elements: [el],
-					applyResultToPage: (superrez_url, scaling_factor)=> {
+					apply_result_to_page: (superrez_url, scaling_factor)=> {
 						// TODO: what about multiple backgrounds?
 
 						// TODO: instead of parsing background-size,
@@ -136,8 +145,8 @@
 			spiderFromURL(location.href, {
 				backwardPages: 1,
 				forwardPages: 20,
-				addJob: (url)=> {
-					addJob({url, elements: [], from_spider: true});
+				add_job: (url)=> {
+					add_job({url, elements: [], from_spider: true});
 				},
 			});
 		}

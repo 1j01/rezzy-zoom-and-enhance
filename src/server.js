@@ -1,4 +1,5 @@
-const Server = require('./socket-io');
+const fs = require('fs');
+const Server = require('socket.io');
 const superrez = require('./superrez');
 
 const port = 4284;
@@ -10,8 +11,26 @@ let jobs_by_url = new Map();
 io.on("connection", (socket)=> {
 	socket.on("jobs", (client_wanted_jobs)=> {
 		for (const client_wanted_job of client_wanted_jobs) {
-			if (!jobs_by_url.has(client_wanted_job.url)) {
-				add_job(client_wanted_job);
+			const job = jobs_by_url.get(client_wanted_job.url);
+			if (!job || !job.wanted_by_sockets.has(socket)) {
+				add_job({
+					url: job.url,
+					scaling_factor: job.scaling_factor,
+					callback: (output_file_path)=> {
+						fs.readFile(output_file_path, (error, data)=> {
+							if (error) {
+								console.error(error);
+								return;
+							}
+							const result_array_buffer = data.buffer;
+							socket.emit("superrez-result", {
+								url: job.url,
+								scaling_factor: job.scaling_factor,
+								result_array_buffer,
+							});
+						});
+					},
+				});
 			}
 		}
 		for (const [url, job] of jobs_by_url.entries()) {
