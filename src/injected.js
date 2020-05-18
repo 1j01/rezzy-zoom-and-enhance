@@ -29,7 +29,11 @@
 
 	function get_priority(job) {
 		const pixels = job.elements.map(visible_pixels).reduce((a, b) => a + b, 0);
-		return pixels;
+		if (job.elements.every((element)=> element.tagName === "IMG")) {
+			return pixels;
+		} else {
+			return pixels / 10;
+		}
 	}
 
 	function visible_pixels(element) {
