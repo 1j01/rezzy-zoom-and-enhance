@@ -103,11 +103,18 @@
 
 	function get_priority(job) {
 		const pixels = job.elements.map(visible_pixels).reduce((a, b) => a + b, 0);
-		if (job.elements.every((element)=> element.tagName === "IMG")) {
-			return pixels;
-		} else {
-			return pixels / 10;
+		let priority = pixels;
+		// TODO: find good values for these priority modifiers
+		if (!job.elements.every((element)=> element.tagName === "IMG")) {
+			priority /= 10;
 		}
+		if (document.visibilityState !== "visible") {
+			priority /= 2;
+		}
+		if (!document.hasFocus()) {
+			priority /= 2;
+		}
+		return priority;
 	}
 
 	function visible_pixels(element) {
