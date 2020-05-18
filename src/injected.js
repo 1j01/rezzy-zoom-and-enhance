@@ -12,11 +12,13 @@
 	let jobs_by_url = {};
 
 	function update_jobs_list() {
+		collect_new_jobs();
 		for (const job of Object.values(jobs_by_url)) {
 			// job.elements.forEach(element=> {
 			// 	element.style.outline = `${visible_pixels(element)/50000}px solid red`;
 			// });
 			job.priority = get_priority(job);
+			// console.log("priority", job.priority, "for", job.elements);
 		}
 		const jobs =
 			[...Object.values(jobs_by_url)]
@@ -41,8 +43,6 @@
 		return visibleWidth * visibleHeight;
 	}
 
-	setInterval(update_jobs_list, 500);
-
 	function add_job({url, elements, apply_result_to_page}) {
 		// TODO: handle multiple elements with the same image resource
 		// i.e. allow for multiple callbacks, not just one (apply_result_to_page)
@@ -66,7 +66,7 @@
 		job.apply_result_to_page(blob_url, scaling_factor);
 	});
 
-	function collect_jobs() {
+	function collect_new_jobs() {
 		// console.log("collect jobs");
 
 		const imgs = Array.from(document.getElementsByTagName("img"));
@@ -137,6 +137,7 @@
 			});
 	}
 
-	window.addEventListener("load", collect_jobs);
-	setInterval(collect_jobs, 500);
+	window.addEventListener("load", update_jobs_list);
+	setInterval(update_jobs_list, 500);
+	// setTimeout(update_jobs_list, 20);
 })();
