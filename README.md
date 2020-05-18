@@ -1,7 +1,7 @@
 
 # Rezzy: Zoom and Enhance for images on the web 🔎
 
-Webcomic [Zoom and Enhance](https://www.youtube.com/watch?v=LhF_56SxrGk)
+Webcomic [Zoom and Enhance](https://www.youtube.com/watch?v=LhF_56SxrGk) browser extension
 
 Powered by [waifu2x-converter-cpp][]
 
@@ -16,7 +16,9 @@ Powered by [waifu2x-converter-cpp][]
 - Turn on Developer mode
 - Click "Load unpacked" and select the root of this repository as the folder
 - Start the superresolution server with `npm start`
-- Visit [Unsounded](http://www.casualvillain.com/Unsounded/comic/ch01/ch01_01.html) because it's the only comic (or site) enabled for superresolution for now. (There's no user-controlled site enabling/disabling yet, and I don't want it to apply EVERYWHERE.)
+- Visit a webcomic, such as [Paranatural](https://www.paranatural.net/comic/chapter-1)
+- Check the server logs to see if it's working
+- Wait for it to buffer several pages before reading
 
 [waifu2x-converter-cpp]: https://github.com/DeadSix27/waifu2x-converter-cpp
 [Node.js]: https://nodejs.org/

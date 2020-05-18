@@ -215,7 +215,15 @@
 			});
 	}
 
-	window.addEventListener("load", update_jobs_list);
-	setInterval(update_jobs_list, 500);
-	// setTimeout(update_jobs_list, 20);
+	window.addEventListener("load", ()=> {
+		// TODO: filter on sites the user chooses with some UI
+		const {next, prev} = find_next_prev_links();
+		// checking for one or the other here in case a site hides the buttons
+		// rather than disabling them when they don't apply
+		if (next || prev) {
+			update_jobs_list();
+			setInterval(update_jobs_list, 500);
+		}
+	});
+	
 })();

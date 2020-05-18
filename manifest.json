@@ -9,7 +9,7 @@
 	},
 	"content_scripts": [
 		{
-			"matches": ["*://*.casualvillain.com/*"],
+			"matches": ["<all_urls>"],
 			"js": [
 				"lib/socket.io.js",
 				"src/injected.js"
