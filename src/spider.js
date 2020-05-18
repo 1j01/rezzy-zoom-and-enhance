@@ -41,7 +41,10 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 	const $ = cheerio.load(html);
 
 	const images = $("img").toArray();
-	const links = $("a").toArray();
+	const links = $("a").toArray().filter((a)=>
+		// ignore login / authentication links that would otherwise be matched
+		!$.html(a).match(/\?next=/i)
+	);
 
 	// TODO: look for linked webcomic image, which could help with webcomics in different languages,
 	// which might not say "back"/"forward" in English in any way

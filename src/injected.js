@@ -9,7 +9,10 @@
 	function find_next_prev_links() {
 		// WET: logic should match spider.js
 		
-		const links = [...document.querySelectorAll("a")];
+		const links = [...document.querySelectorAll("a")].filter((a)=>
+			// ignore login / authentication links that would otherwise be matched
+			!a.outerHTML.match(/\?next=/i)
+		);
 
 		// TODO: look for linked webcomic image, which could help with webcomics in different languages,
 		// which might not say "back"/"forward" in English in any way
