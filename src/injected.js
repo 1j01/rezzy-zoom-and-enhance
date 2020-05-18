@@ -5,7 +5,6 @@
 // - if the extension were to request resources with cookies it could expose private information
 
 (()=> {
-	console.log("Rezzy injected");
 
 	function find_next_prev_links() {
 		// WET: logic should match spider.js
@@ -61,13 +60,18 @@
 	window.addEventListener("keydown", (event)=> {
 		const starting_url = location.href;
 		const starting_scroll_x = window.scrollX;
+		// Also regarding pushState, it may have already happened in an earlier keydown handler (race condition)
+		// could do an interval / animation loop to keep track of the active URL
 		setTimeout(()=> {
 			// if the page scrolled, do nothing
 			// this might warrant a setting, or be more annoying than it's worth
+			// possible race condition: scroll doesn't occur within this timeframe if the page is lagging
+			// TODO: just check if scrollX is at the (relevant) limit instead?
 			if (starting_scroll_x !== window.scrollX) {
 				return;
 			}
-			// in case the site already handles arrow keys, and does history.pushState
+			// in case the site already handles arrow keys, and does history.pushState or uses location.hash
+			// example site: https://www.avasdemon.com/pages.php#0001
 			if (starting_url !== location.href) {
 				return;
 			}
@@ -234,6 +238,9 @@
 		if (next || prev) {
 			update_jobs_list();
 			setInterval(update_jobs_list, 500);
+			console.log("Rezzy active");
+		} else {
+			console.log("Rezzy inactive");
 		}
 	});
 	

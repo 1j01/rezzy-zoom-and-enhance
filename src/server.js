@@ -64,7 +64,6 @@ io.on("connection", (socket)=> {
 			return;
 		}
 		stop_spider && stop_spider();
-		console.log("starting spider from ", starting_url);
 		stop_spider = spiderFromURL(starting_url, {
 			backwardPages: 1,
 			forwardPages: 20,
@@ -91,7 +90,7 @@ io.on("connection", (socket)=> {
 			job.wanted_directly_by_sockets.delete(socket);
 			job.wanted_spidered_by_sockets.delete(socket);
 		}
-		console.log("Client disconnected with", formerly_wanted_directly, "jobs requested, and", formerly_wanted_spidered, "jobs from spidering");
+		console.log("Page disconnected with", formerly_wanted_directly, "jobs requested, and", formerly_wanted_spidered, "jobs from spidering");
 		cancel_unwanted_jobs();
 		stop_spider && stop_spider();
 		stop_spider = null;
@@ -101,7 +100,7 @@ io.on("connection", (socket)=> {
 function cancel_unwanted_jobs() {
 	for (const [url, job] of jobs_by_url.entries()) {
 		if (job.wanted_directly_by_sockets.size === 0 && job.wanted_spidered_by_sockets.size === 0) {
-			console.log("Job no longer wanted by any active clients: ", url);
+			console.log("Job no longer wanted by any active pages:", url);
 			jobs_by_url.delete(url);
 		}
 	}
