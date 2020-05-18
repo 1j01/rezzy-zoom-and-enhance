@@ -45,6 +45,7 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 
 	// TODO: look for linked webcomic image, which could help with webcomics in different languages,
 	// which might not say "back"/"forward" in English in any way
+	// WET: logic should match injected.js
 	const nextLinks = links.filter((a)=>
 		!!$.html(a).match(/next(?![da])|forward|fr?wr?d/i)
 	);

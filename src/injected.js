@@ -7,6 +7,80 @@
 (()=> {
 	console.log("Rezzy injected");
 
+	function find_next_prev_links() {
+		// WET: logic should match spider.js
+		
+		const links = [...document.querySelectorAll("a")];
+
+		// TODO: look for linked webcomic image, which could help with webcomics in different languages,
+		// which might not say "back"/"forward" in English in any way
+		const nextLinks = links.filter((a)=>
+			!!a.outerHTML.match(/next(?![da])|forward|fr?wr?d/i)
+		);
+		const prevLinks = links.filter((a)=>
+			!!a.outerHTML.match(/prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bc?k?wd(\b|[_-])/i)
+		);
+		const prioritizePageLinksFirst = (a, b)=> {
+			const ch_regexp = /chapter|chapt?(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
+			const pg_regexp = /page|(\b|[_-])(p[gp]|cc)(\b|[_-])/i;
+			const comic_regexp = /comic/i;
+			const a_is_ch = !!a.outerHTML.match(ch_regexp);
+			const b_is_ch = !!b.outerHTML.match(ch_regexp);
+			const a_is_pg = !!a.outerHTML.match(pg_regexp);
+			const b_is_pg = !!b.outerHTML.match(pg_regexp);
+			const a_is_comic = !!a.outerHTML.match(comic_regexp);
+			const b_is_comic = !!b.outerHTML.match(comic_regexp);
+
+			// deprioritize, but don't exclude chapter buttons;
+			// a webcomic could have entire chapters on a page
+			if (a_is_ch && !b_is_ch) return +1;
+			if (b_is_ch && !a_is_ch) return -1;
+
+			// prioritize "page" links
+			if (a_is_pg && !b_is_pg) return -1;
+			if (b_is_pg && !a_is_pg) return +1;
+
+			// prioritize "comic" links, which is hopefully synonymous with page,
+			// and not refering to a web ring https://en.wikipedia.org/wiki/Webring
+			// TODO: deprioritize/exclude external links
+			// and simplify to /page|comic/i
+			if (a_is_comic && !b_is_comic) return -1;
+			if (b_is_comic && !a_is_comic) return +1;
+
+			return 0;
+		};
+		nextLinks.sort(prioritizePageLinksFirst);
+		prevLinks.sort(prioritizePageLinksFirst);
+
+		return {
+			next: nextLinks[0],
+			prev: prevLinks[0],
+		};
+	}
+
+	window.addEventListener("keydown", (event)=> {
+		const starting_url = location.href;
+		const starting_scroll_x = window.scrollX;
+		setTimeout(()=> {
+			// if the page scrolled, do nothing
+			// this might warrant a setting, or be more annoying than it's worth
+			if (starting_scroll_x !== window.scrollX) {
+				return;
+			}
+			// in case the site already handles arrow keys, and does history.pushState
+			if (starting_url !== location.href) {
+				return;
+			}
+
+			if (event.key === "ArrowRight") {
+				find_next_prev_links().next.click();
+			}
+			if (event.key === "ArrowLeft") {
+				find_next_prev_links().prev.click();
+			}
+		}, 100);
+	});
+
 	const socket = window.io("http://localhost:4284");
 
 	let jobs_by_url = {};
