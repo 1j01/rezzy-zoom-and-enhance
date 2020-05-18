@@ -129,6 +129,10 @@
 	}
 
 	function add_job({url, elements, apply_result_to_page}) {
+		if (!url.match(/^https?:/)) {
+			console.warn("Tried to add a job for a non-HTTP(S) URL:", url, elements);
+			return;
+		}
 		// TODO: handle multiple elements with the same image resource
 		// i.e. allow for multiple callbacks, not just one (apply_result_to_page)
 		const job = jobs_by_url[url] || {
