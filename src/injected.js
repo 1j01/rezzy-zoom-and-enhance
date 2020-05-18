@@ -16,14 +16,18 @@
 			// job.elements.forEach(element=> {
 			// 	element.style.outline = `${visible_pixels(element)/50000}px solid red`;
 			// });
-			const pixels = job.elements.map(visible_pixels).reduce((a, b) => a + b, 0);
-			job.priority = pixels;
+			job.priority = get_priority(job);
 		}
 		const jobs =
 			[...Object.values(jobs_by_url)]
 			.map(({url, scaling_factor, priority})=> ({url, scaling_factor, priority}));
 		socket.emit("jobs", jobs);
 		socket.emit("spider-from-url", location.href);
+	}
+
+	function get_priority(job) {
+		const pixels = job.elements.map(visible_pixels).reduce((a, b) => a + b, 0);
+		return pixels;
 	}
 
 	function visible_pixels(element) {
@@ -46,11 +50,12 @@
 			url,
 			scaling_factor: 2, // can't be changed for now
 			elements: [], // added with concat below
+			priority: 0, // calculated below
 			apply_result_to_page,
-			priority: 0, // calculated later
 		};
 		jobs_by_url[url] = job;
 		job.elements = job.elements.concat(elements);
+		job.priority = get_priority(job);
 	}
 
 	socket.on("superrez-result", ({url, scaling_factor, result_array_buffer})=> {

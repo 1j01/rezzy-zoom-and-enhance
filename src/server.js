@@ -11,6 +11,7 @@ const io = new Server(port);
 let jobs_by_url = new Map();
 
 io.on("connection", (socket)=> {
+	// TODO: handle reconnection; "jobs" event might be recieved after disconnect, because client may reconnect
 	socket.on("jobs", (client_wanted_jobs)=> {
 		// console.log("client_wanted_jobs", client_wanted_jobs);
 		for (const client_wanted_job of client_wanted_jobs) {
@@ -34,6 +35,13 @@ io.on("connection", (socket)=> {
 						});
 					},
 				});
+			}
+			if (jobs_by_url.has(client_wanted_job.url)) {
+				const job = jobs_by_url.get(client_wanted_job.url);
+				job.wanted_directly_by_sockets.set(socket, client_wanted_job.priority);
+				const priority_values = [...job.wanted_directly_by_sockets.values(), ...job.wanted_spidered_by_sockets.values()];
+				// console.log("priority values:", priority_values, "for", client_wanted_job.url);
+				job.priority = Math.max(...priority_values);
 			}
 		}
 		for (const [url, job] of jobs_by_url.entries()) {
@@ -99,22 +107,23 @@ function cancel_unwanted_jobs() {
 	}
 }
 
-const add_job = ({url, callback, wanted_directly_by_socket, wanted_spidered_by_socket})=> {
+const add_job = ({url, callback, wanted_directly_by_socket, wanted_spidered_by_socket, priority=0})=> {
 	const job = jobs_by_url.get(url) || {
 		url,
 		scaling_factor: 2, // can't be changed for now
 		// Note: a job could be start out from a spider and then the page is navigated to and it gets a directly-interested socket
-		wanted_directly_by_sockets: new Set(), // sockets to send results to when finished, to display on a page that is open
-		wanted_spidered_by_sockets: new Set(), // sockets that led to spidering of a page that has an image; don't need to send to these sockets
+		wanted_directly_by_sockets: new Map(), // socket to priority; sockets to send results to when finished, to display on an open page
+		wanted_spidered_by_sockets: new Map(), // socket to priority; sockets that led to spidering of a page that has an image; don't need to send to these sockets
 		callbacks: [],
 		started: false,
 		output_file_path: null,
+		priority: 0,
 	};
 	if (wanted_directly_by_socket) {
-		job.wanted_directly_by_sockets.add(wanted_directly_by_socket);
+		job.wanted_directly_by_sockets.set(wanted_directly_by_socket, priority);
 	}
 	if (wanted_spidered_by_socket) {
-		job.wanted_spidered_by_sockets.add(wanted_spidered_by_socket);
+		job.wanted_spidered_by_sockets.set(wanted_spidered_by_socket, priority);
 	}
 	if (callback) {
 		if (job.output_file_path) {
@@ -153,6 +162,7 @@ async function run_jobs() {
 		}
 		job.started = true;
 		console.log(`next job: ${job.url} @ ${job.scaling_factor}x`);
+		console.log("priority:", job.priority);
 		console.log("wanted spidered by", job.wanted_spidered_by_sockets.size, "sockets and directly by", job.wanted_directly_by_sockets.size, "pages");
 		try {
 			const head_response = await fetch(job.url, {method: "HEAD"});
