@@ -163,7 +163,8 @@ async function run_jobs() {
 		job.started = true;
 		console.log(`next job: ${job.url} @ ${job.scaling_factor}x`);
 		console.log("priority:", job.priority);
-		console.log("wanted spidered by", job.wanted_spidered_by_sockets.size, "sockets and directly by", job.wanted_directly_by_sockets.size, "pages");
+		console.log("wanted directly by:", job.wanted_directly_by_sockets.size);
+		console.log("wanted spidered by:", job.wanted_spidered_by_sockets.size);
 		try {
 			const head_response = await fetch(job.url, {method: "HEAD"});
 			const content_length = head_response.headers.get("content-length");
