@@ -41,22 +41,22 @@
 
 	function add_job({url, elements, apply_result_to_page}) {
 		// TODO: handle multiple elements with the same image resource
+		// i.e. allow for multiple callbacks, not just one (apply_result_to_page)
 		const job = jobs_by_url[url] || {
 			url,
-			scaling_factor: 2,
-			elements: [], // concated below
+			scaling_factor: 2, // can't be changed for now
+			elements: [], // added with concat below
 			apply_result_to_page,
 			priority: 0, // calculated later
 		};
 		jobs_by_url[url] = job;
 		job.elements = job.elements.concat(elements);
-		socket.emit("job", job);
 	}
 
 	socket.on("superrez-result", ({url, scaling_factor, result_array_buffer})=> {
 		const job = jobs_by_url[url];
 		if (!job) return;
-		const blob = new Blob([result_array_buffer]); // , {type: "image/png"}
+		const blob = new Blob([result_array_buffer]);
 		const blob_url = URL.createObjectURL(blob);
 		job.apply_result_to_page(blob_url, scaling_factor);
 	});
@@ -130,15 +130,6 @@
 					},
 				});
 			});
-
-		// only start spidering when other jobs have an opportunity to be added
-		// so they can be prioritized initially
-		// ...actually, if it's starting on the *current* URL, it should be fine, right?
-		/*
-		if (!spider_started) {
-			spider_started = true;
-		}
-		*/
 	}
 
 	window.addEventListener("load", collect_jobs);

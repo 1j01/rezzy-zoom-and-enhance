@@ -43,9 +43,7 @@ io.on("connection", (socket)=> {
 					wanted_by_this_client = true;
 				}
 			}
-			if (wanted_by_this_client) {
-				job.wanted_directly_by_sockets.add(socket);
-			} else {
+			if (!wanted_by_this_client) {
 				job.wanted_directly_by_sockets.delete(socket);
 				cancel_unwanted_jobs();
 			}
@@ -177,11 +175,6 @@ async function run_jobs() {
 						resolve();
 					});
 				});
-				// job.result = superrez_image_url(job.url);
-				// job.callbacks.forEach((applyResultToPage)=> {
-				// 	applyResultToPage(job.result, job.scaling_factor);
-				// });
-				// console.log(`enhancing image ${job.url} (content-length: ${content_length}) by replacing with ${job.result}`);
 			} else {
 				console.log(`ignoring image ${job.url} (content-length: ${content_length})`);
 			}
