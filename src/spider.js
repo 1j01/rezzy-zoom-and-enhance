@@ -1,5 +1,9 @@
 const cheerio = require('cheerio');
 
+// slowing down the spider makes the server more responsive
+// so superrez images can load faster
+const crawl_delay_ms = 500;
+
 const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 	const description = backwardPages > 0 ?
 		(forwardPages > 0 ? "starting point URL" : "crawling backwards") :
@@ -7,20 +11,22 @@ const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 	let cancel_function;
 	let stopped = false;
 	console.error(`[spider] crawling ${url} (${description})`);
-	require("request")(url, (error, response, body)=> {
-		if (error) {
-			console.error(`[spider] Failed to get ${url} - stopping scraping (${description})`);
-			return;
-		}
-		if (response.statusCode !== 200) {
-			console.error(`[spider] Failed to get ${url} - recieved HTTP ${response.statusCode} - stopping scraping (${description})`);
-			return;
-		}
-		if (stopped) {
-			return;
-		}
-		cancel_function = spiderFromHTML(body, url, {backwardPages, forwardPages, addJob});
-	});
+	setTimeout(()=> {
+		require("request")(url, (error, response, body)=> {
+			if (error) {
+				console.error(`[spider] Failed to get ${url} - stopping scraping (${description})`);
+				return;
+			}
+			if (response.statusCode !== 200) {
+				console.error(`[spider] Failed to get ${url} - recieved HTTP ${response.statusCode} - stopping scraping (${description})`);
+				return;
+			}
+			if (stopped) {
+				return;
+			}
+			cancel_function = spiderFromHTML(body, url, {backwardPages, forwardPages, addJob});
+		});
+	}, crawl_delay_ms);
 	return ()=> {
 		// console.log("[spider] stopped");
 		stopped = true;
