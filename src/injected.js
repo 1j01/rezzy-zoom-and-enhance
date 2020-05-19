@@ -92,6 +92,7 @@
 	});
 
 	const socket = window.io("http://localhost:4284");
+	socket.disconnect();
 
 	let jobs_by_url = {};
 
@@ -249,10 +250,12 @@
 		clearInterval(iid);
 		rezzy_active = enable;
 		if (rezzy_active) {
+			console.log("Rezzy active");
 			update_jobs_list();
 			iid = setInterval(update_jobs_list, 500);
-			console.log("Rezzy active");
+			socket.connect();
 		} else {
+			console.log("Rezzy inactive");
 			const imgs = document.querySelectorAll("[data-low-rez-src]");
 			for (const img of imgs) {
 				img.src = img.dataset.lowRezSrc;
@@ -263,7 +266,7 @@
 				element.style.backgroundImage = element.dataset.originalBackgroundImage;
 				delete element.dataset.originalBackgroundImage;
 			}
-			console.log("Rezzy inactive");
+			socket.disconnect();
 		}
 	};
 

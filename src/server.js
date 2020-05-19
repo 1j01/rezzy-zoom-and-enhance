@@ -11,7 +11,8 @@ const io = new Server(port);
 let jobs_by_url = new Map();
 
 io.on("connection", (socket)=> {
-	// TODO: handle reconnection; "jobs" event might be recieved after disconnect, because client may reconnect
+	// Note: "jobs" event might be recieved after disconnect, because client may reconnect (right?)
+	// (or is it a new "connection"/"socket" on the server when the client reconnects?)
 	socket.on("jobs", (client_wanted_jobs)=> {
 		// console.log("client_wanted_jobs", client_wanted_jobs);
 		for (const client_wanted_job of client_wanted_jobs) {
