@@ -14,9 +14,6 @@ const update_enabled_state = (enabled)=> {
 	toggle_site_button.title = enabled ?
 		"Click to disable Rezzy for this site." :
 		"Click to enable Rezzy for this site.";
-	get_origin().then((origin)=> {
-		browser.storage.local.set({[origin]: enabled});
-	});
 };
 
 get_origin().then((origin)=> {
@@ -31,4 +28,7 @@ get_origin().then((origin)=> {
 toggle_site_button.addEventListener("click", ()=> {
 	const was_enabled = !document.body.classList.contains("off");
 	update_enabled_state(!was_enabled);
+	get_origin().then((origin)=> {
+		browser.storage.local.set({[origin]: !was_enabled});
+	});
 });
