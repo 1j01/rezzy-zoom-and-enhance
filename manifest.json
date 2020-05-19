@@ -11,6 +11,7 @@
 		{
 			"matches": ["<all_urls>"],
 			"js": [
+				"lib/browser-polyfill.js",
 				"lib/socket.io.js",
 				"src/injected.js"
 			]
@@ -25,6 +26,8 @@
 		}
 	},
 	"permissions": [
+		"tabs",
+		"storage",
 		"http://127.0.0.1:4284/*"
 	]
 }

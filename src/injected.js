@@ -5,6 +5,7 @@
 // - if the extension were to request resources with cookies it could expose private information
 
 (()=> {
+	const browser = window.browser; // WebExtensions API, polyfilled by browser-polyfill.js
 
 	function find_next_prev_links() {
 		// WET: logic should match spider.js
@@ -234,17 +235,17 @@
 	}
 
 	window.addEventListener("load", ()=> {
-		// TODO: filter on sites the user chooses with some UI
-		const {next, prev} = find_next_prev_links();
-		// checking for one or the other here in case a site hides the buttons
-		// rather than disabling them when they don't apply
-		if (next || prev) {
-			update_jobs_list();
-			setInterval(update_jobs_list, 500);
-			console.log("Rezzy active");
-		} else {
-			console.log("Rezzy inactive");
-		}
+		browser.storage.local.get(location.origin).then((storedInfo)=> {
+			console.log("storedInfo:", storedInfo);
+			const enabled = storedInfo[location.origin];
+			if (enabled) {
+				update_jobs_list();
+				setInterval(update_jobs_list, 500);
+				console.log("Rezzy active");
+			} else {
+				console.log("Rezzy inactive");
+			}
+		});
 	});
 	
 })();
