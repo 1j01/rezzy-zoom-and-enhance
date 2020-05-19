@@ -7,6 +7,8 @@
 (()=> {
 	const browser = window.browser; // WebExtensions API, polyfilled by browser-polyfill.js
 
+	let rezzy_active = false;
+
 	function find_next_prev_links() {
 		// WET: logic should match spider.js
 		
@@ -184,6 +186,7 @@
 					url: img.src,
 					elements: [img],
 					apply_result_to_page: (superrez_url)=> {
+						img.dataset.lowRezSrc = img.src;
 						img.style.width = getComputedStyle(img).width;
 						img.style.height = getComputedStyle(img).height;
 						img.src = superrez_url;
@@ -208,6 +211,9 @@
 						// TODO: instead of parsing background-size,
 						// try generating an SVG that just contains an <image>
 						// at a higher resolution than the SVG's intrinsic size
+
+						// el.dataset.lowRezBackgroundImage = backgroundImage;
+						el.dataset.originalBackgroundImage = el.style.backgroundImage;
 
 						const newBackgroundImage = backgroundImage.replace(css_url_regex, `url("${superrez_url}")`);
 
@@ -234,16 +240,40 @@
 			});
 	}
 
+	let iid;
+
+	const set_enabled = (enable)=> {
+		if (enable === rezzy_active) {
+			return;
+		}
+		clearInterval(iid);
+		rezzy_active = enable;
+		if (rezzy_active) {
+			update_jobs_list();
+			iid = setInterval(update_jobs_list, 500);
+			console.log("Rezzy active");
+		} else {
+			const imgs = document.querySelectorAll("[data-low-rez-src]");
+			for (const img of imgs) {
+				img.src = img.dataset.lowRezSrc;
+				delete img.dataset.lowRezSrc;
+			}
+			const elements = document.querySelectorAll("[data-low-rez-background-image]");
+			for (const element of elements) {
+				element.style.backgroundImage = element.dataset.originalBackgroundImage;
+				delete element.dataset.originalBackgroundImage;
+			}
+			console.log("Rezzy inactive");
+		}
+	};
+
 	window.addEventListener("load", ()=> {
 		browser.storage.local.get(location.origin).then((storedInfo)=> {
-			console.log("storedInfo:", storedInfo);
-			const enabled = storedInfo[location.origin];
-			if (enabled) {
-				update_jobs_list();
-				setInterval(update_jobs_list, 500);
-				console.log("Rezzy active");
-			} else {
-				console.log("Rezzy inactive");
+			set_enabled(!!storedInfo[location.origin]);
+		});
+		browser.storage.onChanged.addListener((changes)=> {
+			if (location.origin in changes) {
+				set_enabled(!!changes[location.origin].newValue)
 			}
 		});
 	});
