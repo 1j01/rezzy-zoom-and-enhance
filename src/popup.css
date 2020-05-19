@@ -1,0 +1,15 @@
+#toggle-this-site:hover svg {
+	opacity: 0.9;
+}
+body.off #toggle-this-site svg {
+	stroke: #ccc;
+}
+#toggle-this-site {
+	border: 0;
+	margin: 0;
+	padding: 20px;
+	outline: none;
+	background: none;
+	stroke: #0046ff;
+	cursor: pointer;
+}

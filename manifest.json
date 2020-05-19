@@ -16,6 +16,14 @@
 			]
 		}
 	],
+	"browser_action": {
+		"browser_style": true,
+		"default_popup": "src/popup.html",
+		"default_title": "Rezzy: Zoom and Enhance",
+		"default_icon": {
+			"510": "icon-510x510.png"
+		}
+	},
 	"permissions": [
 		"http://127.0.0.1:4284/*"
 	]
