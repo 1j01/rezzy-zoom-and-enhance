@@ -91,8 +91,8 @@
 		}, 100);
 	});
 
-	const socket = window.io("http://localhost:4284");
-	socket.disconnect();
+	const socket = window.io("http://localhost:4284", {transports: ["websocket"]});
+	socket.disconnect(); // TODO: start disconnected, don't connect and then immediately disconnect
 
 	let jobs_by_url = {};
 
