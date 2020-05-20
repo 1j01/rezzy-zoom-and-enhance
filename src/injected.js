@@ -5,6 +5,12 @@
 // security: be mindful about what data access the extension gives pages
 // - regarding CORS, sites can already request any URL using a proxy like CORS Anywhere 
 // - if the extension were to request resources with cookies it could expose private information
+// - Privacy Issue! A site could see if another site had been visited
+//   (if the extension was enabled on that site and the malicious site)
+//   by measuring the upscaling response time to see if it was in the cache.
+//   The difference between cache response time and the superresolution process is very significant,
+//   so it would be very reliable.
+//   TODO: to solve this, maybe keep a separate cache per origin - and separate spider, and jobs list and everything
 
 (()=> {
 	let rezzy_active = false;
