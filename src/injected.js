@@ -91,9 +91,7 @@
 		}, 100);
 	});
 
-	const socket = io("http://localhost:4284", {transports: ["websocket"]});
-	socket.disconnect(); // TODO: start disconnected, don't connect and then immediately disconnect
-
+	let socket;
 	let jobs_by_url = {};
 
 	function update_jobs_list() {
@@ -158,13 +156,20 @@
 		job.priority = get_priority(job);
 	}
 
-	socket.on("superrez-result", ({url, scaling_factor, result_array_buffer})=> {
-		const job = jobs_by_url[url];
-		if (!job) return;
-		const blob = new Blob([result_array_buffer]);
-		const blob_url = URL.createObjectURL(blob);
-		job.apply_result_to_page(blob_url, scaling_factor);
-	});
+	function init_socket() {
+		if (socket) {
+			return;
+		}
+		socket = io("http://localhost:4284", {transports: ["websocket"]});
+
+		socket.on("superrez-result", ({url, scaling_factor, result_array_buffer})=> {
+			const job = jobs_by_url[url];
+			if (!job) return;
+			const blob = new Blob([result_array_buffer]);
+			const blob_url = URL.createObjectURL(blob);
+			job.apply_result_to_page(blob_url, scaling_factor);
+		});
+	}
 
 	function collect_new_jobs() {
 		// console.log("collect jobs");
@@ -249,6 +254,7 @@
 		clearInterval(iid);
 		rezzy_active = enable;
 		if (rezzy_active) {
+			init_socket();
 			console.log("Rezzy active");
 			update_jobs_list();
 			iid = setInterval(update_jobs_list, 500);
