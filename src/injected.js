@@ -187,7 +187,7 @@
 					url: img.src,
 					elements: [img],
 					apply_result_to_page: (superrez_url)=> {
-						img.dataset.lowRezSrc = img.src;
+						img.dataset.originalImgSrc = img.src;
 						img.style.width = getComputedStyle(img).width;
 						img.style.height = getComputedStyle(img).height;
 						img.src = superrez_url;
@@ -213,7 +213,6 @@
 						// try generating an SVG that just contains an <image>
 						// at a higher resolution than the SVG's intrinsic size
 
-						// el.dataset.lowRezBackgroundImage = backgroundImage;
 						el.dataset.originalBackgroundImage = el.style.backgroundImage;
 
 						const newBackgroundImage = backgroundImage.replace(css_url_regex, `url("${superrez_url}")`);
@@ -256,12 +255,12 @@
 			socket.connect();
 		} else {
 			console.log("Rezzy inactive");
-			const imgs = document.querySelectorAll("[data-low-rez-src]");
+			const imgs = document.querySelectorAll("[data-original-img-src]");
 			for (const img of imgs) {
-				img.src = img.dataset.lowRezSrc;
-				delete img.dataset.lowRezSrc;
+				img.src = img.dataset.originalImgSrc;
+				delete img.dataset.originalImgSrc;
 			}
-			const elements = document.querySelectorAll("[data-low-rez-background-image]");
+			const elements = document.querySelectorAll("[data-original-background-image]");
 			for (const element of elements) {
 				element.style.backgroundImage = element.dataset.originalBackgroundImage;
 				delete element.dataset.originalBackgroundImage;
