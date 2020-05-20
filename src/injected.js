@@ -63,7 +63,7 @@
 		};
 	}
 
-	window.addEventListener("keydown", (event)=> {
+	function handle_keydown(event) {
 		const starting_url = location.href;
 		const starting_scroll_x = window.scrollX;
 		// Also regarding pushState, it may have already happened in an earlier keydown handler (race condition)
@@ -89,7 +89,7 @@
 				find_next_prev_links().prev.click();
 			}
 		}, 100);
-	});
+	}
 
 	let socket;
 	let jobs_by_url = {};
@@ -254,6 +254,7 @@
 		clearInterval(iid);
 		rezzy_active = enable;
 		if (rezzy_active) {
+			window.addEventListener("keydown", handle_keydown);
 			init_socket();
 			console.log("Rezzy active");
 			update_jobs_list();
@@ -261,6 +262,7 @@
 			socket.connect();
 		} else {
 			console.log("Rezzy inactive");
+			window.removeEventListener("keydown", handle_keydown);
 			const imgs = document.querySelectorAll("[data-original-img-src]");
 			for (const img of imgs) {
 				img.src = img.dataset.originalImgSrc;
