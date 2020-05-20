@@ -1,11 +1,16 @@
-const fs = require('fs');
 const fetch = require('node-fetch');
+const express = require('express');
+// const bodyParser = require('body-parser');
 const Server = require('socket.io');
 const superrez = require('./superrez');
 const {spiderFromURL} = require("./spider");
 
 const port = 4284;
-const io = new Server(port);
+
+const app = express();
+app.use("/result", express.static(superrez.cache_dir));
+
+const io = new Server(app.listen(port));
 
 // using a Map instead of a plain object just because I don't want the page to be able to overwrite "prototype" and stuff like that
 let jobs_by_url = new Map();
@@ -22,17 +27,16 @@ io.on("connection", (socket)=> {
 					scaling_factor: client_wanted_job.scaling_factor,
 					wanted_directly_by_socket: socket,
 					callback: (output_file_path)=> {
-						fs.readFile(output_file_path, (error, data)=> {
-							if (error) {
-								console.error(error);
-								return;
-							}
-							const result_array_buffer = data.buffer;
-							socket.emit("superrez-result", {
-								url: client_wanted_job.url,
-								scaling_factor: client_wanted_job.scaling_factor,
-								result_array_buffer,
-							});
+						const path_with_slashes = output_file_path.replace(/\\/g, "/");
+						const match_after_path = "/superrez-images/";
+						const result_url = `http://127.0.0.1:${port}/result/${
+							path_with_slashes
+							.slice(path_with_slashes.indexOf(match_after_path) + match_after_path.length)
+						}`;
+						socket.emit("superrez-result", {
+							url: client_wanted_job.url,
+							scaling_factor: client_wanted_job.scaling_factor,
+							result_url,
 						});
 					},
 				});
@@ -205,5 +209,5 @@ run_jobs().catch((error)=> {
 	console.error(`\n\nSuperrez job loop crashed\n\n${error.stack}\n\n`);
 });
 
-console.log('Magic happens on port ' + port);
+console.log("Magic happens on port", port, "✨");
 

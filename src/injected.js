@@ -168,12 +168,17 @@
 		}
 		socket = io("http://localhost:4284", {transports: ["websocket"]});
 
-		socket.on("superrez-result", ({url, scaling_factor, result_array_buffer})=> {
+		socket.on("superrez-result", ({url, scaling_factor, result_url})=> {
 			const job = jobs_by_url[url];
 			if (!job) return;
-			const blob = new Blob([result_array_buffer]);
-			const blob_url = URL.createObjectURL(blob);
-			job.apply_result_to_page(blob_url, scaling_factor);
+			// fetch result and make blob URL instead of using result URL directly
+			// in order to avoid CORS issues
+			fetch(result_url)
+			.then(response => response.blob())
+			.then((blob)=> {
+				const blob_url = URL.createObjectURL(blob);
+				job.apply_result_to_page(blob_url, scaling_factor);
+			});
 		});
 	}
 
@@ -237,7 +242,7 @@
 								el.style.backgroundImage = newBackgroundImage;
 							};
 							new_image.onerror = ()=> {
-								console.error("couldn't superrez background-image for", el, "failed to load image to get width/height");
+								console.error("couldn't superrez background-image for", el, "failed to load image URL", superrez_url, "to get width/height");
 							};
 							new_image.src = superrez_url;
 						} else {

@@ -110,5 +110,6 @@
 	}
 
 	module.exports = superrez;
+	module.exports.cache_dir = cache_dir;
 
 })();
