@@ -178,6 +178,9 @@
 			.then((blob)=> {
 				const blob_url = URL.createObjectURL(blob);
 				job.apply_result_to_page(blob_url, scaling_factor);
+			})
+			.catch((error)=> {
+				console.error("Failed to apply superrez result:", error, {url, result_url});
 			});
 		});
 	}
