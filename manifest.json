@@ -14,7 +14,8 @@
 				"lib/browser-polyfill.js",
 				"lib/socket.io.js",
 				"src/injected.js"
-			]
+			],
+			"run_at": "document_end"
 		}
 	],
 	"browser_action": {

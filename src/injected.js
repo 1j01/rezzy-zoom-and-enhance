@@ -291,25 +291,23 @@
 		}
 	};
 
-	window.addEventListener("load", ()=> {
-		browser.storage.local.get(location.origin).then((storedInfo)=> {
-			set_enabled(!!storedInfo[location.origin]);
+	browser.storage.local.get(location.origin).then((storedInfo)=> {
+		set_enabled(!!storedInfo[location.origin]);
+		if (rezzy_active) {
+			console.log("Rezzy active. Enabled for origin", location.origin);
+		} else {
+			console.log("Rezzy inactive. Not enabled for origin", location.origin);
+		}
+	});
+	browser.storage.onChanged.addListener((changes)=> {
+		if (location.origin in changes) {
+			set_enabled(!!changes[location.origin].newValue);
 			if (rezzy_active) {
-				console.log("Rezzy active. Enabled for origin", location.origin);
+				console.log("Rezzy enabled for origin", location.origin);
 			} else {
-				console.log("Rezzy inactive. Not enabled for origin", location.origin);
+				console.log("Rezzy disabled for origin", location.origin);
 			}
-		});
-		browser.storage.onChanged.addListener((changes)=> {
-			if (location.origin in changes) {
-				set_enabled(!!changes[location.origin].newValue);
-				if (rezzy_active) {
-					console.log("Rezzy enabled for origin", location.origin);
-				} else {
-					console.log("Rezzy disabled for origin", location.origin);
-				}
-			}
-		});
+		}
 	});
 	
 })();
