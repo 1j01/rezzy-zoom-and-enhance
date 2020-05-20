@@ -4,6 +4,15 @@
 body.off #toggle-this-site svg {
 	stroke: #ccc;
 }
+body:not(.connected).off #toggle-this-site svg {
+	stroke: #faa;
+}
+body:not(.connected):not(.off) #toggle-this-site svg {
+	stroke: #f33;
+}
+body.connected #server-not-running {
+	display: none;
+}
 #toggle-this-site {
 	border: 0;
 	margin: 0;

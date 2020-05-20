@@ -2,6 +2,11 @@ const browser = window.browser; // WebExtensions API, polyfilled by browser-poly
 
 const toggle_site_button = document.getElementById("toggle-this-site");
 
+const socket = window.io("http://localhost:4284", {transports: ["websocket"]});
+
+socket.on("disconnect", ()=> { document.body.classList.remove("connected"); });
+socket.on("connect", ()=> { document.body.classList.add("connected"); });
+
 const get_origin = ()=>
 	browser.tabs.query({ active: true, currentWindow: true })
 	.then(
