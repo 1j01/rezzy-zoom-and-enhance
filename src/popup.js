@@ -1,8 +1,8 @@
-const browser = window.browser; // WebExtensions API, polyfilled by browser-polyfill.js
+/* global browser, io */
 
 const toggle_site_button = document.getElementById("toggle-this-site");
 
-const socket = window.io("http://localhost:4284", {transports: ["websocket"]});
+const socket = io("http://localhost:4284", {transports: ["websocket"]});
 
 socket.on("disconnect", ()=> { document.body.classList.remove("connected"); });
 socket.on("connect", ()=> { document.body.classList.add("connected"); });

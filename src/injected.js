@@ -1,12 +1,12 @@
 // Code injected into the page
 
+/* global browser, io */
+
 // security: be mindful about what data access the extension gives pages
 // - regarding CORS, sites can already request any URL using a proxy like CORS Anywhere 
 // - if the extension were to request resources with cookies it could expose private information
 
 (()=> {
-	const browser = window.browser; // WebExtensions API, polyfilled by browser-polyfill.js
-
 	let rezzy_active = false;
 
 	function find_next_prev_links() {
@@ -91,7 +91,7 @@
 		}, 100);
 	});
 
-	const socket = window.io("http://localhost:4284", {transports: ["websocket"]});
+	const socket = io("http://localhost:4284", {transports: ["websocket"]});
 	socket.disconnect(); // TODO: start disconnected, don't connect and then immediately disconnect
 
 	let jobs_by_url = {};
