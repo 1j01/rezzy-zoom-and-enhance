@@ -1,16 +1,20 @@
 {
-  "name": "comic-reader",
-  "productName": "Comic Reader",
+  "name": "rezzy",
+  "productName": "Rezzy",
   "version": "0.0.1",
-  "description": "Read webcomics in superresolution...",
+  "description": "Read webcomics in superresolution",
   "keywords": [
     "comics",
     "comic",
+    "manga",
     "graphic-novels",
     "graphic-novel",
     "app",
     "superresolution",
-    "waifu2x"
+    "waifu2x",
+    "magnification",
+    "magnifier",
+    "zoom"
   ],
   "author": "Isaiah Odhner <isaiahodhner@gmail.com>",
   "dependencies": {
