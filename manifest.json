@@ -27,7 +27,6 @@
 	},
 	"permissions": [
 		"tabs",
-		"storage",
-		"http://127.0.0.1:4284/*"
+		"storage"
 	]
 }
