@@ -13,6 +13,8 @@
 //   TODO: to solve this, maybe keep a separate cache per origin - and separate spider, and jobs list and everything
 
 (()=> {
+	console.log("Rezzy content script injected.");
+
 	let rezzy_active = false;
 
 	function find_next_prev_links() {
@@ -270,12 +272,10 @@
 		if (rezzy_active) {
 			window.addEventListener("keydown", handle_keydown);
 			init_socket();
-			console.log("Rezzy active");
 			update_jobs_list();
 			iid = setInterval(update_jobs_list, 500);
 			socket.connect();
 		} else {
-			console.log("Rezzy inactive");
 			window.removeEventListener("keydown", handle_keydown);
 			const imgs = document.querySelectorAll("[data-original-img-src]");
 			for (const img of imgs) {
@@ -294,10 +294,20 @@
 	window.addEventListener("load", ()=> {
 		browser.storage.local.get(location.origin).then((storedInfo)=> {
 			set_enabled(!!storedInfo[location.origin]);
+			if (rezzy_active) {
+				console.log("Rezzy active. Enabled for origin", location.origin);
+			} else {
+				console.log("Rezzy inactive. Not enabled for origin", location.origin);
+			}
 		});
 		browser.storage.onChanged.addListener((changes)=> {
 			if (location.origin in changes) {
-				set_enabled(!!changes[location.origin].newValue)
+				set_enabled(!!changes[location.origin].newValue);
+				if (rezzy_active) {
+					console.log("Rezzy enabled for origin", location.origin);
+				} else {
+					console.log("Rezzy disabled for origin", location.origin);
+				}
 			}
 		});
 	});
