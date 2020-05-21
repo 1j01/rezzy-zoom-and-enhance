@@ -5,7 +5,7 @@
 	"version": "0.1",
 	"homepage_url": "https://github.com/1j01/comic-reader",
 	"icons": {
-		"510": "icon-510x510.png"
+		"512": "icon-512x512.png"
 	},
 	"content_scripts": [
 		{
@@ -23,7 +23,7 @@
 		"default_popup": "src/popup.html",
 		"default_title": "Rezzy: Zoom and Enhance",
 		"default_icon": {
-			"510": "icon-510x510.png"
+			"512": "icon-512x512.png"
 		}
 	},
 	"permissions": [
