@@ -29,7 +29,7 @@ io.on("connection", (socket)=> {
 					callback: (output_file_path)=> {
 						const path_with_slashes = output_file_path.replace(/\\/g, "/");
 						const match_after_path = "/superrez-images/";
-						const result_url = `http://127.0.0.1:${port}/result/${
+						const result_url = `http://localhost:${port}/result/${
 							path_with_slashes
 							.slice(path_with_slashes.indexOf(match_after_path) + match_after_path.length)
 						}`;
