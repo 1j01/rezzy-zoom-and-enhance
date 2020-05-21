@@ -106,8 +106,8 @@ function cancel_unwanted_jobs() {
 	for (const [url, job] of jobs_by_url.entries()) {
 		if (job.wanted_directly_by_sockets.size === 0 && job.wanted_spidered_by_sockets.size === 0) {
 			if (job.started) {
-				if (!job.completed) {
-					console.log("Current job no longer wanted by any active pages, will be finshed up and just put in the cache:", url);
+				if (job.is_current) {
+					console.log("Current job no longer wanted by any active pages, will be finshed up just for the cache:", url);
 				}
 			} else {
 				console.log("Job no longer wanted by any active pages, will be canceled:", url);
@@ -170,6 +170,7 @@ async function run_jobs() {
 			await new Promise((resolve)=> { setTimeout(resolve, 100); });
 			continue;
 		}
+		job.is_current = true;
 		job.started = true;
 		console.log(`next job: ${job.url} @ ${job.scaling_factor}x`);
 		console.log("priority:", job.priority);
@@ -202,6 +203,9 @@ async function run_jobs() {
 		} catch(error) {
 			console.error("Failed to superrez image", job.url, "because:", error, job);
 		}
+		// https://github.com/eslint/eslint/issues/11899
+		// eslint-disable-next-line require-atomic-updates
+		job.is_current = false;
 	}
 }
 
