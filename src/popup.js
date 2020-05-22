@@ -23,7 +23,6 @@ const update_enabled_state = (enabled)=> {
 
 get_origin().then((origin)=> {
 	browser.storage.local.get(origin).then((storedInfo)=> {
-		// console.log("storedInfo:", storedInfo);
 		const enabled = storedInfo[origin];
 		console.log("origin", origin, "enabled?", enabled);
 		update_enabled_state(enabled);

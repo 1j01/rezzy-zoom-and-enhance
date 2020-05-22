@@ -1,64 +1,38 @@
 /* global browser */
 
-var currentTab;
-var currentBookmark;
-
-/*
- * Updates the browser action icon to reflect whether the extension is active on the page.
- */
-function updateIcon(active) {
-	browser.browserAction.setIcon({
-		path: active ? {
-			38: "../icon-38x38.png"
-		} : {
-			38: "../icon-inactive-38x38.png",
-		},
-		tabId: currentTab.id
-	});
-	// browser.browserAction.setTitle({
-	// 	// Screen readers can see the title
-	// 	title: currentBookmark ? 'Unbookmark it!' : 'Bookmark it!',
-	// 	tabId: currentTab.id
-	// });
-}
-
-/*
- * Switches currentTab and currentBookmark to reflect the currently active tab
- */
-function updateActiveTab(tabs) {
-	function updateTab(tabs) {
+function updateIcon() {
+	browser.tabs.query({active: true, currentWindow: true})
+	.then((tabs)=> {
 		if (tabs[0]) {
-			currentTab = tabs[0];
+			const currentTab = tabs[0];
 			const origin = new URL(currentTab.url).origin;
 			browser.storage.local.get(origin).then((storedInfo)=> {
-				// console.log("storedInfo:", storedInfo);
 				const enabled = storedInfo[origin];
 				console.log("origin", origin, "enabled?", enabled);
-				updateIcon(enabled);
+				browser.browserAction.setIcon({
+					path: enabled ? {
+						38: "../icon-38x38.png"
+					} : {
+						38: "../icon-inactive-38x38.png",
+					},
+					tabId: currentTab.id,
+				});
 			});
 		}
-	}
-
-	var gettingActiveTab = browser.tabs.query({active: true, currentWindow: true});
-	gettingActiveTab.then(updateTab);
+	});
 }
 
 // listen to tab URL changes
-browser.tabs.onUpdated.addListener(updateActiveTab);
+browser.tabs.onUpdated.addListener(updateIcon);
 
 // listen to tab switching
-browser.tabs.onActivated.addListener(updateActiveTab);
+browser.tabs.onActivated.addListener(updateIcon);
 
 // listen for window switching
-browser.windows.onFocusChanged.addListener(updateActiveTab);
+browser.windows.onFocusChanged.addListener(updateIcon);
 
 // listen for storage changes
-browser.storage.onChanged.addListener((changes)=> {
-	// if (current_tab_origin in changes) {
-		
-	// }
-	updateActiveTab();
-});
+browser.storage.onChanged.addListener(updateIcon);
 
 // update when the extension loads initially
-updateActiveTab();
+updateIcon();
