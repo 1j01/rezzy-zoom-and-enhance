@@ -7,6 +7,12 @@
 	"icons": {
 		"512": "icon-512x512.png"
 	},
+	"background": {
+		"scripts": [
+			"lib/browser-polyfill.js",
+			"src/background.js"
+		]
+	},
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
@@ -23,7 +29,8 @@
 		"default_popup": "src/popup.html",
 		"default_title": "Rezzy: Zoom and Enhance",
 		"default_icon": {
-			"512": "icon-512x512.png"
+			"512": "icon-512x512.png",
+			"38": "icon-38x38.png"
 		}
 	},
 	"permissions": [
