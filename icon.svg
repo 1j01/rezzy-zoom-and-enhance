@@ -34,6 +34,41 @@
          x="-52.906738"
          y="437.71103" />
     </clipPath>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Blur"
+       id="filter928"
+       y="-0.13"
+       height="1.23">
+      <feGaussianBlur
+         stdDeviation="0.01 1.05"
+         result="blur"
+         id="feGaussianBlur926" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Blur"
+       id="filter932"
+       x="-0.10000000000000001"
+       y="-0.14000000000000001"
+       height="1.3100000000000001"
+       width="1.24">
+      <feGaussianBlur
+         stdDeviation="0.01 1.05"
+         result="blur"
+         id="feGaussianBlur930" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Blur"
+       id="filter936"
+       y="-0.15000000000000002"
+       height="1.25">
+      <feGaussianBlur
+         stdDeviation="0.01 1.05"
+         result="blur"
+         id="feGaussianBlur934" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -43,11 +78,11 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="15.839192"
-     inkscape:cx="15.427737"
-     inkscape:cy="14.564759"
+     inkscape:cx="-6.7262746"
+     inkscape:cy="16.270272"
      inkscape:document-units="px"
-     inkscape:current-layer="g887"
-     showgrid="true"
+     inkscape:current-layer="layer1"
+     showgrid="false"
      units="px"
      borderlayer="true"
      inkscape:window-width="1920"
@@ -165,19 +200,19 @@
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccccc" />
     <path
-       style="fill:#ffff00;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter936)"
        d="M 6,297.53333 8,296.53333 9,293.53333 10,296.53333 12,297.53333 10,298.53333 9,301.53333 8,298.53333 Z"
        id="path889-0-0"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccccc" />
     <path
-       style="fill:#ffff00;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter928)"
        d="M 10,310.03333 12.5,308.53333 14,305.03333 15.5,308.53333 18,310.03333 15.5,311.53333 14,315.03333 12.5,311.53333 Z"
        id="path889-0-9-1"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccccccc" />
     <path
-       style="fill:#ffff00;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter932)"
        d="M 16,300.53333 20,298.53333 21.5,293.53333 23,298.53333 27,300.53333 23,302.53333 21.5,307.53333 20,302.53333 Z"
        id="path889-3"
        inkscape:connector-curvature="0"
