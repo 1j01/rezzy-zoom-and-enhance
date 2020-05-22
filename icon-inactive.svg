@@ -14,7 +14,11 @@
    viewBox="0 0 32 32"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   inkscape:export-xdpi="114"
+   inkscape:export-ydpi="114"
+   sodipodi:docname="icon-inactive.svg"
+   inkscape:export-filename="C:\Users\Isaiah\Projects\comic-reader\icon-inactive-38x38.png">
   <title
      id="title815">Superresolution Inactive</title>
   <defs
@@ -69,6 +73,33 @@
          result="blur"
          id="feGaussianBlur926-4" />
     </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="Blur"
+       id="filter928-0-7">
+      <feGaussianBlur
+         stdDeviation="0.01 1.05"
+         result="blur"
+         id="feGaussianBlur926-4-2" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="Blur"
+       id="filter928-0-79">
+      <feGaussianBlur
+         stdDeviation="0.01 1.05"
+         result="blur"
+         id="feGaussianBlur926-4-9" />
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB"
+       inkscape:label="Blur"
+       id="filter928-0-73">
+      <feGaussianBlur
+         stdDeviation="0.01 1.05"
+         result="blur"
+         id="feGaussianBlur926-4-1" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -78,8 +109,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.919596"
-     inkscape:cx="-14.896709"
-     inkscape:cy="37.549642"
+     inkscape:cx="-26.709287"
+     inkscape:cy="25.705848"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -182,7 +213,7 @@
       </g>
     </g>
     <g
-       transform="translate(-0.74174794,-8.3140911)"
+       transform="matrix(0.83085938,0,0,0.83085938,10.928119,38.334746)"
        id="g944">
       <path
          sodipodi:nodetypes="ccccccccc"
@@ -196,6 +227,40 @@
          id="path889-0-9-1"
          d="M 10,310.03333 12.5,308.53333 14,305.03333 15.5,308.53333 18,310.03333 15.5,311.53333 14,315.03333 12.5,311.53333 Z"
          style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter928-0)"
+         transform="matrix(1.4208969,0,0,1.4208969,-5.8925565,-130.49206)" />
+    </g>
+    <g
+       transform="matrix(0.70304699,0,0,0.70304699,-5.0128933,79.278618)"
+       id="g944-4">
+      <path
+         sodipodi:nodetypes="ccccccccc"
+         inkscape:connector-curvature="0"
+         id="path889-0-9-0"
+         d="M 10,310.03333 12.5,308.53333 14,305.03333 15.5,308.53333 18,310.03333 15.5,311.53333 14,315.03333 12.5,311.53333 Z"
+         style="fill:#ffff00;fill-rule:evenodd;stroke:#ffcc00;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="ccccccccc"
+         inkscape:connector-curvature="0"
+         id="path889-0-9-1-64"
+         d="M 10,310.03333 12.5,308.53333 14,305.03333 15.5,308.53333 18,310.03333 15.5,311.53333 14,315.03333 12.5,311.53333 Z"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter928-0-79)"
+         transform="matrix(1.4208969,0,0,1.4208969,-5.8925565,-130.49206)" />
+    </g>
+    <g
+       transform="matrix(0.59790086,0,0,0.59790086,4.3571536,126.51368)"
+       id="g944-8">
+      <path
+         sodipodi:nodetypes="ccccccccc"
+         inkscape:connector-curvature="0"
+         id="path889-0-9-9"
+         d="M 10,310.03333 12.5,308.53333 14,305.03333 15.5,308.53333 18,310.03333 15.5,311.53333 14,315.03333 12.5,311.53333 Z"
+         style="fill:#ffff00;fill-rule:evenodd;stroke:#ffcc00;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         sodipodi:nodetypes="ccccccccc"
+         inkscape:connector-curvature="0"
+         id="path889-0-9-1-4"
+         d="M 10,310.03333 12.5,308.53333 14,305.03333 15.5,308.53333 18,310.03333 15.5,311.53333 14,315.03333 12.5,311.53333 Z"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:none;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter928-0-73)"
          transform="matrix(1.4208969,0,0,1.4208969,-5.8925565,-130.49206)" />
     </g>
   </g>
