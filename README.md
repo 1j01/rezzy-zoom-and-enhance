@@ -24,6 +24,13 @@ THIS EXTENSION IS NOT RELEASED YET
 - [Clone the repo.][git clone]
 - Install [Node.js][] if you don't have it, then open up a command prompt / terminal in the project directory.
 - Install project dependencies with `npm install`
+- For **Linux** (not needed on Windows), run the following:
+  ```sh
+  sudo apt-get update -y
+  sudo apt-get install -y libopencv-core-dev libopencv-imgcodecs-dev
+  sudo ldconfig -v
+  sudo ln -s "$(pwd)/waifu2x-DeadSix27-win64_v531/models_rgb/" /usr/local/share/waifu2x-converter-cpp
+  ```
 - Start the superresolution server with `npm start`
 - For **Firefox**, run `npx web-ext run` in the project directory
   - It will open a window with the extension temporarily installed.
@@ -38,7 +45,7 @@ THIS EXTENSION IS NOT RELEASED YET
     - Reload pages you're testing on to get the updated content script.
 
 ## Usage
-- Visit a webcomic, such as [Paranatural](https://www.paranatural.net/comic/chapter-1)... well, maybe that's not the best example, at the begining, but it works really well once the art gets better. [Kill Six Billion Demons](https://killsixbilliondemons.com/comic/kill-six-billion-demons-chapter-1/), [Sleepless Domain](https://www.sleeplessdomain.com/comic/chapter-1-cover)
+- Visit a webcomic, such as [Paranatural](https://www.paranatural.net/comic/chapter-1)... well, maybe that's not the best example, at the beginning, but it works really well once the art gets better. [Kill Six Billion Demons](https://killsixbilliondemons.com/comic/kill-six-billion-demons-chapter-1/), [Sleepless Domain](https://www.sleeplessdomain.com/comic/chapter-1-cover)
 - Click on the extension icon in the browser toolbar, and click the power button in the popup to enable the extension for the current site
 - (Check the server logs to see if it's working - or, if you hear your computer's cooling fans whirring into motion, it's probably working.)
 - Wait for it to buffer several pages before reading

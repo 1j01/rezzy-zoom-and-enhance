@@ -1,3 +1,6 @@
+# Generated at runtime based on GPU
+# e.g. GeForce_GT_720.bin
+waifu2x-DeadSix27-linux64_v533/*.bin
 
 # electron forge output (historical, for switching branches)
 out/

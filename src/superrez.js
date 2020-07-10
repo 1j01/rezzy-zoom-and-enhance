@@ -15,7 +15,11 @@
 	fs.mkdirSync(temp_dir, { recursive: true });
 	fs.mkdirSync(cache_dir, { recursive: true });
 
-	const converter_path = path.join(__dirname, "../waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe");
+	const converter_path = path.join(__dirname,
+		process.platform === "win32" ? 
+		"../waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe" : 
+		"../waifu2x-DeadSix27-linux64_v533/waifu2x-converter-cpp"
+	);
 
 	const scaling_factor = 2;
 
