@@ -10,8 +10,8 @@ Rezzy is a browser extension that automatically enhances the resolution of image
 using machine learning (powered by [waifu2x-converter-cpp][]).
 
 ![](promo.png)
-<center><i>Image credit: <a href="https://www.sleeplessdomain.com/comic/chapter-1-cover">Sleepless Domain</a></i></center>
-<p>
+<p align="center"><i>Image credit: <a href="https://www.sleeplessdomain.com/comic/chapter-1-cover">Sleepless Domain</a></i></p>
+
 
 Machine learning is cool, but it's important to make it *accessible*, and get it into the hands of the masses.
 
