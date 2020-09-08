@@ -7,9 +7,11 @@ Sometimes the text in a web comic is a little too small to read comfortably.
 Zooming in normally makes the text blurry, so it's not much help.  
 
 Rezzy is a browser extension that automatically enhances the resolution of images on the web,
-using machine learning.
+using machine learning (powered by [waifu2x-converter-cpp][]).
 
-Powered by [waifu2x-converter-cpp][]
+![](promo.png)
+<center><i>Image credit: <a href="https://www.sleeplessdomain.com/comic/chapter-1-cover">Sleepless Domain</a></i></center>
+<p>
 
 Machine learning is cool, but it's important to make it *accessible*, and get it into the hands of the masses.
 
