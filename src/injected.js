@@ -209,9 +209,23 @@
 					elements: [img],
 					apply_result_to_page: (superrez_url)=> {
 						img.dataset.originalImgSrc = img.src;
-						img.style.width = getComputedStyle(img).width;
-						img.style.height = getComputedStyle(img).height;
-						img.src = superrez_url;
+						const computedStyle = getComputedStyle(img);
+						// We may need to wait for the image to load.
+						if (
+							parseFloat(computedStyle.width) === 0 ||
+							parseFloat(computedStyle.height) === 0
+						) {
+							img.addEventListener("load", ()=> {
+								const computedStyle = getComputedStyle(img);
+								img.style.width = computedStyle.width;
+								img.style.height = computedStyle.height;
+								img.src = superrez_url;
+							}, {once: true});
+						} else {
+							img.style.width = computedStyle.width;
+							img.style.height = computedStyle.height;
+							img.src = superrez_url;
+						}
 					}
 				});
 			});
