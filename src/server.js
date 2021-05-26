@@ -71,14 +71,14 @@ io.on("connection", (socket)=> {
 	});
 	let stop_spider;
 	let started_from_url;
-	socket.on("spider-from-url", (starting_url)=> {
+	socket.on("spider", ({ starting_url, crawl_backward_pages = 1, crawl_forward_pages = 20 }) => {
 		if (started_from_url === starting_url) {
 			return;
 		}
 		stop_spider && stop_spider();
 		stop_spider = spiderFromURL(starting_url, {
-			backwardPages: 1,
-			forwardPages: 20,
+			backwardPages: crawl_backward_pages,
+			forwardPages: crawl_forward_pages,
 			addJob: (url)=> {
 				add_job({
 					url,

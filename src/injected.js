@@ -19,6 +19,7 @@
 	const { find_next_prev_links } = globalThis;
 
 	let rezzy_active = false;
+	let options = {};
 
 	function handle_keydown(event) {
 		const starting_url = location.href;
@@ -64,7 +65,11 @@
 			[...Object.values(jobs_by_url)]
 			.map(({url, scaling_factor, priority})=> ({url, scaling_factor, priority}));
 		socket.emit("jobs", jobs);
-		socket.emit("spider-from-url", location.href);
+		socket.emit("spider", {
+			starting_url: location.href,
+			crawl_backward_pages: options.crawl_backward_pages,
+			crawl_forward_pages: options.crawl_forward_pages
+		});
 	}
 
 	function get_priority(job) {
@@ -262,7 +267,14 @@
 				console.log("Rezzy disabled for origin", location.origin);
 			}
 		}
+		for (const [key, { newValue }] of Object.entries(changes)) {
+			if (["crawl_forward_pages", "crawl_backward_pages"].includes(key)) {
+				options[key] = newValue;
+			}
+		}
 	});
+
+	Object.assign(options, await browser.storage.local.get(["crawl_forward_pages", "crawl_backward_pages"]));
 
 	const storedInfo = await browser.storage.local.get(location.origin);
 	set_enabled(!!storedInfo[location.origin]);
