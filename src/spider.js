@@ -18,7 +18,7 @@ const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 				return;
 			}
 			if (response.statusCode !== 200) {
-				console.error(`[spider] Failed to get ${url} - recieved HTTP ${response.statusCode} - stopping scraping (${description})`);
+				console.error(`[spider] Failed to get ${url} - received HTTP ${response.statusCode} - stopping scraping (${description})`);
 				return;
 			}
 			if (stopped) {
@@ -76,7 +76,7 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 		if (b_is_pg && !a_is_pg) return +1;
 
 		// prioritize "comic" links, which is hopefully synonymous with page,
-		// and not refering to a web ring https://en.wikipedia.org/wiki/Webring
+		// and not referring to a web ring https://en.wikipedia.org/wiki/Webring
 		// TODO: deprioritize/exclude external links
 		// and simplify to /page|comic/i
 		if (a_is_comic && !b_is_comic) return -1;

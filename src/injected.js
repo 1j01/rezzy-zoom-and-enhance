@@ -54,7 +54,7 @@
 			if (b_is_pg && !a_is_pg) return +1;
 
 			// prioritize "comic" links, which is hopefully synonymous with page,
-			// and not refering to a web ring https://en.wikipedia.org/wiki/Webring
+			// and not referring to a web ring https://en.wikipedia.org/wiki/Webring
 			// TODO: deprioritize/exclude external links
 			// and simplify to /page|comic/i
 			if (a_is_comic && !b_is_comic) return -1;

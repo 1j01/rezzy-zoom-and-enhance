@@ -52,9 +52,9 @@ I was thinking it would just crawl the web pages,
 maybe use clues like meta tags but mostly look for clearly labeled Next buttons etc.
 
 * It should save your place automatically.
-(And you shouldn't lose it by simply navigating someplace else, so 1. you should be able to go back, which implies a browser like experience (with either a browser extention or specialized browser), and 2. it should be clear to the user how the address is being saved automatically)
+(And you shouldn't lose it by simply navigating someplace else, so 1. you should be able to go back, which implies a browser like experience (with either a browser extension or specialized browser), and 2. it should be clear to the user how the address is being saved automatically)
 
-* Splitting pages up by frames could be useful for reading on mobile devices like phones and ereaders,
+* Splitting pages up by frames could be useful for reading on mobile devices like phones and e-readers,
 but it couldn't handle all page layouts (like, creative ones! y'know?),
 and if it did them in the wrong order that would be confusing
 and you might not be able to tell what happened.
@@ -106,9 +106,9 @@ but it doesn't have to be a *new* one. No need to reinvent the wheel here.
 That said, having all this integrated into a comic reader could be really nice.
 You don't want to have to think about all these different tools.
 And the different tools might *all* have to support *streaming comic book archive files* for them to work nicely together,
-that is, without agregious wait times.
+that is, without egregious wait times.
 And that's not an established thing... of value... like, probably no app has ever supported that.
-So not being able to do it in a streaming fasion (super-rez-ing while preloading pages) for arbitrary reader apps
+So not being able to do it in a streaming fashion (super-rez-ing while preloading pages) for arbitrary reader apps
 might make the splitting up / modularity less useful.
 
 

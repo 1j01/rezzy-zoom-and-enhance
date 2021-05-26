@@ -56,18 +56,18 @@
 				console.log("temp file path:", input_image_path);
 
 				var write_stream = fs.createWriteStream(input_image_path);
-				var errored = false;
+				var got_error = false;
 				// TODO: detect non-200 status code?
 				request
 					.get(input_image_url)
 					.on('error', (err)=> {
-						errored = true
+						got_error = true
 						callback(err);
 					})
 					.pipe(write_stream);
 
 				write_stream.on("finish", ()=> {
-					if(errored){
+					if(got_error){
 						console.warn("finish after error?"); // TODO: is it possible?
 						return;
 					}

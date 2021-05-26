@@ -16,7 +16,7 @@ const io = new Server(app.listen(port));
 let jobs_by_url = new Map();
 
 io.on("connection", (socket)=> {
-	// Note: "jobs" event might be recieved after disconnect, because client may reconnect (right?)
+	// Note: "jobs" event might be received after disconnect, because client may reconnect (right?)
 	// (or is it a new "connection"/"socket" on the server when the client reconnects?)
 	socket.on("jobs", (client_wanted_jobs)=> {
 		// console.log("client_wanted_jobs", client_wanted_jobs);
@@ -107,7 +107,7 @@ function cancel_unwanted_jobs() {
 		if (job.wanted_directly_by_sockets.size === 0 && job.wanted_spidered_by_sockets.size === 0) {
 			if (job.started) {
 				if (job.is_current) {
-					console.log("Current job no longer wanted by any active pages, will be finshed up just for the cache:", url);
+					console.log("Current job no longer wanted by any active pages, will be finished up just for the cache:", url);
 				}
 			} else {
 				console.log("Job no longer wanted by any active pages, will be canceled:", url);
