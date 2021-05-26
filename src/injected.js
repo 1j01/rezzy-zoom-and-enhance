@@ -182,7 +182,7 @@
 				job.apply_result_to_page(blob_url, scaling_factor);
 			})
 			.catch((error)=> {
-				console.error("Failed to apply superrez result:", error, {url, result_url});
+				console.error("Failed to apply superrez result:", error, "url:", url, "result_url:", result_url);
 			});
 		});
 	}

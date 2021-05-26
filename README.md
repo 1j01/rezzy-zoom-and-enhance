@@ -39,7 +39,7 @@ THIS EXTENSION IS NOT RELEASED YET
   - When you make changes:
     - It will automatically reload the extension.
     - Reload pages you're testing on to get the updated content script.
-- For **Chrome**, type `chrome://extensions` in the address bar
+- For **Chrome** or **Chromium**, type `chrome://extensions` in the address bar
   - Turn on Developer mode
   - Click "Load unpacked" and select the root of this repository as the folder
   - When you make changes:

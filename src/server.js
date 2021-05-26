@@ -8,7 +8,13 @@ const {spiderFromURL} = require("./spider");
 const port = 4284;
 
 const app = express();
-app.use("/result", express.static(superrez.cache_dir));
+app.use("/result", express.static(superrez.cache_dir, {
+	setHeaders: function setHeaders(res/*, path, stat*/) {
+		res.header('Access-Control-Allow-Origin', '*');
+		res.header('Access-Control-Allow-Methods', 'GET');
+		res.header('Access-Control-Allow-Headers', 'Content-Type');
+	},
+}));
 
 const io = new Server(app.listen(port));
 
