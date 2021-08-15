@@ -65,6 +65,15 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 		const b_is_pg = !!$.html(b).match(pg_regexp);
 		const a_is_comic = !!$.html(a).match(comic_regexp);
 		const b_is_comic = !!$.html(b).match(comic_regexp);
+		const a_is_long = a.textContent.length > 40;
+		const b_is_long = b.textContent.length > 40;
+
+		// I found long text in a link on https://mara-comic.com/comic/01/01?lang=en
+		// "Rosi explores a new style, and Mara leaves her enemies for the crows.
+		// Vote on Mara at Top Webcomics to see a preview of the next page!"
+		// which contains "next page" in the link text, but the link is not a next link
+		if (a_is_long && !b_is_long) return +1;
+		if (b_is_long && !a_is_long) return -1;
 
 		// deprioritize, but don't exclude chapter buttons;
 		// a webcomic could have entire chapters on a page
