@@ -1,5 +1,6 @@
 /* eslint-env node */
 const cheerio = require('cheerio');
+const { find_next_prev_links } = require("./find-nav-links");
 
 // slowing down the spider makes the server more responsive
 // so superrez images can load faster
@@ -42,60 +43,9 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 	const $ = cheerio.load(html);
 
 	const images = $("img").toArray();
-	const links = $("a").toArray().filter((a)=>
-		// ignore login / authentication links that would otherwise be matched
-		!$.html(a).match(/\?next=/i)
-	);
+	const links = $("a").toArray();
 
-	// TODO: look for linked webcomic image, which could help with webcomics in different languages,
-	// which might not say "back"/"forward" in English in any way
-	// WET: logic should match injected.js
-	const nextLinks = links.filter((a)=>
-		!!$.html(a).match(/next(?![da])|forward|fr?wr?d/i)
-	);
-	const prevLinks = links.filter((a)=>
-		!!$.html(a).match(/prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bc?k?wd(\b|[_-])/i)
-	);
-	const prioritizePageLinksFirst = (a, b)=> {
-		const ch_regexp = /chapter|chapt?(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
-		const pg_regexp = /page|(\b|[_-])(p[gp]|cc)(\b|[_-])/i;
-		const comic_regexp = /comic/i;
-		const a_is_ch = !!$.html(a).match(ch_regexp);
-		const b_is_ch = !!$.html(b).match(ch_regexp);
-		const a_is_pg = !!$.html(a).match(pg_regexp);
-		const b_is_pg = !!$.html(b).match(pg_regexp);
-		const a_is_comic = !!$.html(a).match(comic_regexp);
-		const b_is_comic = !!$.html(b).match(comic_regexp);
-		const a_is_long = a.textContent.length > 40;
-		const b_is_long = b.textContent.length > 40;
-
-		// I found long text in a link on https://mara-comic.com/comic/01/01?lang=en
-		// "Rosi explores a new style, and Mara leaves her enemies for the crows.
-		// Vote on Mara at Top Webcomics to see a preview of the next page!"
-		// which contains "next page" in the link text, but the link is not a next link
-		if (a_is_long && !b_is_long) return +1;
-		if (b_is_long && !a_is_long) return -1;
-
-		// deprioritize, but don't exclude chapter buttons;
-		// a webcomic could have entire chapters on a page
-		if (a_is_ch && !b_is_ch) return +1;
-		if (b_is_ch && !a_is_ch) return -1;
-
-		// prioritize "page" links
-		if (a_is_pg && !b_is_pg) return -1;
-		if (b_is_pg && !a_is_pg) return +1;
-
-		// prioritize "comic" links, which is hopefully synonymous with page,
-		// and not referring to a web ring https://en.wikipedia.org/wiki/Webring
-		// TODO: deprioritize/exclude external links
-		// and simplify to /page|comic/i
-		if (a_is_comic && !b_is_comic) return -1;
-		if (b_is_comic && !a_is_comic) return +1;
-
-		return 0;
-	};
-	nextLinks.sort(prioritizePageLinksFirst);
-	prevLinks.sort(prioritizePageLinksFirst);
+	const { nextLinks, prevLinks } = find_next_prev_links(links);
 
 	console.log(`[spider] found ${images.length} images, ${nextLinks.length} next link(s), ${prevLinks.length} prev link(s)`);
 	// console.log("[spider] found elements:", {nextLinks, prevLinks, images});
