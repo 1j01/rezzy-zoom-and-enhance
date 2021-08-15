@@ -1,0 +1,102 @@
+(() => {
+	let $;
+	if (typeof module !== 'undefined' && typeof require === 'function') {
+		$ = require('cheerio');
+	}
+
+	function find_next_prev_links(links) {
+		if (!links) {
+			links = document.getElementsByTagName('a');
+		}
+		if (links.toArray) {
+			// cheerio / jQuery
+			links = links.toArray();
+		} else {
+			// native DOM querySelectorAll
+			links = [...links];
+		}
+
+		function outerHTML(element) {
+			// native DOM
+			if (element.outerHTML) {
+				return element.outerHTML;
+			}
+			// cheerio
+			return $.html(element);
+		}
+
+		// ignore login / authentication links that would otherwise be matched
+		// (they often include a "next" parameter that is used to redirect to the page you were on last or that needed authentication)
+		links = links.filter((a) =>
+			!outerHTML(a).match(/\?next=/i)
+		);
+
+		// TODO: look for linked webcomic image, which could help with webcomics in different languages,
+		// which might not say "back"/"forward" in English in any way
+		// TODO: look for <link rel="prev" href="...">
+		const nextLinks = links.filter((a) =>
+			!!outerHTML(a).match(/next(?![da])|forward|fr?wr?d/i)
+		);
+		const prevLinks = links.filter((a) =>
+			!!outerHTML(a).match(/prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bc?k?wd(\b|[_-])/i)
+		);
+		const prioritizePageLinksFirst = (a, b) => {
+			const ch_regexp = /chapter|chapt?(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
+			const pg_regexp = /page|(\b|[_-])(p[gp]|cc)(\b|[_-])/i;
+			const comic_regexp = /comic/i;
+			const a_is_ch = !!outerHTML(a).match(ch_regexp);
+			const b_is_ch = !!outerHTML(b).match(ch_regexp);
+			const a_is_pg = !!outerHTML(a).match(pg_regexp);
+			const b_is_pg = !!outerHTML(b).match(pg_regexp);
+			const a_is_comic = !!outerHTML(a).match(comic_regexp);
+			const b_is_comic = !!outerHTML(b).match(comic_regexp);
+			const a_is_long = a.textContent.length > 40;
+			const b_is_long = b.textContent.length > 40;
+
+			// I found long text in a link on https://mara-comic.com/comic/01/01?lang=en
+			// "Rosi explores a new style, and Mara leaves her enemies for the crows.
+			// Vote on Mara at Top Webcomics to see a preview of the next page!"
+			// which contains "next page" in the link text, but the link is not a next link
+			// Deprioritize, but don't exclude, just in case.
+			// For reference, "Click here to read the next chapter" is 35 characters long.
+			if (a_is_long && !b_is_long) return +1;
+			if (b_is_long && !a_is_long) return -1;
+
+			// deprioritize, but don't exclude chapter buttons;
+			// a webcomic could have entire chapters on a page
+			if (a_is_ch && !b_is_ch) return +1;
+			if (b_is_ch && !a_is_ch) return -1;
+
+			// prioritize "page" links
+			if (a_is_pg && !b_is_pg) return -1;
+			if (b_is_pg && !a_is_pg) return +1;
+
+			// prioritize "comic" links, which is hopefully synonymous with page,
+			// and not referring to a web ring https://en.wikipedia.org/wiki/Webring
+			// TODO: deprioritize/exclude external links
+			// and simplify to /page|comic/i
+			if (a_is_comic && !b_is_comic) return -1;
+			if (b_is_comic && !a_is_comic) return +1;
+
+			return 0;
+		};
+		nextLinks.sort(prioritizePageLinksFirst);
+		prevLinks.sort(prioritizePageLinksFirst);
+
+		return {
+			nextLinks,
+			prevLinks,
+			next: nextLinks[0],
+			prev: prevLinks[0],
+		};
+	}
+
+	if (typeof module !== "undefined") {
+		module.exports = {
+			find_next_prev_links,
+		};
+	} else {
+		globalThis.find_next_prev_links = find_next_prev_links;
+	}
+
+})();
