@@ -45,12 +45,15 @@
 			const ch_regexp = /chapter|chapt?(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
 			const pg_regexp = /page|(\b|[_-])(p[gp]|cc)(\b|[_-])/i;
 			const comic_regexp = /comic/i;
+			const prev_not_back_regexp = /prev(?!iew|[eau])/i;
 			const a_is_ch = !!outerHTML(a).match(ch_regexp);
 			const b_is_ch = !!outerHTML(b).match(ch_regexp);
 			const a_is_pg = !!outerHTML(a).match(pg_regexp);
 			const b_is_pg = !!outerHTML(b).match(pg_regexp);
 			const a_is_comic = !!outerHTML(a).match(comic_regexp);
 			const b_is_comic = !!outerHTML(b).match(comic_regexp);
+			const a_is_prev_not_back = !!outerHTML(a).match(prev_not_back_regexp);
+			const b_is_prev_not_back = !!outerHTML(b).match(prev_not_back_regexp);
 			const a_is_long = a.textContent.length > 40;
 			const b_is_long = b.textContent.length > 40;
 
@@ -78,6 +81,14 @@
 			// and simplify to /page|comic/i
 			if (a_is_comic && !b_is_comic) return -1;
 			if (b_is_comic && !a_is_comic) return +1;
+
+			// There are different kinds of "back" buttons,
+			// for instance on https://www.webcomicsapp.com/view/600503cc8c252b26d748d074/1
+			// there is a "Back" button to go back to the comic description page,
+			// and a "Previous" button for the previous page of the comic.
+			// Prioritize "previous" buttons.
+			if (a_is_prev_not_back && !b_is_prev_not_back) return -1;
+			if (b_is_prev_not_back && !a_is_prev_not_back) return +1;
 
 			return 0;
 		};
