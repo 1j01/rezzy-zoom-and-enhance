@@ -15,11 +15,20 @@
 
 	function outerHTML(element) {
 		// native DOM
-		if (element.outerHTML) {
+		if ("outerHTML" in element) {
 			return element.outerHTML;
 		}
 		// cheerio
 		return $.html(element);
+	}
+
+	function textContent(element) {
+		// native DOM
+		if ("textContent" in element) {
+			return element.textContent;
+		}
+		// cheerio
+		return $(element).text();
 	}
 
 	function find_next_prev_links(links) {
@@ -52,8 +61,8 @@
 			const b_is_comic = !!outerHTML(b).match(comic_regexp);
 			const a_is_prev_not_back = !!outerHTML(a).match(prev_not_back_regexp);
 			const b_is_prev_not_back = !!outerHTML(b).match(prev_not_back_regexp);
-			const a_is_long = a.textContent.length > 40;
-			const b_is_long = b.textContent.length > 40;
+			const a_is_long = textContent(a).length > 40;
+			const b_is_long = textContent(b).length > 40;
 
 			// I found long text in a link on https://mara-comic.com/comic/01/01?lang=en
 			// "Rosi explores a new style, and Mara leaves her enemies for the crows.
