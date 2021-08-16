@@ -5,6 +5,23 @@
 		$ = require('cheerio');
 	}
 
+	const query_param_next_regex = /\?next=/i;
+	const next_regex = /next(?![da])|forward|fr?wr?d/i;
+	const prev_regex = /prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bc?k?wd(\b|[_-])/i;
+	const ch_regexp = /chapter|chapt?(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
+	const pg_regexp = /page|(\b|[_-])(p[gp]|cc)(\b|[_-])/i;
+	const comic_regexp = /comic/i;
+	const prev_not_back_regexp = /prev(?!iew|[eau])/i;
+
+	function outerHTML(element) {
+		// native DOM
+		if (element.outerHTML) {
+			return element.outerHTML;
+		}
+		// cheerio
+		return $.html(element);
+	}
+
 	function find_next_prev_links(links) {
 		if (!links) {
 			links = document.getElementsByTagName('a');
@@ -17,35 +34,16 @@
 			links = [...links];
 		}
 
-		function outerHTML(element) {
-			// native DOM
-			if (element.outerHTML) {
-				return element.outerHTML;
-			}
-			// cheerio
-			return $.html(element);
-		}
-
 		// ignore login / authentication links that would otherwise be matched
 		// (they often include a "next" parameter that is used to redirect to the page you were on last or that needed authentication)
-		links = links.filter((a) =>
-			!outerHTML(a).match(/\?next=/i)
-		);
+		links = links.filter((a) => !outerHTML(a).match(query_param_next_regex));
 
 		// TODO: look for linked webcomic image, which could help with webcomics in different languages,
 		// which might not say "back"/"forward" in English in any way
 		// TODO: look for <link rel="prev" href="...">
-		const nextLinks = links.filter((a) =>
-			!!outerHTML(a).match(/next(?![da])|forward|fr?wr?d/i)
-		);
-		const prevLinks = links.filter((a) =>
-			!!outerHTML(a).match(/prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bc?k?wd(\b|[_-])/i)
-		);
+		const nextLinks = links.filter((a) => !!outerHTML(a).match(next_regex));
+		const prevLinks = links.filter((a) => !!outerHTML(a).match(prev_regex));
 		const prioritizePageLinksFirst = (a, b) => {
-			const ch_regexp = /chapter|chapt?(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
-			const pg_regexp = /page|(\b|[_-])(p[gp]|cc)(\b|[_-])/i;
-			const comic_regexp = /comic/i;
-			const prev_not_back_regexp = /prev(?!iew|[eau])/i;
 			const a_is_ch = !!outerHTML(a).match(ch_regexp);
 			const b_is_ch = !!outerHTML(b).match(ch_regexp);
 			const a_is_pg = !!outerHTML(a).match(pg_regexp);
