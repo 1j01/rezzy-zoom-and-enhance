@@ -1,4 +1,4 @@
-/* global browser */
+/* eslint-env browser, webextensions */
 
 function updateIcon() {
 	browser.tabs.query({active: true, currentWindow: true})

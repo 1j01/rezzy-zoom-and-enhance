@@ -1,4 +1,5 @@
-/* global browser, io */
+/* eslint-env browser, webextensions */
+/* global io */
 
 const toggle_site_button = document.getElementById("toggle-this-site");
 

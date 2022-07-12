@@ -1,3 +1,4 @@
+/* eslint-env node */
 const cheerio = require('cheerio');
 
 // slowing down the spider makes the server more responsive

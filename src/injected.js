@@ -1,6 +1,7 @@
 // Code injected into the page
 
-/* global browser, io */
+/* eslint-env browser, webextensions */
+/* global io */
 
 // security: be mindful about what data access the extension gives pages
 // - regarding CORS, sites can already request any URL using a proxy like CORS Anywhere 
