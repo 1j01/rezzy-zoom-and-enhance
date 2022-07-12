@@ -4,10 +4,17 @@ async function updateIcon() {
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
 	if (tabs[0]) {
 		const currentTab = tabs[0];
-		const origin = new URL(currentTab.url).origin;
-		const storedInfo = await browser.storage.local.get(origin);
-		const enabled = storedInfo[origin];
-		console.log("origin", origin, "enabled?", enabled);
+		console.log("current tab:", currentTab);
+		let enabled = false;
+		try {
+			const origin = new URL(currentTab.url).origin;
+			const storedInfo = await browser.storage.local.get(origin);
+			enabled = Boolean(storedInfo[origin]);
+			console.log("origin", origin, enabled ? "enabled" : "disabled");
+		} catch (error) {
+			console.log("origin", origin, "disabled because:", error);
+		}
+
 		await browser.browserAction.setIcon({
 			path: enabled ? {
 				38: "../icon-38x38.png"
