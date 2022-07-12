@@ -101,10 +101,10 @@
 			}
 
 			if (event.key === "ArrowRight") {
-				find_next_prev_links().next.click();
+				find_next_prev_links().next?.click();
 			}
 			if (event.key === "ArrowLeft") {
-				find_next_prev_links().prev.click();
+				find_next_prev_links().prev?.click();
 			}
 		}, 100);
 	}
