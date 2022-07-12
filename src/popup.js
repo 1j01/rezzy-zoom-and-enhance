@@ -8,12 +8,10 @@ const socket = io("http://localhost:4284", {transports: ["websocket"]});
 socket.on("disconnect", ()=> { document.body.classList.remove("connected"); });
 socket.on("connect", ()=> { document.body.classList.add("connected"); });
 
-const get_origin = ()=>
-	browser.tabs.query({ active: true, currentWindow: true })
-	.then(
-		(tabs)=> new URL(tabs[0].url).origin,
-		(error)=> { console.error(error); }
-	);
+const get_origin = async ()=> {
+	const tabs = await browser.tabs.query({active: true, currentWindow: true});
+	return new URL(tabs[0].url).origin;
+}
 
 const update_enabled_state = (enabled)=> {
 	document.body.classList.toggle("off", !enabled);
@@ -22,18 +20,17 @@ const update_enabled_state = (enabled)=> {
 		"Click to enable Rezzy for this site.";
 };
 
-get_origin().then((origin)=> {
-	browser.storage.local.get(origin).then((storedInfo)=> {
-		const enabled = storedInfo[origin];
-		console.log("origin", origin, "enabled?", enabled);
-		update_enabled_state(enabled);
-	});
-});
+(async function() {
+	const origin = await get_origin();
+	const storedInfo = await browser.storage.local.get(origin);
+	const enabled = storedInfo[origin];
+	console.log("origin", origin, "enabled?", enabled);
+	update_enabled_state(enabled);
+})();
 
-toggle_site_button.addEventListener("click", ()=> {
+toggle_site_button.addEventListener("click", async ()=> {
 	const was_enabled = !document.body.classList.contains("off");
 	update_enabled_state(!was_enabled);
-	get_origin().then((origin)=> {
-		browser.storage.local.set({[origin]: !was_enabled});
-	});
+	const origin = await get_origin();
+	await browser.storage.local.set({[origin]: !was_enabled});
 });

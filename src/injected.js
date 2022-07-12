@@ -13,7 +13,7 @@
 //   so it would be very reliable.
 //   TODO: to solve this, maybe keep a separate cache per origin - and separate spider, and jobs list and everything
 
-(()=> {
+(async ()=> {
 	console.log("Rezzy content script injected.");
 
 	let rezzy_active = false;
@@ -180,20 +180,19 @@
 		}
 		socket = io("http://localhost:4284", {transports: ["websocket"]});
 
-		socket.on("superrez-result", ({url, scaling_factor, result_url})=> {
+		socket.on("superrez-result", async ({url, scaling_factor, result_url})=> {
 			const job = jobs_by_url[url];
 			if (!job) return;
 			// fetch result and make blob URL instead of using result URL directly
 			// in order to avoid CORS issues
-			fetch(result_url)
-			.then(response => response.blob())
-			.then((blob)=> {
+			try {
+				const response = await fetch(result_url);
+				const blob = await response.blob();
 				const blob_url = URL.createObjectURL(blob);
 				job.apply_result_to_page(blob_url, scaling_factor);
-			})
-			.catch((error)=> {
+			} catch (error) {
 				console.error("Failed to apply superrez result:", error, "url:", url, "result_url:", result_url);
-			});
+			}
 		});
 	}
 
@@ -315,14 +314,6 @@
 		}
 	};
 
-	browser.storage.local.get(location.origin).then((storedInfo)=> {
-		set_enabled(!!storedInfo[location.origin]);
-		if (rezzy_active) {
-			console.log("Rezzy active. Enabled for origin", location.origin);
-		} else {
-			console.log("Rezzy inactive. Not enabled for origin", location.origin);
-		}
-	});
 	browser.storage.onChanged.addListener((changes)=> {
 		if (location.origin in changes) {
 			set_enabled(!!changes[location.origin].newValue);
@@ -333,5 +324,12 @@
 			}
 		}
 	});
-	
+
+	const storedInfo = await browser.storage.local.get(location.origin);
+	set_enabled(!!storedInfo[location.origin]);
+	if (rezzy_active) {
+		console.log("Rezzy active. Enabled for origin", location.origin);
+	} else {
+		console.log("Rezzy inactive. Not enabled for origin", location.origin);
+	}
 })();

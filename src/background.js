@@ -1,25 +1,22 @@
 /* eslint-env browser, webextensions */
 
-function updateIcon() {
-	browser.tabs.query({active: true, currentWindow: true})
-	.then((tabs)=> {
-		if (tabs[0]) {
-			const currentTab = tabs[0];
-			const origin = new URL(currentTab.url).origin;
-			browser.storage.local.get(origin).then((storedInfo)=> {
-				const enabled = storedInfo[origin];
-				console.log("origin", origin, "enabled?", enabled);
-				browser.browserAction.setIcon({
-					path: enabled ? {
-						38: "../icon-38x38.png"
-					} : {
-						38: "../icon-inactive-38x38.png",
-					},
-					tabId: currentTab.id,
-				});
-			});
-		}
-	});
+async function updateIcon() {
+	const tabs = await browser.tabs.query({active: true, currentWindow: true});
+	if (tabs[0]) {
+		const currentTab = tabs[0];
+		const origin = new URL(currentTab.url).origin;
+		const storedInfo = await browser.storage.local.get(origin);
+		const enabled = storedInfo[origin];
+		console.log("origin", origin, "enabled?", enabled);
+		await browser.browserAction.setIcon({
+			path: enabled ? {
+				38: "../icon-38x38.png"
+			} : {
+				38: "../icon-inactive-38x38.png",
+			},
+			tabId: currentTab.id,
+		});
+	}
 }
 
 // listen to tab URL changes
