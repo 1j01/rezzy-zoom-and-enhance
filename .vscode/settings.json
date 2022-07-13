@@ -4,6 +4,7 @@
 		"deprioritize",
 		"gamepad",
 		"imgcodecs",
+		"imgproc",
 		"imwrite",
 		"ldconfig",
 		"libopencv",

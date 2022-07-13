@@ -31,7 +31,12 @@ THIS EXTENSION IS NOT RELEASED YET
   sudo apt-get update -y
   sudo apt-get install -y libopencv-core-dev libopencv-imgcodecs-dev
   sudo ldconfig -v
+  # Hack it so waifu2x-converter-cpp can find the ML model.
   sudo ln -s "$(pwd)/waifu2x-DeadSix27-win64_v531/models_rgb/" /usr/local/share/waifu2x-converter-cpp
+  # Trick it into thinking it's OpenCV 4.2, if that's not what got installed. Might be better to actually install 4.2, but 4.5 seems to work with this:
+  sudo ln -s /usr/lib/x86_64-linux-gnu/libopencv_imgcodecs.so /usr/lib/x86_64-linux-gnu/libopencv_imgcodecs.so.4.2
+  sudo ln -s /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.4.2
+  sudo ln -s /usr/lib/x86_64-linux-gnu/libopencv_core.so /usr/lib/x86_64-linux-gnu/libopencv_core.so.4.2
   ```
 - Start the superresolution server with `npm start`
 - For **Firefox**, run `npx web-ext run` in the project directory
