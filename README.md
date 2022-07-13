@@ -43,13 +43,13 @@ THIS EXTENSION IS NOT RELEASED YET
   - It will open a window with the extension temporarily installed.
   - When you make changes:
     - It will automatically reload the extension.
-    - Reload pages you're testing on to get the updated content script.
+    - You need to reload pages you're testing on to get the updated content script.
 - For **Chrome** or **Chromium**, type `chrome://extensions` in the address bar
   - Turn on Developer mode
   - Click "Load unpacked" and select the root of this repository as the folder
   - When you make changes:
-    - Click the Reload button in the Extensions page
-    - Reload pages you're testing on to get the updated content script.
+    - You need to click the Reload button in the Extensions page
+    - Then reload pages you're testing on to get the updated content script.
 
 ## Usage
 - Visit a webcomic, such as [Paranatural](https://www.paranatural.net/comic/chapter-1)... well, maybe that's not the best example, at the beginning, but it works really well once the art gets better. [Kill Six Billion Demons](https://killsixbilliondemons.com/comic/kill-six-billion-demons-chapter-1/), [Sleepless Domain](https://www.sleeplessdomain.com/comic/chapter-1-cover)
