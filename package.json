@@ -24,7 +24,7 @@
     "node-fetch": "2.6.1",
     "request": "2.88.2",
     "sanitize-filename": "1.6.3",
-    "socket.io": "2.3.0"
+    "socket.io": "2.4.0"
   },
   "devDependencies": {
     "eslint": "^8.19.0",
