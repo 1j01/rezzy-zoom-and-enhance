@@ -1,7 +1,7 @@
 /* eslint-env node */
 const express = require('express');
 // const bodyParser = require('body-parser');
-const Server = require('socket.io');
+const {Server} = require('socket.io');
 const superrez = require('./superrez');
 const {spiderFromURL} = require("./spider");
 

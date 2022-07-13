@@ -23,7 +23,7 @@
     "express": "4.17.1",
     "request": "2.88.2",
     "sanitize-filename": "1.6.3",
-    "socket.io": "2.3.0"
+    "socket.io": "4.5.1"
   },
   "devDependencies": {
     "eslint": "^8.19.0",
