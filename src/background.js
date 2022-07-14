@@ -15,7 +15,7 @@ async function updateIcon() {
 			console.log("origin", origin, "disabled because:", error);
 		}
 
-		await browser.browserAction.setIcon({
+		await browser.action.setIcon({
 			path: enabled ? {
 				38: "../icon-38x38.png"
 			} : {
