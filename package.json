@@ -17,6 +17,7 @@
     "zoom"
   ],
   "author": "Isaiah Odhner <isaiahodhner@gmail.com>",
+  "type": "module",
   "dependencies": {
     "cheerio": "1.0.0-rc.12",
     "env-paths": "3.0.0",

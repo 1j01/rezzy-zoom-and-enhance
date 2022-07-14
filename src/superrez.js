@@ -1,12 +1,12 @@
 /* eslint-env node */
-(()=> {
 
-	const fs = require("fs");
-	const {execFile} = require("child_process");
-	const path = require("path");
-	const crypto = require("crypto");
-	const envPaths = require("env-paths");
-	const sanitizeFilename = require("sanitize-filename");
+import fs from "fs";
+import {execFile} from "child_process";
+import path from "path";
+import {fileURLToPath} from 'url';
+import crypto from "crypto";
+import envPaths from "env-paths";
+import sanitizeFilename from "sanitize-filename";
 
 	const paths = envPaths("Rezzy");
 
@@ -15,7 +15,7 @@
 	fs.mkdirSync(temp_dir, { recursive: true });
 	fs.mkdirSync(cache_dir, { recursive: true });
 
-	const converter_path = path.join(__dirname,
+	const converter_path = path.join(path.dirname(fileURLToPath(import.meta.url)),
 		process.platform === "win32" ? 
 		"../waifu2x-DeadSix27-win64_v531/waifu2x-converter-cpp.exe" : 
 		"../waifu2x-DeadSix27-linux64_v533/waifu2x-converter-cpp"
@@ -115,7 +115,5 @@
 		);
 	}
 
-	module.exports = superrez;
-	module.exports.cache_dir = cache_dir;
-
-})();
+export default superrez;
+export { cache_dir };

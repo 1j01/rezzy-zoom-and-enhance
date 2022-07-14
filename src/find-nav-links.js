@@ -2,7 +2,7 @@
 (() => {
 	let cheerio;
 	if (typeof module !== 'undefined' && typeof require === 'function') {
-		cheerio = require('cheerio').default;
+		cheerio = await import('cheerio');
 	}
 
 	const query_param_next_regex = /\?next=/i;
@@ -124,12 +124,4 @@
 		};
 	}
 
-	if (typeof module !== "undefined") {
-		module.exports = {
-			find_next_prev_links,
-		};
-	} else {
-		globalThis.find_next_prev_links = find_next_prev_links;
-	}
-
-})();
+	export default find_next_prev_links;
