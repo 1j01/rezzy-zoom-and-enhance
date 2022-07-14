@@ -1,8 +1,8 @@
 /* eslint-env node, browser */
 
 	let $;
-	if (typeof window === 'undefined') {
-		$ = await import('cheerio');
+	if (typeof window === "undefined" || typeof window.document == "undefined") {
+		$ = (await import("cheerio")).default;
 	}
 
 	const query_param_next_regex = /\?next=/i;
@@ -19,7 +19,8 @@
 			return element.outerHTML;
 		}
 		// cheerio
-		return $.html(element);
+		return $(element).prop("outerHTML");
+		// return $.html(element);
 	}
 
 	function textContent(element) {

@@ -1,6 +1,10 @@
 /* eslint-env node */
 import cheerio from 'cheerio';
 import find_next_prev_links from "./find-nav-links.js";
+// TODO: replace deprecated request module with something supporting ESM (or maybe just use fetch?)
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const request = require("request");
 
 // slowing down the spider makes the server more responsive
 // so superrez images can load faster
@@ -14,7 +18,7 @@ const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 	let stopped = false;
 	console.error(`[spider] crawling ${url} (${description})`);
 	setTimeout(()=> {
-		require("request")(url, (error, response, body)=> {
+		request(url, (error, response, body)=> {
 			if (error) {
 				console.error(`[spider] Failed to get ${url} - stopping scraping (${description})`);
 				return;
@@ -59,7 +63,7 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 		if (!image_url.match(/^(https?):/)) {
 			return;
 		}
-		require("request")
+		request
 		.head(image_url)
 		// this error handling doesn't seem to cover invalid URLs
 		.on("error", (error)=> {
