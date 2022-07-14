@@ -1,8 +1,8 @@
 /* eslint-env node, browser */
 (() => {
-	let $;
+	let cheerio;
 	if (typeof module !== 'undefined' && typeof require === 'function') {
-		$ = require('cheerio');
+		cheerio = require('cheerio').default;
 	}
 
 	const query_param_next_regex = /\?next=/i;
@@ -19,7 +19,7 @@
 			return element.outerHTML;
 		}
 		// cheerio
-		return $.html(element);
+		return cheerio(element).prop("outerHTML");
 	}
 
 	function textContent(element) {
@@ -28,7 +28,7 @@
 			return element.textContent;
 		}
 		// cheerio
-		return $(element).text();
+		return cheerio(element).text();
 	}
 
 	function find_next_prev_links(links) {

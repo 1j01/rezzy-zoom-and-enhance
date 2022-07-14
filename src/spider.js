@@ -1,5 +1,5 @@
 /* eslint-env node */
-const cheerio = require('cheerio');
+const cheerio = require('cheerio').default;
 const { find_next_prev_links } = require("./find-nav-links");
 
 // slowing down the spider makes the server more responsive
