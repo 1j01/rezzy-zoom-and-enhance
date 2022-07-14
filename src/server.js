@@ -1,14 +1,14 @@
 /* eslint-env node */
-const express = require('express');
-// const bodyParser = require('body-parser');
-const {Server} = require('socket.io');
-const superrez = require('./superrez');
-const {spiderFromURL} = require("./spider");
+import express from 'express';
+// import bodyParser from 'body-parser';
+import {Server} from 'socket.io';
+import superrez, { cache_dir } from './superrez.js';
+import {spiderFromURL} from "./spider.js";
 
 const port = 4284;
 
 const app = express();
-app.use("/result", express.static(superrez.cache_dir, {
+app.use("/result", express.static(cache_dir, {
 	setHeaders: function setHeaders(res/*, path, stat*/) {
 		res.header('Access-Control-Allow-Origin', '*');
 		res.header('Access-Control-Allow-Methods', 'GET');

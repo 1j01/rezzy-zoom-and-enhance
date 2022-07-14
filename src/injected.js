@@ -13,10 +13,10 @@
 //   so it would be very reliable.
 //   TODO: to solve this, maybe keep a separate cache per origin - and separate spider, and jobs list and everything
 
+import find_next_prev_links from "./find-nav-links.js";
+
 (async ()=> {
 	console.log("Rezzy content script injected.");
-
-	const { find_next_prev_links } = globalThis;
 
 	let rezzy_active = false;
 	let options = {};

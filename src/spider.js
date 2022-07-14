@@ -1,6 +1,6 @@
 /* eslint-env node */
-const cheerio = require('cheerio');
-const { find_next_prev_links } = require("./find-nav-links");
+import cheerio from 'cheerio';
+import find_next_prev_links from "./find-nav-links.js";
 
 // slowing down the spider makes the server more responsive
 // so superrez images can load faster
@@ -114,4 +114,4 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 	};
 };
 
-module.exports = {spiderFromURL};
+export {spiderFromURL};
