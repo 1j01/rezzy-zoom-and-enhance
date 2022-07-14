@@ -1,5 +1,5 @@
 /* eslint-env browser, webextensions */
-/* global io */
+import { io } from "../lib/socket.io.esm.js";
 
 const toggle_site_button = document.getElementById("toggle-this-site");
 const crawl_forward_input = document.getElementById("crawl-forward-input");
