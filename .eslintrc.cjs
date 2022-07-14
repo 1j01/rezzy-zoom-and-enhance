@@ -1,7 +1,7 @@
 /* eslint-env node */
 module.exports = {
 	"env": {
-		"es2020": true,
+		"es2022": true,
 	},
 	"extends": "eslint:recommended",
 	"globals": {

@@ -1,8 +1,8 @@
 /* eslint-env node, browser */
-(() => {
+
 	let cheerio;
-	if (typeof module !== 'undefined' && typeof require === 'function') {
-		cheerio = await import('cheerio');
+	if (typeof window === "undefined" || typeof window.document == "undefined") {
+		cheerio = (await import("cheerio")).default;
 	}
 
 	const query_param_next_regex = /\?next=/i;

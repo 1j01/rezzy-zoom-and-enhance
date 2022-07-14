@@ -1,6 +1,10 @@
 /* eslint-env node */
 import cheerio from 'cheerio';
 import find_next_prev_links from "./find-nav-links.js";
+// TODO: replace deprecated request module with something supporting ESM (or maybe just use fetch?)
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const request = require("request");
 
 // slowing down the spider makes the server more responsive
 // so superrez images can load faster
