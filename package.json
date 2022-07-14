@@ -18,16 +18,16 @@
   ],
   "author": "Isaiah Odhner <isaiahodhner@gmail.com>",
   "dependencies": {
-    "cheerio": "1.0.0-rc.3",
-    "env-paths": "2.2.0",
-    "express": "4.17.1",
+    "cheerio": "1.0.0-rc.12",
+    "env-paths": "3.0.0",
+    "express": "4.18.1",
     "request": "2.88.2",
     "sanitize-filename": "1.6.3",
     "socket.io": "4.5.1"
   },
   "devDependencies": {
     "eslint": "^8.19.0",
-    "webextension-polyfill": "0.6.0"
+    "webextension-polyfill": "0.9.0"
   },
   "scripts": {
     "start": "node src/server.js",
