@@ -1,5 +1,7 @@
 /* eslint-env webextensions, serviceworker */
 
+import browser from "../lib/browser-polyfill.monkey-patched.esm.js";
+
 async function updateIcon() {
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
 	if (tabs[0]) {
