@@ -12,7 +12,7 @@ async function updateIcon() {
 			enabled = Boolean(storedInfo[origin]);
 			console.log("origin", origin, enabled ? "enabled" : "disabled");
 		} catch (error) {
-			console.log("origin", origin, "disabled because:", error);
+			console.log("page", currentTab.url, "disabled because:", error);
 		}
 
 		await browser.browserAction.setIcon({
