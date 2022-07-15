@@ -1,7 +1,7 @@
 // Code injected into the page
 
 /* eslint-env browser, webextensions */
-/* global io */
+import { io } from "../lib/socket.io.esm.js";
 
 // security: be mindful about what data access the extension gives pages
 // - regarding CORS, sites can already request any URL using a proxy like CORS Anywhere 
