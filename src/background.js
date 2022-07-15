@@ -1,4 +1,4 @@
-/* eslint-env browser, webextensions */
+/* eslint-env webextensions, serviceworker */
 
 async function updateIcon() {
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
