@@ -13,21 +13,24 @@ const spiderFromURL = (url, {backwardPages, forwardPages, addJob})=> {
 	let cancel_function;
 	let stopped = false;
 	console.error(`[spider] crawling ${url} (${description})`);
-	setTimeout(()=> {
-		require("request")(url, (error, response, body)=> {
-			if (error) {
-				console.error(`[spider] Failed to get ${url} - stopping scraping (${description})`);
+	setTimeout(async ()=> {
+		try {
+			const response = await fetch(url);
+			if (response.ok) {
+				const body = await response.text();
+				
+				if (stopped) {
+					return;
+				}
+				cancel_function = spiderFromHTML(body, url, {backwardPages, forwardPages, addJob});
+			} else {
+				console.error(`[spider] Failed to get ${url} - received HTTP ${response.status} - stopping scraping (${description})`);
 				return;
 			}
-			if (response.statusCode !== 200) {
-				console.error(`[spider] Failed to get ${url} - received HTTP ${response.statusCode} - stopping scraping (${description})`);
-				return;
-			}
-			if (stopped) {
-				return;
-			}
-			cancel_function = spiderFromHTML(body, url, {backwardPages, forwardPages, addJob});
-		});
+		} catch (error) {
+			console.error(`[spider] Failed to get ${url} - stopping scraping (${description})`);
+			return;
+		}
 	}, crawl_delay_ms);
 	return ()=> {
 		// console.log("[spider] stopped");
