@@ -12,6 +12,7 @@
 	const pg_regexp = /page|(\b|[_-])(p[gp]|cc)(\b|[_-])/i;
 	const comic_regexp = /comic/i;
 	const prev_not_back_regexp = /prev(?!iew|[eau])/i;
+	const promo_regexp = /promo|advert|vote|this comic|this project|back this|back now|please back|donate|patreon|kickstarter|gofundme/i; // financial backing link, not a back button
 
 	function outerHTML(element) {
 		// native DOM
@@ -61,10 +62,16 @@
 			const b_is_comic = !!outerHTML(b).match(comic_regexp);
 			const a_is_prev_not_back = !!outerHTML(a).match(prev_not_back_regexp);
 			const b_is_prev_not_back = !!outerHTML(b).match(prev_not_back_regexp);
+			const a_is_promo = !!outerHTML(a).match(promo_regexp);
+			const b_is_promo = !!outerHTML(b).match(promo_regexp);
 			const a_is_long = textContent(a).length > 40;
 			const b_is_long = textContent(b).length > 40;
 
 			return (
+				// Deprioritize "back this project" funding links
+				// (financial backing links, which are not back buttons)
+				(a_is_promo - b_is_promo) ||
+
 				// I found long text in a link on https://mara-comic.com/comic/01/01?lang=en
 				// "Rosi explores a new style, and Mara leaves her enemies for the crows.
 				// Vote on Mara at Top Webcomics to see a preview of the next page!"
