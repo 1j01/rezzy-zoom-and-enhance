@@ -21,7 +21,6 @@
     "cheerio": "1.0.0-rc.12",
     "env-paths": "2.2.1",
     "express": "4.18.1",
-    "request": "2.88.2",
     "sanitize-filename": "1.6.3",
     "socket.io": "4.5.1"
   },
