@@ -62,20 +62,20 @@ const spiderFromHTML = (html, url, {backwardPages, forwardPages, addJob})=> {
 		if (!image_url.match(/^(https?):/)) {
 			return;
 		}
-		require("request")
-		.head(image_url)
-		// this error handling doesn't seem to cover invalid URLs
-		.on("error", (error)=> {
-			console.error("[spider] error doing HEAD request for", image_url, error);
-		})
-		.on("response", (response)=> {
-			const content_length = response.headers["content-length"];
-			if (content_length > 20000) {
-				// console.log(`[spider] preloading image ${image_url} (content-length: ${content_length})`);
-				addJob(image_url);
+		fetch(image_url, { method: "HEAD" }).then((response) => {
+			if (response.ok) {
+				const content_length = response.headers.get("content-length");
+				if (content_length > 20000) {
+					// console.log(`[spider] preloading image ${image_url} (content-length: ${content_length})`);
+					addJob(image_url);
+				} else {
+					// console.log(`[spider] ignoring image ${image_url} (content-length: ${content_length})`);
+				}
 			} else {
-				// console.log(`[spider] ignoring image ${image_url} (content-length: ${content_length})`);
+				console.log(`[spider] HEAD request for image ${image_url} got HTTP ${response.status} ${response.statusText}`);
 			}
+		}, (error) => {
+			console.log(`[spider] HEAD request for image ${image_url} failed: ${error}`);
 		});
 	});
 
