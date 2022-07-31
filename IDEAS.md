@@ -65,7 +65,7 @@ and display the whole image (by default; it would be good to be able to override
 ## Previous Work ("prior art")
 
 For elementary OS:
-* [This mockup by Daniel Foré for an XKCD-specific app](https://danrabbit.deviantart.com/art/XKCD-App-332444858) (2012)
+* [This mockup by Danielle Foré for an XKCD-specific app](https://danrabbit.deviantart.com/art/XKCD-App-332444858) (2012)
 * [xkcdV](https://launchpad.net/xkcdv) (2012)
 * [eComics](https://github.com/Digi59404/eComics) (2013 (with a branch from 2015?))
 * [Bookworm](https://babluboy.github.io/bookworm/) (active development; says it supports `.cbr` and `.cbz`)
