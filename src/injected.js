@@ -16,7 +16,7 @@
 (async ()=> {
 	console.log("Rezzy content script injected.");
 
-	const { find_next_prev_links } = globalThis;
+	const { find_next_prev_links, Anime4K } = globalThis;
 
 	let rezzy_active = false;
 	let options = {};
@@ -51,6 +51,7 @@
 
 	let socket;
 	let jobs_by_url = {};
+	let job_queue = [];
 
 	function update_jobs_list() {
 		collect_new_jobs();
@@ -63,13 +64,16 @@
 		}
 		const jobs =
 			[...Object.values(jobs_by_url)]
-			.map(({url, scaling_factor, priority})=> ({url, scaling_factor, priority}));
+			// .map(({url, scaling_factor, priority})=> ({url, scaling_factor, priority})); // for client-server interface clarity
+		/*
 		socket.emit("jobs", jobs);
 		socket.emit("spider", {
 			starting_url: location.href,
 			crawl_backward_pages: options.crawl_backward_pages,
 			crawl_forward_pages: options.crawl_forward_pages
 		});
+		*/
+		job_queue = jobs;
 	}
 
 	function get_priority(job) {
@@ -116,6 +120,35 @@
 		jobs_by_url[url] = job;
 		job.elements = job.elements.concat(elements);
 		job.priority = get_priority(job);
+	}
+
+	let active_job;
+	let image = new Image();
+	let canvas = document.createElement("canvas");
+	const scaler = Anime4K.Scaler(canvas.getContext('webgl'))
+	function run_job_queue() {
+		if (active_job) return;
+		active_job = job_queue.shift();
+		if (!active_job) return;
+		console.log("Running job", active_job);
+		const { url, scaling_factor, apply_result_to_page } = active_job;
+		image.src = url;
+		image.onload = () => {
+			// canvas.width = image.width * scaling_factor;
+			// canvas.height = image.height * scaling_factor;
+			scaler.inputImage(image);
+			scaler.resize(scaling_factor, {});
+
+			apply_result_to_page(canvas.toDataURL("image/png"));
+
+			active_job = null;
+			run_job_queue();
+		};
+		image.onerror = () => {
+			console.error("Error loading image", url);
+			active_job = null;
+			run_job_queue();
+		};
 	}
 
 	function init_socket() {
@@ -238,10 +271,11 @@
 		rezzy_active = enable;
 		if (rezzy_active) {
 			window.addEventListener("keydown", handle_keydown);
-			init_socket();
+			// init_socket();
 			update_jobs_list();
+			run_job_queue();
 			iid = setInterval(update_jobs_list, 500);
-			socket.connect();
+			socket?.connect();
 		} else {
 			window.removeEventListener("keydown", handle_keydown);
 			const imgs = document.querySelectorAll("[data-original-img-src]");
@@ -254,7 +288,7 @@
 				element.style.backgroundImage = element.dataset.originalBackgroundImage;
 				delete element.dataset.originalBackgroundImage;
 			}
-			socket.disconnect();
+			socket?.disconnect();
 		}
 	};
 

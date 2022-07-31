@@ -19,6 +19,7 @@
 			"js": [
 				"lib/browser-polyfill.js",
 				"lib/socket.io.js",
+				"lib/anime4k.js",
 				"src/find-nav-links.js",
 				"src/injected.js"
 			],
