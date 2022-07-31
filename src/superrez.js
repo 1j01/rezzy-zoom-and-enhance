@@ -5,7 +5,6 @@
 	const {execFile} = require("child_process");
 	const path = require("path");
 	const crypto = require("crypto");
-	const request = require("request");
 	const envPaths = require("env-paths");
 	const sanitizeFilename = require("sanitize-filename");
 
@@ -56,30 +55,32 @@
 				console.log("superrez cache miss; do the conversion");
 				console.log("temp file path:", input_image_path);
 
-				var write_stream = fs.createWriteStream(input_image_path);
-				var got_error = false;
-				// TODO: detect non-200 status code?
-				request
-					.get(input_image_url)
-					.on('error', (err)=> {
-						got_error = true
-						callback(err);
-					})
-					.pipe(write_stream);
-
-				write_stream.on("finish", ()=> {
-					if(got_error){
-						console.warn("finish after error?"); // TODO: is it possible?
-						return;
-					}
-					superrez_file(input_image_path, output_image_path, (err)=> {
-						if(err){
+				// download image
+				fetch(input_image_url).then(response => {
+					if (response.ok) {
+						response.arrayBuffer().then(arrayBuffer => {
+							fs.writeFile(input_image_path, Buffer.from(arrayBuffer), (err) => {
+								if (err) {
+									return callback(err);
+								}
+								console.log("superrez downloaded image", input_image_path);
+								// upscale image
+								superrez_file(input_image_path, output_image_path, (err) => {
+									if (err) {
+										return callback(err);
+									}
+									callback(null, output_image_path);
+								});
+							});
+						}, (err) => {
 							return callback(err);
-						}
-						callback(null, output_image_path);
-					})
+						});
+					} else {
+						return callback(new Error(`Failed to fetch image: ${response.status} ${response.statusText}`));
+					}
+				}, (err) => {
+					return callback(err);
 				});
-				return;
 			}
 		});
 	}
