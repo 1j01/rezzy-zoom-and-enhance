@@ -81,43 +81,31 @@
 				// which contains "next page" in the link text, but the link is not a next link
 				// Deprioritize, but don't exclude, just in case.
 				// For reference, "Click here to read the next chapter" is 35 characters long.
-				// if (a_is_long && !b_is_long) return +1;
-				// if (b_is_long && !a_is_long) return -1;
-				(b_is_long - a_is_long) ||
+				(a_is_long - b_is_long) ||
 
 				// deprioritize, but don't exclude chapter buttons;
 				// a webcomic could have entire chapters on a page
-				// if (a_is_ch && !b_is_ch) return +1;
-				// if (b_is_ch && !a_is_ch) return -1;
-				(b_is_ch - a_is_ch) ||
+				(a_is_ch - b_is_ch) ||
 
 				// prioritize "page" links
-				// if (a_is_pg && !b_is_pg) return -1;
-				// if (b_is_pg && !a_is_pg) return +1;
-				(a_is_pg - b_is_pg) ||
+				(b_is_pg - a_is_pg) ||
 
 				// prioritize "episode" links
-				// if (a_is_ep && !b_is_ep) return -1;
-				// if (b_is_ep && !a_is_ep) return +1;
-				(a_is_ep - b_is_ep) ||
+				(b_is_ep - a_is_ep) ||
 
 				// prioritize "comic" links, which is hopefully synonymous with page,
 				// and not referring to a web ring 
 				// (but I'm checking for web rings)
 				// TODO: deprioritize/exclude external links
 				// and simplify to /page|comic/i
-				// if (a_is_comic && !b_is_comic) return -1;
-				// if (b_is_comic && !a_is_comic) return +1;
-				(a_is_comic - b_is_comic) ||
+				(b_is_comic - a_is_comic) ||
 
 				// There are different kinds of "back" buttons,
 				// for instance on https://www.webcomicsapp.com/view/600503cc8c252b26d748d074/1
 				// there is a "Back" button to go back to the comic description page,
 				// and a "Previous" button for the previous page of the comic.
 				// Prioritize "previous" buttons.
-				// if (a_is_prev_not_back && !b_is_prev_not_back) return -1;
-				// if (b_is_prev_not_back && !a_is_prev_not_back) return +1;
-				(a_is_prev_not_back - b_is_prev_not_back) ||
+				(b_is_prev_not_back - a_is_prev_not_back) ||
 
 				0
 			);
