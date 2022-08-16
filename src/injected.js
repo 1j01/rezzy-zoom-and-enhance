@@ -121,7 +121,8 @@
 			scanGamepads();
 		}
 	
-		for (const [i, controller] of Object.entries(controllers)) {
+		// for (const [i, controller] of Object.entries(controllers)) {
+		for (const controller of Object.values(controllers)) {
 			// const d = document.getElementById(`controller${i}`);
 			// const buttons = d.getElementsByClassName("button");
 	
@@ -140,7 +141,7 @@
 	
 				if (pressed) {
 					// b.className = "button pressed";
-					if (!wasPressed[i]) {
+					if (!wasPressed[i] && rezzy_active) {
 						// navigate to next/prev page with shoulder buttons
 						if (i === 4) {
 							console.log(`Rezzy: gamepad button ${i} pressed - navigating to prev page`, find_next_prev_links().prev);
@@ -163,7 +164,7 @@
 				// a.setAttribute("value", axis + 1);
 
 				// scroll the page
-				if (Math.abs(axis) > 0.3) {
+				if (Math.abs(axis) > 0.3 && rezzy_active) {
 					const scroll_amount = Math.pow(Math.abs(axis) * 10, 2) * Math.sign(axis);
 					if (i === 0) {
 						window.scrollBy(scroll_amount, 0);
