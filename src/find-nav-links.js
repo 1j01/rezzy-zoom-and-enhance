@@ -10,6 +10,7 @@
 	const prev_regex = /prev(?!iew|[eau])|backward|back(\b|[_-])|backwd|bc?k?wd(\b|[_-])/i;
 	const ch_regexp = /chapter|chapt?(\b|[_-])|(\b|[_-])ch(\b|[_-])/i;
 	const pg_regexp = /page|(\b|[_-])(p[gp]|cc)(\b|[_-])/i;
+	const ep_regexp = /episode|ep(\b|[_-])/i;
 	const comic_regexp = /comic/i;
 	const prev_not_back_regexp = /prev(?!iew|[eau])/i;
 	const promo_regexp = /promo|advert|vote|this comic|this project|back this|back now|please back|donate|patreon|kickstarter|gofundme/i; // financial backing link, not a back button
@@ -58,6 +59,8 @@
 			const b_is_ch = !!outerHTML(b).match(ch_regexp);
 			const a_is_pg = !!outerHTML(a).match(pg_regexp);
 			const b_is_pg = !!outerHTML(b).match(pg_regexp);
+			const a_is_ep = !!outerHTML(a).match(ep_regexp);
+			const b_is_ep = !!outerHTML(b).match(ep_regexp);
 			const a_is_comic = !!outerHTML(a).match(comic_regexp);
 			const b_is_comic = !!outerHTML(b).match(comic_regexp);
 			const a_is_prev_not_back = !!outerHTML(a).match(prev_not_back_regexp);
@@ -92,6 +95,11 @@
 				// if (a_is_pg && !b_is_pg) return -1;
 				// if (b_is_pg && !a_is_pg) return +1;
 				(a_is_pg - b_is_pg) ||
+
+				// prioritize "episode" links
+				// if (a_is_ep && !b_is_ep) return -1;
+				// if (b_is_ep && !a_is_ep) return +1;
+				(a_is_ep - b_is_ep) ||
 
 				// prioritize "comic" links, which is hopefully synonymous with page,
 				// and not referring to a web ring https://en.wikipedia.org/wiki/Webring
