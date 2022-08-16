@@ -63,46 +63,46 @@
 	function addGamepad(gamepad) {
 		controllers[gamepad.index] = gamepad;
 	
-		const d = document.createElement("div");
-		d.setAttribute("id", `controller${gamepad.index}`);
+		// const d = document.createElement("div");
+		// d.setAttribute("id", `controller${gamepad.index}`);
 	
-		const t = document.createElement("h1");
-		t.textContent = `gamepad: ${gamepad.id}`;
-		d.appendChild(t);
+		// const t = document.createElement("h1");
+		// t.textContent = `gamepad: ${gamepad.id}`;
+		// d.appendChild(t);
 	
-		const b = document.createElement("div");
-		b.className = "buttons";
+		// const b = document.createElement("div");
+		// b.className = "buttons";
 		gamepad.buttons.forEach((button, i) => {
-			const e = document.createElement("span");
-			e.className = "button";
-			e.textContent = i;
-			b.appendChild(e);
+			// const e = document.createElement("span");
+			// e.className = "button";
+			// e.textContent = i;
+			// b.appendChild(e);
 			wasPressed[i] = false;
 		});
 	
-		d.appendChild(b);
+		// d.appendChild(b);
 	
-		const a = document.createElement("div");
-		a.className = "axes";
+		// const a = document.createElement("div");
+		// a.className = "axes";
 	
-		gamepad.axes.forEach((axis, i) => {
-			const p = document.createElement("progress");
-			p.className = "axis";
-			p.setAttribute("max", "2");
-			p.setAttribute("value", "1");
-			p.textContent = i;
-			a.appendChild(p);
-		});
+		// gamepad.axes.forEach((axis, i) => {
+		// 	const p = document.createElement("progress");
+		// 	p.className = "axis";
+		// 	p.setAttribute("max", "2");
+		// 	p.setAttribute("value", "1");
+		// 	p.textContent = i;
+		// 	a.appendChild(p);
+		// });
 	
-		d.appendChild(a);
+		// d.appendChild(a);
 	
 		// See https://github.com/luser/gamepadtest/blob/master/index.html
-		const start = document.getElementById("start");
-		if (start) {
-			start.style.display = "none";
-		}
+		// const start = document.getElementById("start");
+		// if (start) {
+		// 	start.style.display = "none";
+		// }
 	
-		document.body.appendChild(d);
+		// document.body.appendChild(d);
 		requestAnimationFrame(updateStatus);
 	}
 	
@@ -111,8 +111,8 @@
 	}
 	
 	function removeGamepad(gamepad) {
-		const d = document.getElementById(`controller${gamepad.index}`);
-		document.body.removeChild(d);
+		// const d = document.getElementById(`controller${gamepad.index}`);
+		// document.body.removeChild(d);
 		delete controllers[gamepad.index];
 	}
 	
@@ -122,11 +122,11 @@
 		}
 	
 		for (const [i, controller] of Object.entries(controllers)) {
-			const d = document.getElementById(`controller${i}`);
-			const buttons = d.getElementsByClassName("button");
+			// const d = document.getElementById(`controller${i}`);
+			// const buttons = d.getElementsByClassName("button");
 	
 			controller.buttons.forEach((button, i) => {
-				const b = buttons[i];
+				// const b = buttons[i];
 				let pressed = button === 1.0;
 				let val = button;
 	
@@ -135,11 +135,11 @@
 					val = val.value;
 				}
 	
-				const pct = `${Math.round(val * 100)}%`;
-				b.style.backgroundSize = `${pct} ${pct}`;
+				// const pct = `${Math.round(val * 100)}%`;
+				// b.style.backgroundSize = `${pct} ${pct}`;
 	
 				if (pressed) {
-					b.className = "button pressed";
+					// b.className = "button pressed";
 					if (!wasPressed[i]) {
 						// navigate to next/prev page with shoulder buttons
 						if (i === 4) {
@@ -151,16 +151,16 @@
 						}
 					}
 				} else {
-					b.className = "button";
+					// b.className = "button";
 				}
 				wasPressed[i] = pressed;
 			});
 	
-			const axes = d.getElementsByClassName("axis");
+			// const axes = d.getElementsByClassName("axis");
 			controller.axes.forEach((axis, i) => {
-				const a = axes[i];
-				a.textContent = `${i}: ${axis.toFixed(4)}`;
-				a.setAttribute("value", axis + 1);
+				// const a = axes[i];
+				// a.textContent = `${i}: ${axis.toFixed(4)}`;
+				// a.setAttribute("value", axis + 1);
 
 				// scroll the page
 				if (Math.abs(axis) > 0.3) {
