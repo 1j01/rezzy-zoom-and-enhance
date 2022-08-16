@@ -15,6 +15,77 @@
 	const prev_not_back_regexp = /prev(?!iew|[eau])/i;
 	const promo_regexp = /promo|advert|vote|this comic|this project|back this|back now|please back|donate|patreon|kickstarter|gofundme|roundup|webring|comicring|\bring\b|next read|favorite/i; // financial backing link (or link to other separate comics), not a back button
 
+	const prioritizationRules = [
+		// Deprioritize "back this project" funding links
+		// (financial backing links, which are not back buttons)
+		{
+			name: '"back this project" funding links (not back buttons)',
+			htmlRegexp: promo_regexp,
+			matchIsBad: true,
+		},
+
+		// I found long text in a link on https://mara-comic.com/comic/01/01?lang=en
+		// "Rosi explores a new style, and Mara leaves her enemies for the crows.
+		// Vote on Mara at Top Webcomics to see a preview of the next page!"
+		// which contains "next page" in the link text, but the link is not a next link
+		// Deprioritize, but don't exclude, just in case.
+		// For reference, "Click here to read the next chapter" is 35 characters long.
+		{
+			name: 'long link text',
+			matchFn: (link) => textContent(link).length > 40,
+			matchIsBad: true,
+		},
+
+		// deprioritize, but don't exclude chapter buttons;
+		// a webcomic could have entire chapters on a page
+		{
+			name: 'chapter links',
+			htmlRegexp: ch_regexp,
+			matchIsBad: true,
+		},
+
+		// prioritize "page" links
+		{
+			name: 'page links',
+			htmlRegexp: pg_regexp,
+		},
+
+		// prioritize "episode" links
+		{
+			name: 'episode links',
+			htmlRegexp: ep_regexp,
+		},
+
+		// prioritize "comic" links, which is hopefully synonymous with page,
+		// and not referring to a web ring 
+		// (but I'm checking for web rings)
+		// TODO: deprioritize/exclude external links
+		// and simplify to /page|comic/i
+		{
+			name: 'comic links',
+			htmlRegexp: comic_regexp,
+		},
+
+		// There are different kinds of "back" buttons,
+		// for instance on https://www.webcomicsapp.com/view/600503cc8c252b26d748d074/1
+		// there is a "Back" button to go back to the comic description page,
+		// and a "Previous" button for the previous page of the comic.
+		// Prioritize "previous" buttons.
+		{
+			name: 'previous buttons (as opposed to hierarchical back buttons)',
+			htmlRegexp: prev_not_back_regexp,
+		},
+	];
+	// de-sugar htmlRegexp into matchFn
+	for (const rule of prioritizationRules) {
+		if (rule.htmlRegexp) {
+			if (rule.matchFn) {
+				throw new Error(`Rule (${rule.name}) has both htmlRegexp and matchFn`);
+			}
+			rule.matchFn = (link) => outerHTML(link).match(rule.htmlRegexp);
+		}
+	}
+
 	function outerHTML(element) {
 		// native DOM
 		if ("outerHTML" in element) {
@@ -55,60 +126,16 @@
 		const nextLinks = links.filter((a) => !!outerHTML(a).match(next_regex));
 		const prevLinks = links.filter((a) => !!outerHTML(a).match(prev_regex));
 		const prioritizePageLinksFirst = (a, b) => {
-			const a_is_ch = !!outerHTML(a).match(ch_regexp);
-			const b_is_ch = !!outerHTML(b).match(ch_regexp);
-			const a_is_pg = !!outerHTML(a).match(pg_regexp);
-			const b_is_pg = !!outerHTML(b).match(pg_regexp);
-			const a_is_ep = !!outerHTML(a).match(ep_regexp);
-			const b_is_ep = !!outerHTML(b).match(ep_regexp);
-			const a_is_comic = !!outerHTML(a).match(comic_regexp);
-			const b_is_comic = !!outerHTML(b).match(comic_regexp);
-			const a_is_prev_not_back = !!outerHTML(a).match(prev_not_back_regexp);
-			const b_is_prev_not_back = !!outerHTML(b).match(prev_not_back_regexp);
-			const a_is_promo = !!outerHTML(a).match(promo_regexp);
-			const b_is_promo = !!outerHTML(b).match(promo_regexp);
-			const a_is_long = textContent(a).length > 40;
-			const b_is_long = textContent(b).length > 40;
-
-			return (
-				// Deprioritize "back this project" funding links
-				// (financial backing links, which are not back buttons)
-				(a_is_promo - b_is_promo) ||
-
-				// I found long text in a link on https://mara-comic.com/comic/01/01?lang=en
-				// "Rosi explores a new style, and Mara leaves her enemies for the crows.
-				// Vote on Mara at Top Webcomics to see a preview of the next page!"
-				// which contains "next page" in the link text, but the link is not a next link
-				// Deprioritize, but don't exclude, just in case.
-				// For reference, "Click here to read the next chapter" is 35 characters long.
-				(a_is_long - b_is_long) ||
-
-				// deprioritize, but don't exclude chapter buttons;
-				// a webcomic could have entire chapters on a page
-				(a_is_ch - b_is_ch) ||
-
-				// prioritize "page" links
-				(b_is_pg - a_is_pg) ||
-
-				// prioritize "episode" links
-				(b_is_ep - a_is_ep) ||
-
-				// prioritize "comic" links, which is hopefully synonymous with page,
-				// and not referring to a web ring 
-				// (but I'm checking for web rings)
-				// TODO: deprioritize/exclude external links
-				// and simplify to /page|comic/i
-				(b_is_comic - a_is_comic) ||
-
-				// There are different kinds of "back" buttons,
-				// for instance on https://www.webcomicsapp.com/view/600503cc8c252b26d748d074/1
-				// there is a "Back" button to go back to the comic description page,
-				// and a "Previous" button for the previous page of the comic.
-				// Prioritize "previous" buttons.
-				(b_is_prev_not_back - a_is_prev_not_back) ||
-
-				0
-			);
+			for (const rule of prioritizationRules) {
+				const a_match = rule.matchFn(a);
+				const b_match = rule.matchFn(b);
+				if (a_match && !b_match) {
+					return rule.matchIsBad ? 1 : -1;
+				}
+				if (b_match && !a_match) {
+					return rule.matchIsBad ? -1 : 1;
+				}
+			}
 		};
 		nextLinks.sort(prioritizePageLinksFirst);
 		prevLinks.sort(prioritizePageLinksFirst);
