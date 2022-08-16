@@ -13,7 +13,7 @@
 	const ep_regexp = /episode|ep(\b|[_-])/i;
 	const comic_regexp = /comic/i;
 	const prev_not_back_regexp = /prev(?!iew|[eau])/i;
-	const promo_regexp = /promo|advert|vote|this comic|this project|back this|back now|please back|donate|patreon|kickstarter|gofundme/i; // financial backing link, not a back button
+	const promo_regexp = /promo|advert|vote|this comic|this project|back this|back now|please back|donate|patreon|kickstarter|gofundme|roundup|webring|comicring|\bring\b|next read|favorite/i; // financial backing link (or link to other separate comics), not a back button
 
 	function outerHTML(element) {
 		// native DOM
@@ -102,7 +102,8 @@
 				(a_is_ep - b_is_ep) ||
 
 				// prioritize "comic" links, which is hopefully synonymous with page,
-				// and not referring to a web ring https://en.wikipedia.org/wiki/Webring
+				// and not referring to a web ring 
+				// (but I'm checking for web rings)
 				// TODO: deprioritize/exclude external links
 				// and simplify to /page|comic/i
 				// if (a_is_comic && !b_is_comic) return -1;
