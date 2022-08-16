@@ -104,6 +104,21 @@
 		return cheerio(element).text();
 	}
 
+	function debug_link_prioritization(link) {
+		return {
+			outerHTML: outerHTML(link),
+			textContent: textContent(link),
+			prioritization: prioritizationRules.map((rule) => {
+				const match = rule.matchFn(link);
+				return {
+					name: rule.name,
+					match,
+					matchIsBad: rule.matchIsBad,
+				};
+			}),
+		};
+	}
+
 	function find_next_prev_links(links) {
 		if (!links) {
 			links = document.getElementsByTagName('a');
@@ -145,6 +160,8 @@
 			prevLinks,
 			next: nextLinks[0],
 			prev: prevLinks[0],
+			nextLinksDebug: nextLinks.map(debug_link_prioritization),
+			prevLinksDebug: prevLinks.map(debug_link_prioritization),
 		};
 	}
 
