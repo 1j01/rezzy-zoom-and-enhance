@@ -49,6 +49,155 @@
 		}, 100);
 	}
 
+	// #region gamepad support
+	console.log("Rezzy: gamepad support enabled");
+
+	const haveEvents = 'ongamepadconnected' in window;
+	const controllers = {};
+	const wasPressed = {};
+	
+	function connectHandler(e) {
+		addGamepad(e.gamepad);
+	}
+	
+	function addGamepad(gamepad) {
+		controllers[gamepad.index] = gamepad;
+	
+		const d = document.createElement("div");
+		d.setAttribute("id", `controller${gamepad.index}`);
+	
+		const t = document.createElement("h1");
+		t.textContent = `gamepad: ${gamepad.id}`;
+		d.appendChild(t);
+	
+		const b = document.createElement("div");
+		b.className = "buttons";
+		gamepad.buttons.forEach((button, i) => {
+			const e = document.createElement("span");
+			e.className = "button";
+			e.textContent = i;
+			b.appendChild(e);
+			wasPressed[i] = false;
+		});
+	
+		d.appendChild(b);
+	
+		const a = document.createElement("div");
+		a.className = "axes";
+	
+		gamepad.axes.forEach((axis, i) => {
+			const p = document.createElement("progress");
+			p.className = "axis";
+			p.setAttribute("max", "2");
+			p.setAttribute("value", "1");
+			p.textContent = i;
+			a.appendChild(p);
+		});
+	
+		d.appendChild(a);
+	
+		// See https://github.com/luser/gamepadtest/blob/master/index.html
+		const start = document.getElementById("start");
+		if (start) {
+			start.style.display = "none";
+		}
+	
+		document.body.appendChild(d);
+		requestAnimationFrame(updateStatus);
+	}
+	
+	function disconnectHandler(e) {
+		removeGamepad(e.gamepad);
+	}
+	
+	function removeGamepad(gamepad) {
+		const d = document.getElementById(`controller${gamepad.index}`);
+		document.body.removeChild(d);
+		delete controllers[gamepad.index];
+	}
+	
+	function updateStatus() {
+		if (!haveEvents) {
+			scanGamepads();
+		}
+	
+		for (const [i, controller] of Object.entries(controllers)) {
+			const d = document.getElementById(`controller${i}`);
+			const buttons = d.getElementsByClassName("button");
+	
+			controller.buttons.forEach((button, i) => {
+				const b = buttons[i];
+				let pressed = button === 1.0;
+				let val = button;
+	
+				if (typeof button === "object") {
+					pressed = val.pressed;
+					val = val.value;
+				}
+	
+				const pct = `${Math.round(val * 100)}%`;
+				b.style.backgroundSize = `${pct} ${pct}`;
+	
+				if (pressed) {
+					b.className = "button pressed";
+					if (!wasPressed[i]) {
+						// navigate to next/prev page with shoulder buttons
+						if (i === 4) {
+							console.log(`Rezzy: gamepad button ${i} pressed - navigating to prev page`, find_next_prev_links().prev);
+							find_next_prev_links().prev?.click();
+						} else if (i === 5) {
+							console.log(`Rezzy: gamepad button ${i} pressed - navigating to next page`, find_next_prev_links().next);
+							find_next_prev_links().next?.click();
+						}
+					}
+				} else {
+					b.className = "button";
+				}
+				wasPressed[i] = pressed;
+			});
+	
+			const axes = d.getElementsByClassName("axis");
+			controller.axes.forEach((axis, i) => {
+				const a = axes[i];
+				a.textContent = `${i}: ${axis.toFixed(4)}`;
+				a.setAttribute("value", axis + 1);
+
+				// scroll the page
+				if (Math.abs(axis) > 0.3) {
+					const scroll_amount = Math.pow(Math.abs(axis) * 10, 2) * Math.sign(axis);
+					if (i === 0) {
+						window.scrollBy(scroll_amount, 0);
+					} else {
+						window.scrollBy(0, scroll_amount);
+					}
+				}
+			});
+		}
+	
+		requestAnimationFrame(updateStatus);
+	}
+	
+	function scanGamepads() {
+		const gamepads = navigator.getGamepads();
+		for (const gamepad of gamepads) {
+			if (gamepad) { // Can be null if disconnected during the session
+				if (gamepad.index in controllers) {
+					controllers[gamepad.index] = gamepad;
+				} else {
+					addGamepad(gamepad);
+				}
+			}
+		}
+	}
+	
+	window.addEventListener("gamepadconnected", connectHandler);
+	window.addEventListener("gamepaddisconnected", disconnectHandler);
+	
+	if (!haveEvents) {
+		setInterval(scanGamepads, 500);
+	}
+	// #endregion
+	
 	let socket;
 	let jobs_by_url = {};
 
