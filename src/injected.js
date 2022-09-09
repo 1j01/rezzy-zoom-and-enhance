@@ -164,8 +164,9 @@
 				// a.setAttribute("value", axis + 1);
 
 				// scroll the page
-				if (Math.abs(axis) > 0.3 && rezzy_active) {
-					const scroll_amount = Math.pow(Math.abs(axis) * 10, 2) * Math.sign(axis);
+				const deadZone = 0.2;
+				if (Math.abs(axis) > deadZone && rezzy_active) {
+					const scroll_amount = Math.pow((Math.abs(axis) - deadZone) * 10, 2) * Math.sign(axis);
 					if (i === 0) {
 						window.scrollBy(scroll_amount, 0);
 					} else {
