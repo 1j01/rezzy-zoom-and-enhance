@@ -22,7 +22,7 @@
     "env-paths": "2.2.1",
     "express": "4.18.1",
     "sanitize-filename": "1.6.3",
-    "socket.io": "4.5.1"
+    "socket.io": "4.7.2"
   },
   "devDependencies": {
     "eslint": "^8.19.0",
