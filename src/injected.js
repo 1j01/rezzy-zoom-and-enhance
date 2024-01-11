@@ -77,7 +77,9 @@
 			// e.className = "button";
 			// e.textContent = i;
 			// b.appendChild(e);
-			wasPressed[i] = false;
+			// It's important to use the pressed state, not just false,
+			// to avoid rapidly moving through pages (when they load fast.)
+			wasPressed[i] = button.pressed;
 		});
 	
 		// d.appendChild(b);
