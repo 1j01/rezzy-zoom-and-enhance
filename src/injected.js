@@ -41,10 +41,10 @@
 			}
 
 			if (event.key === "ArrowRight") {
-				find_next_prev_links().next?.click();
+				click(find_next_prev_links().next);
 			}
 			if (event.key === "ArrowLeft") {
-				find_next_prev_links().prev?.click();
+				click(find_next_prev_links().prev);
 			}
 		}, 100);
 	}
@@ -147,10 +147,10 @@
 						// navigate to next/prev page with shoulder buttons
 						if (i === 4) {
 							console.log(`Rezzy: gamepad button ${i} pressed - navigating to prev page`, find_next_prev_links().prev);
-							find_next_prev_links().prev?.click();
+							click(find_next_prev_links().prev);
 						} else if (i === 5) {
 							console.log(`Rezzy: gamepad button ${i} pressed - navigating to next page`, find_next_prev_links().next);
-							find_next_prev_links().next?.click();
+							click(find_next_prev_links().next);
 						}
 					}
 				} else {
@@ -435,5 +435,18 @@
 		console.log("Rezzy active. Enabled for origin", location.origin);
 	} else {
 		console.log("Rezzy inactive. Not enabled for origin", location.origin);
+	}
+
+	function click(element) {
+		if (!element) {
+			return;
+		}
+		// workaround for webtoons on archive.org
+		// where annoying tracker jacks links on click, switching them to un-archived URLs
+		if (element.tagName === "A" && element.href.match(/archive\.org/)) {
+			location.href = element.href;
+			return;
+		}
+		element.click();
 	}
 })();
